@@ -1,6 +1,6 @@
 {
-  "name": "E-Commerce Platform",
-  "description": "A modern e-commerce platform application",
+  "name": "Care Beauty Solution",
+  "description": "Production-Grade D2C Skincare E-Commerce Platform for India (www.carebeautysolution.com)",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

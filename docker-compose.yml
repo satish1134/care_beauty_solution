@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: care_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: care_admin
+      POSTGRES_PASSWORD: care_secure_password_2026
+      POSTGRES_DB: care_beauty_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U care_admin -d care_beauty_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: care_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: care_api
+    restart: always
+    ports:
+      - "4000:4000"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://care_admin:care_secure_password_2026@postgres:5432/care_beauty_db?schema=public
+      REDIS_URL: redis://redis:6379
+      PORT: 4000
+      JWT_SECRET: super_secret_care_beauty_jwt_token_key_2026
+      RAZORPAY_KEY_ID: rzp_test_CareBeauty2026
+      RAZORPAY_KEY_SECRET: secret_care_razorpay_2026
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  redis_data:
