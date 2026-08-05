@@ -1,0 +1,6 @@
+{
+  "name": "E-Commerce Platform",
+  "description": "A modern e-commerce platform application",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
