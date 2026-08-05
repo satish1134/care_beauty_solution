@@ -3,6 +3,8 @@ import { Navbar } from './components/Navbar';
 import { Banner } from './components/Banner';
 import { ProductCard } from './components/ProductCard';
 import { ProductDetailModal } from './components/ProductDetailModal';
+import { ProductListingPage } from './components/ProductListingPage';
+import { ProductDetailPage } from './components/ProductDetailPage';
 import { CartDrawer } from './components/CartDrawer';
 import { CheckoutModal } from './components/CheckoutModal';
 import { UserOrdersModal } from './components/UserOrdersModal';
@@ -13,12 +15,31 @@ import { Footer } from './components/Footer';
 
 import { Product, ProductVariant, Category, CartItem, Coupon, AuditLog, Order, Review, SkinConcern } from './types';
 import { INITIAL_PRODUCTS, INITIAL_CATEGORIES, INITIAL_COUPONS, INITIAL_AUDIT_LOGS, INITIAL_ORDERS } from './data/initialData';
-import { Shield, Lock } from 'lucide-react';
+import { Shield, Lock, ArrowRight, Sparkles, Award } from 'lucide-react';
 
 export default function App() {
   // Navigation Route Check
-  const currentPath = window.location.pathname;
+  const [currentPath, setCurrentPath] = useState(window.location.pathname);
+
+  useEffect(() => {
+    const handleLocationChange = () => {
+      setCurrentPath(window.location.pathname);
+    };
+    window.addEventListener('popstate', handleLocationChange);
+    return () => window.removeEventListener('popstate', handleLocationChange);
+  }, []);
+
+  const navigateTo = (path: string) => {
+    window.history.pushState(null, '', path);
+    setCurrentPath(path);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const isDirectAdminRoute = currentPath === '/admin' || currentPath.startsWith('/admin');
+
+  // Check if current route is a PDP path (e.g. /product/hydrating-moisturizer)
+  const isPdpRoute = currentPath.startsWith('/product/') || currentPath.startsWith('/products/');
+  const pdpSlug = isPdpRoute ? currentPath.split('/')[2] : null;
 
   // Data State
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
@@ -32,6 +53,11 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedSkinConcern, setSelectedSkinConcern] = useState<SkinConcern | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
+
+  // Selected PDP Product
+  const activePdpProduct = isPdpRoute && pdpSlug
+    ? products.find(p => p.slug === pdpSlug || p.id === pdpSlug) || products[0]
+    : null;
 
   // Cart State
   const [cart, setCart] = useState<CartItem[]>(() => {
@@ -321,9 +347,15 @@ export default function App() {
       <Navbar
         categories={categories}
         selectedCategory={selectedCategory}
-        onSelectCategory={catId => setSelectedCategory(catId)}
+        onSelectCategory={catId => {
+          setSelectedCategory(catId);
+          if (currentPath !== '/') navigateTo('/');
+        }}
         selectedSkinConcern={selectedSkinConcern}
-        onSelectSkinConcern={concern => setSelectedSkinConcern(concern)}
+        onSelectSkinConcern={concern => {
+          setSelectedSkinConcern(concern);
+          if (currentPath !== '/') navigateTo('/');
+        }}
         searchQuery={searchQuery}
         onSearchChange={q => setSearchQuery(q)}
         cartCount={totalCartItems}
@@ -338,74 +370,112 @@ export default function App() {
       />
 
       <main className="flex-1">
-        {/* Hero Banner Header */}
-        <Banner />
+        {/* Render PDP route if on /product/:slug */}
+        {activePdpProduct ? (
+          <ProductDetailPage
+            product={activePdpProduct}
+            onBackToCatalog={() => navigateTo('/')}
+            onAddToCart={handleAddToCart}
+            reviews={reviews}
+            onAddReview={handleAddReview}
+          />
+        ) : currentPath === '/catalog' || currentPath === '/products' || currentPath === '/store' ? (
+          /* Dedicated PLP View */
+          <ProductListingPage
+            products={products}
+            categories={categories}
+            selectedCategory={selectedCategory}
+            onSelectCategory={catId => setSelectedCategory(catId)}
+            selectedSkinConcern={selectedSkinConcern}
+            onSelectSkinConcern={concern => setSelectedSkinConcern(concern)}
+            onAddToCart={handleAddToCart}
+            onOpenQuickView={p => setQuickViewProduct(p)}
+            onOpenProductDetail={p => navigateTo(`/product/${p.slug}`)}
+          />
+        ) : (
+          /* Home View: Banner + Bestsellers + Full PLP Catalog Grid */
+          <div>
+            <Banner />
 
-        {/* Product Catalog Section */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6">
-          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-4">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900">
-                {selectedCategory
-                  ? categories.find(c => c.id === selectedCategory)?.name
-                  : selectedSkinConcern
-                  ? `Formulations for ${selectedSkinConcern}`
-                  : 'Clinical Skincare Collection'}
-              </h2>
-              <p className="text-xs text-slate-500 mt-1">
-                Showing {filteredProducts.length} dermatologist-formulated products
-              </p>
-            </div>
+            {/* Core Featured Formulations Section */}
+            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+              <div className="flex flex-wrap items-end justify-between gap-4 border-b border-emerald-100 pb-4">
+                <div>
+                  <span className="text-xs font-bold uppercase tracking-widest text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full">
+                    Clinical Skincare Line
+                  </span>
+                  <h2 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900 mt-2">
+                    {selectedCategory
+                      ? categories.find(c => c.id === selectedCategory)?.name
+                      : selectedSkinConcern
+                      ? `Formulations for ${selectedSkinConcern}`
+                      : 'Featured Formulations'}
+                  </h2>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Dermatologically tested, 100% fragrance-free, non-comedogenic formulations for Indian skin
+                  </p>
+                </div>
 
-            {(selectedCategory || selectedSkinConcern || searchQuery) && (
-              <button
-                onClick={() => {
-                  setSelectedCategory(null);
-                  setSelectedSkinConcern(null);
-                  setSearchQuery('');
-                }}
-                className="text-xs text-emerald-800 font-bold bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-full transition"
-              >
-                Reset Filters ✕
-              </button>
-            )}
+                <div className="flex items-center gap-3">
+                  {(selectedCategory || selectedSkinConcern || searchQuery) && (
+                    <button
+                      onClick={() => {
+                        setSelectedCategory(null);
+                        setSelectedSkinConcern(null);
+                        setSearchQuery('');
+                      }}
+                      className="text-xs text-emerald-800 font-bold bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-full transition"
+                    >
+                      Reset Filters ✕
+                    </button>
+                  )}
+
+                  <button
+                    onClick={() => navigateTo('/catalog')}
+                    className="bg-emerald-950 text-white font-bold text-xs px-4 py-2 rounded-xl flex items-center gap-1.5 shadow-md hover:bg-emerald-900 transition"
+                  >
+                    View All Catalog <ArrowRight className="w-3.5 h-3.5 text-amber-300" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Product Grid */}
+              {filteredProducts.length === 0 ? (
+                <div className="text-center py-16 bg-white rounded-3xl border border-slate-200 space-y-3">
+                  <p className="text-slate-500 text-sm">No formulations matching your search criteria.</p>
+                  <button
+                    onClick={() => {
+                      setSelectedCategory(null);
+                      setSelectedSkinConcern(null);
+                      setSearchQuery('');
+                    }}
+                    className="bg-emerald-950 text-white font-semibold text-xs px-4 py-2 rounded-xl"
+                  >
+                    View All Products
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {filteredProducts.map(product => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      onAddToCart={handleAddToCart}
+                      onOpenQuickView={p => navigateTo(`/product/${p.slug}`)}
+                    />
+                  ))}
+                </div>
+              )}
+            </section>
           </div>
-
-          {/* Product Grid */}
-          {filteredProducts.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-3xl border border-slate-200 space-y-3">
-              <p className="text-slate-500 text-sm">No products matching your search criteria.</p>
-              <button
-                onClick={() => {
-                  setSelectedCategory(null);
-                  setSelectedSkinConcern(null);
-                  setSearchQuery('');
-                }}
-                className="bg-emerald-950 text-white font-semibold text-xs px-4 py-2 rounded-xl"
-              >
-                View All Products
-              </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredProducts.map(product => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  onAddToCart={handleAddToCart}
-                  onOpenQuickView={p => setQuickViewProduct(p)}
-                />
-              ))}
-            </div>
-          )}
-        </section>
+        )}
       </main>
 
       {/* Footer */}
       <Footer />
 
       {/* ================= MODALS & DRAWERS ================= */}
-      {/* Product Detail Modal */}
+      {/* Product Quick View Modal */}
       <ProductDetailModal
         product={quickViewProduct}
         onClose={() => setQuickViewProduct(null)}
@@ -477,3 +547,4 @@ export default function App() {
     </div>
   );
 }
+

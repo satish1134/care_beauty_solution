@@ -147,15 +147,28 @@ app.get('/api/health', (req: Request, res: Response) => {
 });
 
 // ==========================================
-// 2. PRODUCTS API
+// 2. PRODUCTS & SEED API
 // ==========================================
+app.post('/api/seed', (req: Request, res: Response) => {
+  products = [...INITIAL_PRODUCTS];
+  categories = [...INITIAL_CATEGORIES];
+  coupons = [...INITIAL_COUPONS];
+  recordAuditLog('system@carebeautysolution.com', 'SEED_DATABASE', 'System', 'all', 'Re-seeded database with 3 core CARe clinical products');
+  res.json({
+    success: true,
+    message: 'Database re-seeded successfully with initial CARe products & categories',
+    productsCount: products.length,
+    categoriesCount: categories.length,
+  });
+});
+
 app.get('/api/products', (req: Request, res: Response) => {
-  const { category, skinConcern, skinType, search, bestseller } = req.query;
+  const { category, skinConcern, skinType, priceMin, priceMax, search, bestseller, sort, page, limit } = req.query;
 
   let filtered = [...products];
 
   if (category && typeof category === 'string') {
-    filtered = filtered.filter(p => p.categoryId === category || p.categoryName.toLowerCase().includes(category.toLowerCase()));
+    filtered = filtered.filter(p => p.categoryId === category || p.categoryName.toLowerCase().includes(category.toLowerCase()) || p.slug === category);
   }
 
   if (skinConcern && typeof skinConcern === 'string') {
@@ -170,18 +183,71 @@ app.get('/api/products', (req: Request, res: Response) => {
     filtered = filtered.filter(p => p.isBestSeller);
   }
 
+  if (priceMin && !isNaN(Number(priceMin))) {
+    const minVal = Number(priceMin);
+    filtered = filtered.filter(p => p.variants.some(v => v.price >= minVal));
+  }
+
+  if (priceMax && !isNaN(Number(priceMax))) {
+    const maxVal = Number(priceMax);
+    filtered = filtered.filter(p => p.variants.some(v => v.price <= maxVal));
+  }
+
   if (search && typeof search === 'string') {
-    const query = search.toLowerCase();
+    const query = search.toLowerCase().trim();
     filtered = filtered.filter(
       p =>
         p.name.toLowerCase().includes(query) ||
         p.tagline.toLowerCase().includes(query) ||
         p.description.toLowerCase().includes(query) ||
-        p.keyIngredients.some(ing => ing.toLowerCase().includes(query))
+        p.keyIngredients.some(ing => ing.toLowerCase().includes(query)) ||
+        (p.features && p.features.some(f => f.toLowerCase().includes(query)))
     );
   }
 
-  res.json({ success: true, count: filtered.length, data: filtered });
+  // Sorting Logic
+  if (sort && typeof sort === 'string') {
+    if (sort === 'price_asc') {
+      filtered.sort((a, b) => {
+        const minA = Math.min(...a.variants.map(v => v.price));
+        const minB = Math.min(...b.variants.map(v => v.price));
+        return minA - minB;
+      });
+    } else if (sort === 'price_desc') {
+      filtered.sort((a, b) => {
+        const minA = Math.min(...a.variants.map(v => v.price));
+        const minB = Math.min(...b.variants.map(v => v.price));
+        return minB - minA;
+      });
+    } else if (sort === 'rating') {
+      filtered.sort((a, b) => b.rating - a.rating);
+    } else if (sort === 'newest') {
+      filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    } else if (sort === 'bestseller') {
+      filtered.sort((a, b) => (b.isBestSeller ? 1 : 0) - (a.isBestSeller ? 1 : 0));
+    }
+  }
+
+  // Pagination Logic
+  const total = filtered.length;
+  const pageNum = Math.max(1, parseInt(String(page || '1'), 10) || 1);
+  const limitNum = Math.max(1, parseInt(String(limit || '12'), 10) || 12);
+  const totalPages = Math.ceil(total / limitNum) || 1;
+  const startIndex = (pageNum - 1) * limitNum;
+  const paginatedData = filtered.slice(startIndex, startIndex + limitNum);
+
+  res.json({
+    success: true,
+    count: paginatedData.length,
+    total,
+    data: paginatedData,
+    pagination: {
+      total,
+      page: pageNum,
+      limit: limitNum,
+      totalPages,
+    },
+  });
 });
 
 app.get('/api/products/:slugOrId', (req: Request, res: Response) => {
@@ -216,6 +282,7 @@ app.post('/api/products', (req: Request, res: Response) => {
       categoryName: body.categoryName || categories.find(c => c.id === body.categoryId)?.name || 'Skincare',
       skinConcerns: body.skinConcerns || ['Dryness'],
       skinTypes: body.skinTypes || ['All Skin Types'],
+      features: body.features || [],
       variants: body.variants.map((v, i) => ({
         id: v.id || `var-${Date.now()}-${i}`,
         productId: `prod-${Date.now()}`,
@@ -281,6 +348,84 @@ app.delete('/api/products/:id', (req: Request, res: Response) => {
   recordAuditLog('admin@carebeautysolution.com', 'DELETE_PRODUCT', 'Product', id, `Deleted product "${target.name}"`);
 
   res.json({ success: true, message: 'Product deleted successfully' });
+});
+
+// Product Variant Endpoints
+app.post('/api/products/:id/variants', (req: Request, res: Response) => {
+  const { id } = req.params;
+  const product = products.find(p => p.id === id);
+  if (!product) {
+    return res.status(404).json({ success: false, message: 'Product not found' });
+  }
+
+  const { name, sku, price, compareAtPrice, stock } = req.body;
+  if (!name || price === undefined) {
+    return res.status(400).json({ success: false, message: 'Variant name and price are required' });
+  }
+
+  const newVariant = {
+    id: `var-${Date.now()}`,
+    productId: id,
+    name,
+    sku: sku || `CBS-${product.slug.toUpperCase()}-${product.variants.length + 1}`,
+    price: Number(price),
+    compareAtPrice: compareAtPrice ? Number(compareAtPrice) : undefined,
+    stock: Number(stock || 50),
+  };
+
+  product.variants.push(newVariant);
+  product.updatedAt = new Date().toISOString();
+
+  recordAuditLog('admin@carebeautysolution.com', 'ADD_VARIANT', 'ProductVariant', newVariant.id, `Added variant "${newVariant.name}" to product "${product.name}"`);
+
+  res.status(201).json({ success: true, data: newVariant, product });
+});
+
+app.put('/api/products/:id/variants/:variantId', (req: Request, res: Response) => {
+  const { id, variantId } = req.params;
+  const product = products.find(p => p.id === id);
+  if (!product) {
+    return res.status(404).json({ success: false, message: 'Product not found' });
+  }
+
+  const vIndex = product.variants.findIndex(v => v.id === variantId);
+  if (vIndex === -1) {
+    return res.status(404).json({ success: false, message: 'Variant not found' });
+  }
+
+  const existingVariant = product.variants[vIndex];
+  const updatedVariant = {
+    ...existingVariant,
+    ...req.body,
+    price: req.body.price !== undefined ? Number(req.body.price) : existingVariant.price,
+    stock: req.body.stock !== undefined ? Number(req.body.stock) : existingVariant.stock,
+  };
+
+  product.variants[vIndex] = updatedVariant;
+  product.updatedAt = new Date().toISOString();
+
+  recordAuditLog('admin@carebeautysolution.com', 'UPDATE_VARIANT', 'ProductVariant', variantId, `Updated variant "${updatedVariant.name}" for product "${product.name}"`);
+
+  res.json({ success: true, data: updatedVariant, product });
+});
+
+app.delete('/api/products/:id/variants/:variantId', (req: Request, res: Response) => {
+  const { id, variantId } = req.params;
+  const product = products.find(p => p.id === id);
+  if (!product) {
+    return res.status(404).json({ success: false, message: 'Product not found' });
+  }
+
+  if (product.variants.length <= 1) {
+    return res.status(400).json({ success: false, message: 'Cannot delete the only variant of a product' });
+  }
+
+  product.variants = product.variants.filter(v => v.id !== variantId);
+  product.updatedAt = new Date().toISOString();
+
+  recordAuditLog('admin@carebeautysolution.com', 'DELETE_VARIANT', 'ProductVariant', variantId, `Deleted variant ${variantId} from product "${product.name}"`);
+
+  res.json({ success: true, message: 'Variant deleted successfully', product });
 });
 
 // ==========================================
@@ -1012,7 +1157,191 @@ app.post('/api/upload', (req: Request, res: Response) => {
 });
 
 // ==========================================
-// 9. VITE DEV SERVER / STATIC SERVING
+// 9. SSR & PRE-RENDERING MIDDLEWARE FOR SEO & CRAWLERS
+// ==========================================
+function renderSSRPageHtml(reqPath: string): { html: string; title: string; metaDesc: string; jsonLd: string } | null {
+  const pathParts = reqPath.split('?')[0].split('/').filter(Boolean);
+
+  let title = 'Care Beauty Solution | Clinical Skincare for India';
+  let metaDesc = 'Dermatologically tested, fragrance-free skincare formulations with Ceramides, Niacinamide, and SPF 50+. Engineered for Indian skin types.';
+  let jsonLd = '';
+  let bodyContent = '';
+
+  if ((pathParts[0] === 'products' && pathParts[1]) || (pathParts[0] === 'product' && pathParts[1])) {
+    const slugOrId = pathParts[1];
+    const product = products.find(p => p.id === slugOrId || p.slug === slugOrId);
+    if (product) {
+      title = `${product.name} | Care Beauty Solution`;
+      metaDesc = `${product.tagline}. ${product.description.slice(0, 160)}`;
+      jsonLd = JSON.stringify({
+        '@context': 'https://schema.org/',
+        '@type': 'Product',
+        'name': product.name,
+        'image': product.images.map(img => img.url),
+        'description': product.description,
+        'sku': product.variants[0]?.sku || product.id,
+        'brand': {
+          '@type': 'Brand',
+          'name': 'Care Beauty Solution',
+        },
+        'offers': {
+          '@type': 'Offer',
+          'url': `https://www.carebeautysolution.com/product/${product.slug}`,
+          'priceCurrency': 'INR',
+          'price': product.variants[0]?.price || 0,
+          'itemCondition': 'https://schema.org/NewCondition',
+          'availability': product.variants[0]?.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+        },
+        'aggregateRating': {
+          '@type': 'AggregateRating',
+          'ratingValue': product.rating,
+          'reviewCount': product.reviewCount,
+        },
+      });
+
+      bodyContent = `
+        <div style="max-width: 1200px; margin: 0 auto; padding: 2rem; font-family: system-ui, -apple-system, sans-serif; color: #022c22;">
+          <header style="border-bottom: 1px solid #a7f3d0; padding-bottom: 1rem; margin-bottom: 2rem;">
+            <a href="/" style="font-size: 1.5rem; font-weight: bold; color: #065f46; text-decoration: none;">Care Beauty Solution</a>
+            <span style="font-size: 0.875rem; color: #047857; margin-left: 1rem;">Clinical Skincare</span>
+          </header>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+            <div>
+              <img src="${product.images[0]?.url}" alt="${product.name}" style="width: 100%; border-radius: 1rem; border: 1px solid #e2e8f0;" referrerPolicy="no-referrer" />
+            </div>
+            <div>
+              <span style="background-color: #d1fae5; color: #065f46; font-size: 0.75rem; font-weight: bold; padding: 0.25rem 0.75rem; border-radius: 9999px;">${product.categoryName}</span>
+              <h1 style="font-size: 2rem; font-weight: bold; margin-top: 0.5rem; margin-bottom: 0.25rem;">${product.name}</h1>
+              <p style="font-size: 1rem; color: #047857; font-weight: 500; margin-bottom: 1rem;">${product.tagline}</p>
+              <div style="font-size: 1.75rem; font-weight: bold; color: #064e3b; margin-bottom: 1rem;">₹${product.variants[0]?.price} ${product.variants[0]?.compareAtPrice ? `<span style="font-size: 1rem; color: #64748b; text-decoration: line-through;">₹${product.variants[0]?.compareAtPrice}</span>` : ''}</div>
+              <p style="line-height: 1.6; color: #334155; margin-bottom: 1.5rem;">${product.description}</p>
+              <h3 style="font-size: 1.1rem; font-weight: bold; color: #065f46;">Key Features & Highlights</h3>
+              <ul style="margin-top: 0.5rem; margin-bottom: 1.5rem; padding-left: 1.25rem; color: #0f766e;">
+                ${(product.features || []).map(f => `<li style="margin-bottom: 0.25rem;">${f}</li>`).join('')}
+              </ul>
+              <h3 style="font-size: 1.1rem; font-weight: bold; color: #065f46;">Key Ingredients</h3>
+              <p style="color: #475569; margin-bottom: 1.5rem;">${product.keyIngredients.join(', ')}</p>
+              <h3 style="font-size: 1.1rem; font-weight: bold; color: #065f46;">Full Ingredients (INCI)</h3>
+              <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 1.5rem;">${product.fullIngredients}</p>
+              <h3 style="font-size: 1.1rem; font-weight: bold; color: #065f46;">How To Use</h3>
+              <p style="color: #334155;">${product.howToUse}</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+  } else if ((pathParts[0] === 'category' && pathParts[1]) || (pathParts[0] === 'categories' && pathParts[1])) {
+    const slugOrId = pathParts[1];
+    const category = categories.find(c => c.id === slugOrId || c.slug === slugOrId);
+    if (category) {
+      title = `${category.name} | Care Beauty Solution`;
+      metaDesc = category.description;
+      const catProducts = products.filter(p => p.categoryId === category.id);
+
+      jsonLd = JSON.stringify({
+        '@context': 'https://schema.org/',
+        '@type': 'ItemList',
+        'name': category.name,
+        'description': category.description,
+        'numberOfItems': catProducts.length,
+        'itemListElement': catProducts.map((p, idx) => ({
+          '@type': 'ListItem',
+          'position': idx + 1,
+          'item': {
+            '@type': 'Product',
+            'name': p.name,
+            'url': `https://www.carebeautysolution.com/product/${p.slug}`,
+          },
+        })),
+      });
+
+      bodyContent = `
+        <div style="max-width: 1200px; margin: 0 auto; padding: 2rem; font-family: system-ui, -apple-system, sans-serif; color: #022c22;">
+          <h1 style="font-size: 2rem; font-weight: bold;">${category.name}</h1>
+          <p style="color: #047857; margin-bottom: 2rem;">${category.description}</p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
+            ${catProducts.map(p => `
+              <div style="border: 1px solid #e2e8f0; border-radius: 1rem; padding: 1rem; background: #ffffff;">
+                <img src="${p.images[0]?.url}" alt="${p.name}" style="width: 100%; border-radius: 0.5rem;" referrerPolicy="no-referrer" />
+                <h3 style="font-size: 1.25rem; font-weight: bold; margin-top: 0.75rem;">${p.name}</h3>
+                <p style="font-size: 0.875rem; color: #047857; margin-bottom: 0.5rem;">${p.tagline}</p>
+                <div style="font-weight: bold; font-size: 1.25rem; color: #064e3b;">₹${p.variants[0]?.price}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  if (!bodyContent && (reqPath === '/' || reqPath === '/products' || reqPath === '/store')) {
+    title = 'Care Beauty Solution | Clinical Skincare Storefront';
+    jsonLd = JSON.stringify({
+      '@context': 'https://schema.org/',
+      '@type': 'Organization',
+      'name': 'Care Beauty Solution',
+      'url': 'https://www.carebeautysolution.com',
+      'description': 'Dermatologically tested clinical skincare formulations engineered for Indian climate.',
+    });
+
+    bodyContent = `
+      <div style="max-width: 1200px; margin: 0 auto; padding: 2rem; font-family: system-ui, -apple-system, sans-serif; color: #022c22;">
+        <header style="text-align: center; margin-bottom: 3rem;">
+          <h1 style="font-size: 2.5rem; font-weight: bold; color: #064e3b;">Care Beauty Solution</h1>
+          <p style="font-size: 1.125rem; color: #047857;">Clinical Skincare Formulations Engineered for Indian Skin Types</p>
+        </header>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
+          ${products.map(p => `
+            <div style="border: 1px solid #e2e8f0; border-radius: 1rem; padding: 1rem; background: #ffffff;">
+              <img src="${p.images[0]?.url}" alt="${p.name}" style="width: 100%; border-radius: 0.5rem;" referrerPolicy="no-referrer" />
+              <h3 style="font-size: 1.25rem; font-weight: bold; margin-top: 0.75rem;">${p.name}</h3>
+              <p style="font-size: 0.875rem; color: #047857; margin-bottom: 0.5rem;">${p.tagline}</p>
+              <div style="font-weight: bold; font-size: 1.25rem; color: #064e3b;">₹${p.variants[0]?.price}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  if (!bodyContent) return null;
+
+  try {
+    let indexTemplate = fs.readFileSync(path.join(process.cwd(), 'index.html'), 'utf-8');
+    indexTemplate = indexTemplate.replace('<title>My Google AI Studio App</title>', `<title>${title}</title>\n    <meta name="description" content="${metaDesc.replace(/"/g, '&quot;')}" />`);
+    if (jsonLd) {
+      indexTemplate = indexTemplate.replace('</head>', `  <script type="application/ld+json">\n${jsonLd}\n    </script>\n  </head>`);
+    }
+    indexTemplate = indexTemplate.replace('<div id="root"></div>', `<div id="root">${bodyContent}</div>`);
+
+    return {
+      html: indexTemplate,
+      title,
+      metaDesc,
+      jsonLd,
+    };
+  } catch (err) {
+    return null;
+  }
+}
+
+// Intercept page requests for pre-rendering
+app.use((req: Request, res: Response, next: NextFunction) => {
+  if (req.method !== 'GET' || req.path.startsWith('/api') || req.path.includes('.')) {
+    return next();
+  }
+
+  const ssr = renderSSRPageHtml(req.path);
+  if (ssr) {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.send(ssr.html);
+  }
+
+  next();
+});
+
+// ==========================================
+// 10. VITE DEV SERVER / STATIC SERVING
 // ==========================================
 async function startServer() {
   if (process.env.NODE_ENV !== 'production') {

@@ -32,6 +32,7 @@ export interface Product {
   categoryName: string;
   skinConcerns: SkinConcern[];
   skinTypes: SkinType[];
+  features?: string[];
   variants: ProductVariant[];
   images: ProductImage[];
   rating: number;

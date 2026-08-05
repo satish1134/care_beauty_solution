@@ -60,16 +60,8 @@ export const Footer: React.FC = () => {
       </div>
 
       <div className="max-w-7xl mx-auto pt-6 border-t border-emerald-900 flex flex-col sm:flex-row justify-between items-center text-[11px] text-emerald-400 gap-3">
-        <div className="flex items-center gap-3">
-          <span>© {new Date().getFullYear()} Care Beauty Solution Pvt. Ltd. All rights reserved.</span>
-          <span>•</span>
-          <a href="/admin" className="text-emerald-500 hover:text-amber-300 transition underline">
-            Staff Portal
-          </a>
-          <span>•</span>
-          <a href="/api/docs" target="_blank" rel="noreferrer" className="text-emerald-500 hover:text-amber-300 transition underline">
-            OpenAPI Specs
-          </a>
+        <div>
+          © {new Date().getFullYear()} Care Beauty Solution Pvt. Ltd. All rights reserved.
         </div>
         <div className="flex items-center gap-1 text-emerald-300">
           <span>Crafted with</span>

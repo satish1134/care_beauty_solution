@@ -64,9 +64,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           ✨ Special Offer: Free Express Shipping in India on Orders Above ₹499 | Use Code <span className="underline decoration-dashed font-bold">WELCOME10</span>
         </div>
         <div className="hidden md:flex items-center space-x-3 text-[11px] text-emerald-300">
-          <a href="/api/docs" target="_blank" rel="noreferrer" className="hover:text-amber-300 transition underline">
-            OpenAPI Specs
-          </a>
+          <span>🚚 Cash on Delivery Available</span>
         </div>
       </div>
 
