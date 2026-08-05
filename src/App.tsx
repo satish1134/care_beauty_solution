@@ -59,6 +59,16 @@ export default function App() {
     ? products.find(p => p.slug === pdpSlug || p.id === pdpSlug) || products[0]
     : null;
 
+  // Guest Cart Session ID for persistent Redis/backend cart storage
+  const [guestSessionId] = useState<string>(() => {
+    let id = localStorage.getItem('care_guest_session_id');
+    if (!id) {
+      id = `gs_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+      localStorage.setItem('care_guest_session_id', id);
+    }
+    return id;
+  });
+
   // Cart State
   const [cart, setCart] = useState<CartItem[]>(() => {
     try {
@@ -167,8 +177,8 @@ export default function App() {
     return true;
   });
 
-  // Cart Actions
-  const handleAddToCart = (product: Product, variant: ProductVariant, quantity: number) => {
+  // Cart Actions (Synced with Backend Persistent Cart Store)
+  const handleAddToCart = async (product: Product, variant: ProductVariant, quantity: number) => {
     setCart(prev => {
       const existingIndex = prev.findIndex(item => item.variantId === variant.id);
       if (existingIndex > -1) {
@@ -191,24 +201,76 @@ export default function App() {
         },
       ];
     });
+
+    try {
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        'x-cart-session-id': guestSessionId,
+      };
+      if (user?.accessToken) headers['Authorization'] = `Bearer ${user.accessToken}`;
+
+      await fetch('/api/cart/items', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          productId: product.id,
+          variantId: variant.id,
+          quantity,
+          sessionId: guestSessionId,
+        }),
+      });
+    } catch (e) {
+      console.error('Failed to sync item addition to backend cart:', e);
+    }
   };
 
-  const handleUpdateQuantity = (variantId: string, delta: number) => {
+  const handleUpdateQuantity = async (variantId: string, delta: number) => {
+    let targetQty = 0;
     setCart(prev =>
       prev
         .map(item => {
           if (item.variantId === variantId) {
             const newQty = item.quantity + delta;
+            targetQty = newQty;
             return newQty > 0 ? { ...item, quantity: newQty } : null;
           }
           return item;
         })
         .filter((item): item is CartItem => item !== null)
     );
+
+    try {
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        'x-cart-session-id': guestSessionId,
+      };
+      if (user?.accessToken) headers['Authorization'] = `Bearer ${user.accessToken}`;
+
+      await fetch(`/api/cart/items/${variantId}`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({ quantity: targetQty, sessionId: guestSessionId }),
+      });
+    } catch (e) {
+      console.error('Failed to sync cart update to backend:', e);
+    }
   };
 
-  const handleRemoveCartItem = (variantId: string) => {
+  const handleRemoveCartItem = async (variantId: string) => {
     setCart(prev => prev.filter(item => item.variantId !== variantId));
+    try {
+      const headers: Record<string, string> = {
+        'x-cart-session-id': guestSessionId,
+      };
+      if (user?.accessToken) headers['Authorization'] = `Bearer ${user.accessToken}`;
+
+      await fetch(`/api/cart/items/${variantId}?sessionId=${guestSessionId}`, {
+        method: 'DELETE',
+        headers,
+      });
+    } catch (e) {
+      console.error('Failed to sync item removal to backend:', e);
+    }
   };
 
   // Coupon Application

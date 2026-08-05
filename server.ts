@@ -8,6 +8,10 @@ import { Product, Category, Coupon, AuditLog, Order, Review } from './src/types'
 import { authService, TokenPayload } from './src/services/authService';
 import { mockSmsProvider } from './src/services/smsService';
 import { addressService } from './src/services/addressService';
+import { cartService } from './src/services/cartService';
+import { paymentService } from './src/services/paymentService';
+import { emailService } from './src/services/emailService';
+import { runPhase3CheckoutTests } from './src/services/phase3Checkout.test';
 
 // User Account Interface
 export interface DBUser {
@@ -924,26 +928,140 @@ app.get('/api/docs', (req: Request, res: Response) => {
 });
 
 // ==========================================
+// 5h. PERSISTENT CART API (Redis/Session Store + User Cart Merge)
+// ==========================================
+app.get('/api/cart', (req: Request, res: Response) => {
+  const sessionId = (req.headers['x-cart-session-id'] as string) || (req.query.sessionId as string);
+  const authHeader = req.headers.authorization;
+  let userId: string | undefined;
+
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const payload = authService.verifyToken(authHeader.slice(7));
+    if (payload) userId = payload.userId;
+  }
+
+  const cart = cartService.getCart(sessionId, userId);
+  res.json({ success: true, data: cart });
+});
+
+app.post('/api/cart/items', (req: Request, res: Response) => {
+  const sessionId = (req.headers['x-cart-session-id'] as string) || req.body.sessionId;
+  const authHeader = req.headers.authorization;
+  let userId: string | undefined;
+
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const payload = authService.verifyToken(authHeader.slice(7));
+    if (payload) userId = payload.userId;
+  }
+
+  const { productId, variantId, quantity = 1 } = req.body;
+  const product = products.find(p => p.id === productId);
+  if (!product) {
+    return res.status(404).json({ success: false, message: 'Product not found' });
+  }
+
+  const variant = product.variants.find(v => v.id === variantId) || product.variants[0];
+  if (!variant) {
+    return res.status(404).json({ success: false, message: 'Variant not found' });
+  }
+
+  const cartItem = {
+    id: `ci-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    productId: product.id,
+    variantId: variant.id,
+    productName: product.name,
+    variantName: variant.name,
+    productImage: product.images[0]?.url || '',
+    price: variant.price,
+    quantity: Number(quantity),
+    stock: variant.stock,
+  };
+
+  const updatedCart = cartService.addItem(cartItem, sessionId, userId);
+  res.json({ success: true, data: updatedCart });
+});
+
+app.put('/api/cart/items/:variantId', (req: Request, res: Response) => {
+  const sessionId = (req.headers['x-cart-session-id'] as string) || req.body.sessionId;
+  const authHeader = req.headers.authorization;
+  let userId: string | undefined;
+
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const payload = authService.verifyToken(authHeader.slice(7));
+    if (payload) userId = payload.userId;
+  }
+
+  const { variantId } = req.params;
+  const { quantity } = req.body;
+
+  const updatedCart = cartService.updateQuantity(variantId, Number(quantity), sessionId, userId);
+  res.json({ success: true, data: updatedCart });
+});
+
+app.delete('/api/cart/items/:variantId', (req: Request, res: Response) => {
+  const sessionId = (req.headers['x-cart-session-id'] as string) || (req.query.sessionId as string);
+  const authHeader = req.headers.authorization;
+  let userId: string | undefined;
+
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const payload = authService.verifyToken(authHeader.slice(7));
+    if (payload) userId = payload.userId;
+  }
+
+  const { variantId } = req.params;
+  const updatedCart = cartService.removeItem(variantId, sessionId, userId);
+  res.json({ success: true, data: updatedCart });
+});
+
+app.post('/api/cart/merge', (req: Request, res: Response) => {
+  const { guestSessionId } = req.body;
+  const authHeader = req.headers.authorization;
+
+  if (!guestSessionId) {
+    return res.status(400).json({ success: false, message: 'Guest session ID is required to merge cart' });
+  }
+
+  let userId: string | undefined;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const payload = authService.verifyToken(authHeader.slice(7));
+    if (payload) userId = payload.userId;
+  }
+
+  if (!userId) {
+    return res.status(401).json({ success: false, message: 'User must be authenticated to merge cart' });
+  }
+
+  const mergedCart = cartService.mergeCart(guestSessionId, userId);
+  res.json({ success: true, message: 'Guest cart merged into account cart successfully', data: mergedCart });
+});
+
+app.delete('/api/cart', (req: Request, res: Response) => {
+  const sessionId = (req.headers['x-cart-session-id'] as string) || (req.query.sessionId as string);
+  const authHeader = req.headers.authorization;
+  let userId: string | undefined;
+
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const payload = authService.verifyToken(authHeader.slice(7));
+    if (payload) userId = payload.userId;
+  }
+
+  const emptyCart = cartService.clearCart(sessionId, userId);
+  res.json({ success: true, data: emptyCart });
+});
+
+// ==========================================
 // 6. RAZORPAY PAYMENT & ORDERS API
 // ==========================================
 app.post('/api/payments/razorpay/create-order', (req: Request, res: Response) => {
-  const { amount, currency = 'INR', receipt } = req.body;
+  const { amount, receipt } = req.body;
   if (!amount) {
     return res.status(400).json({ success: false, message: 'Amount in paise/INR is required' });
   }
 
-  const razorpayOrderId = `order_rzp_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+  const rzpOrder = paymentService.createRazorpayOrder(Number(amount), receipt);
   res.json({
     success: true,
-    data: {
-      id: razorpayOrderId,
-      entity: 'order',
-      amount: Math.round(amount * 100), // in paise
-      currency,
-      receipt: receipt || `rcpt_${Date.now()}`,
-      status: 'created',
-      keyId: 'rzp_test_CareBeauty2026',
-    },
+    data: rzpOrder,
   });
 });
 
@@ -954,14 +1072,58 @@ app.post('/api/payments/razorpay/verify-signature', (req: Request, res: Response
     return res.status(400).json({ success: false, message: 'Missing Razorpay verification parameters' });
   }
 
-  // In production, compute HMAC SHA256 of order_id + "|" + payment_id using RAZORPAY_KEY_SECRET
-  // Here we simulate successful signature verification for production test key
+  const verification = paymentService.verifyPaymentSignature(razorpay_order_id, razorpay_payment_id, razorpay_signature);
+  if (!verification.verified) {
+    return res.status(400).json({ success: false, message: verification.message, verified: false });
+  }
+
   res.json({
     success: true,
     verified: true,
-    message: 'Payment signature verified successfully',
+    message: verification.message,
     paymentId: razorpay_payment_id,
   });
+});
+
+app.post('/api/payments/razorpay/webhook', (req: Request, res: Response) => {
+  try {
+    const signature = req.headers['x-razorpay-signature'] as string;
+    const rawBody = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
+
+    const verification = paymentService.verifyWebhookSignature(rawBody, signature);
+    if (!verification.verified) {
+      return res.status(400).json({ success: false, message: verification.message });
+    }
+
+    const bodyObj = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    const { event, payload } = bodyObj || {};
+
+    if (event === 'payment.captured' || event === 'order.paid') {
+      const razorpayOrderId = payload?.payment?.entity?.order_id || payload?.order?.entity?.id;
+      if (razorpayOrderId) {
+        const targetOrder = orders.find(o => o.razorpayOrderId === razorpayOrderId);
+        if (targetOrder) {
+          targetOrder.paymentStatus = 'PAID';
+          targetOrder.status = 'CONFIRMED';
+          targetOrder.updatedAt = new Date().toISOString();
+          targetOrder.statusHistory.push({
+            id: `sh-${Date.now()}`,
+            orderId: targetOrder.id,
+            status: 'CONFIRMED',
+            note: 'Payment captured and verified via Razorpay webhook',
+            createdAt: new Date().toISOString(),
+          });
+
+          // Send confirmation email
+          emailService.sendOrderConfirmationEmail(targetOrder);
+        }
+      }
+    }
+
+    res.json({ success: true, message: 'Webhook event processed successfully' });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: err.message });
+  }
 });
 
 app.post('/api/orders', (req: Request, res: Response) => {
@@ -1036,10 +1198,19 @@ app.post('/api/orders', (req: Request, res: Response) => {
 
     orders.unshift(newOrder);
 
+    // Send transactional order confirmation email via Email Service
+    emailService.sendOrderConfirmationEmail(newOrder);
+
     res.status(201).json({ success: true, data: newOrder });
   } catch (err: any) {
     res.status(500).json({ success: false, message: err.message });
   }
+});
+
+// Admin Transactional Emails API
+app.get('/api/admin/emails', (req: Request, res: Response) => {
+  const emails = emailService.getSentEmails();
+  res.json({ success: true, count: emails.length, data: emails });
 });
 
 app.get('/api/orders', (req: Request, res: Response) => {
@@ -1154,6 +1325,19 @@ app.post('/api/upload', (req: Request, res: Response) => {
   } catch (err: any) {
     res.status(500).json({ success: false, message: err.message });
   }
+});
+
+// ==========================================
+// 8b. PHASE 3 E2E CHECKOUT INTEGRATION TEST ENDPOINT
+// ==========================================
+app.get('/api/tests/phase3', async (req: Request, res: Response) => {
+  const result = await runPhase3CheckoutTests();
+  res.status(result.success ? 200 : 500).json(result);
+});
+
+app.post('/api/tests/phase3', async (req: Request, res: Response) => {
+  const result = await runPhase3CheckoutTests();
+  res.status(result.success ? 200 : 500).json(result);
 });
 
 // ==========================================

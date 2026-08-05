@@ -136,6 +136,11 @@ export class AuthService {
     }
   }
 
+  // Alias for verifyJwt
+  verifyToken(token: string): TokenPayload | null {
+    return this.verifyJwt(token);
+  }
+
   // Token Rotation Flow for /api/auth/refresh
   rotateRefreshToken(refreshToken: string): { success: boolean; newAccessToken?: string; newRefreshToken?: string; message?: string } {
     const payload = this.verifyJwt(refreshToken);
