@@ -1,9 +1,73 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import path from 'path';
 import crypto from 'crypto';
+import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
 import { INITIAL_PRODUCTS, INITIAL_CATEGORIES, INITIAL_COUPONS, INITIAL_AUDIT_LOGS, INITIAL_ORDERS } from './src/data/initialData';
 import { Product, Category, Coupon, AuditLog, Order, Review } from './src/types';
+import { authService, TokenPayload } from './src/services/authService';
+import { mockSmsProvider } from './src/services/smsService';
+import { addressService } from './src/services/addressService';
+
+// User Account Interface
+export interface DBUser {
+  id: string;
+  email?: string;
+  phone?: string;
+  fullName: string;
+  passwordHash?: string;
+  passwordSalt?: string;
+  role: 'CUSTOMER' | 'ADMIN';
+  createdAt: string;
+}
+
+// In-Memory User Table (preloaded with default accounts)
+const usersStore: Map<string, DBUser> = new Map([
+  [
+    'usr-default-customer',
+    {
+      id: 'usr-default-customer',
+      email: 'priya@example.com',
+      phone: '9876543210',
+      fullName: 'Priya Sharma',
+      role: 'CUSTOMER',
+      createdAt: new Date().toISOString(),
+    },
+  ],
+  [
+    'usr-admin-999',
+    {
+      id: 'usr-admin-999',
+      email: 'admin@carebeautysolution.com',
+      phone: '9999999999',
+      fullName: 'Care Beauty Administrator',
+      role: 'ADMIN',
+      createdAt: new Date().toISOString(),
+    },
+  ],
+]);
+
+// Auth Middleware
+interface AuthenticatedRequest extends Request {
+  user?: TokenPayload;
+}
+
+function authenticateToken(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ success: false, message: 'Access token required. Pass Authorization: Bearer <token>' });
+  }
+
+  const payload = authService.verifyJwt(token);
+  if (!payload || payload.type !== 'access') {
+    return res.status(401).json({ success: false, message: 'Invalid or expired access token' });
+  }
+
+  req.user = payload;
+  next();
+}
 
 const app = express();
 const PORT = 3000;
@@ -318,47 +382,400 @@ app.post('/api/coupons', (req: Request, res: Response) => {
 });
 
 // ==========================================
-// 5. AUTH (OTP & Mobile Login)
+// 5. AUTH & USER SYSTEM (Mobile OTP, Email/Password, JWT Rotation/Revocation)
 // ==========================================
-app.post('/api/auth/send-otp', (req: Request, res: Response) => {
-  const { phone } = req.body;
-  if (!phone || phone.trim().length < 10) {
-    return res.status(400).json({ success: false, message: 'Valid 10-digit phone number is required' });
-  }
 
-  res.json({
-    success: true,
-    message: `OTP sent to ${phone}. (Use test code: 123456)`,
-    otpHint: '123456',
-  });
+// 5a. Mobile OTP Login
+app.post('/api/auth/send-otp', async (req: Request, res: Response) => {
+  try {
+    const { phone } = req.body;
+    if (!phone || phone.trim().length < 10) {
+      return res.status(400).json({ success: false, message: 'Valid 10-digit mobile number is required' });
+    }
+
+    const cleanPhone = phone.replace(/\D/g, '').slice(-10);
+    const { code, expiresAt } = mockSmsProvider.generateAndStoreOtp(cleanPhone);
+    const smsResult = await mockSmsProvider.sendSms(cleanPhone, `Your Care Beauty Solution OTP is ${code}. Valid for 5 minutes.`);
+
+    if (!smsResult.success) {
+      return res.status(429).json({ success: false, message: smsResult.error });
+    }
+
+    res.json({
+      success: true,
+      message: `OTP sent to +91 ${cleanPhone}.`,
+      otpHint: code, // Convenient hint for dev/testing
+      expiresAt: new Date(expiresAt).toISOString(),
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: err.message });
+  }
 });
 
 app.post('/api/auth/verify-otp', (req: Request, res: Response) => {
-  const { phone, otp, name } = req.body;
-  if (!phone || !otp) {
-    return res.status(400).json({ success: false, message: 'Phone and OTP are required' });
+  try {
+    const { phone, otp, name } = req.body;
+    if (!phone || !otp) {
+      return res.status(400).json({ success: false, message: 'Mobile number and OTP code are required' });
+    }
+
+    const cleanPhone = phone.replace(/\D/g, '').slice(-10);
+    const verification = mockSmsProvider.verifyOtp(cleanPhone, otp);
+
+    if (!verification.success) {
+      return res.status(400).json({ success: false, message: verification.message });
+    }
+
+    // Find or create user
+    let user = Array.from(usersStore.values()).find(u => u.phone === cleanPhone);
+    const role = cleanPhone === '9999999999' ? 'ADMIN' : 'CUSTOMER';
+
+    if (!user) {
+      user = {
+        id: `usr-${cleanPhone.slice(-6)}`,
+        phone: cleanPhone,
+        fullName: name || 'Care Customer',
+        role,
+        createdAt: new Date().toISOString(),
+      };
+      usersStore.set(user.id, user);
+    } else if (name && user.fullName === 'Care Customer') {
+      user.fullName = name;
+    }
+
+    // Generate Access & Refresh Tokens
+    const accessToken = authService.generateAccessToken(user.id, user.role, user.email, user.phone);
+    const refreshToken = authService.generateRefreshToken(user.id, user.role, user.email, user.phone);
+
+    recordAuditLog(user.email || user.phone || 'customer', 'OTP_LOGIN', 'User', user.id, `User signed in via Mobile OTP`);
+
+    res.json({
+      success: true,
+      message: 'Mobile OTP authentication successful',
+      accessToken,
+      refreshToken,
+      user: {
+        id: user.id,
+        fullName: user.fullName,
+        phone: user.phone,
+        email: user.email,
+        role: user.role,
+        createdAt: user.createdAt,
+      },
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// 5b. Email / Password Registration & Login
+app.post('/api/auth/register', (req: Request, res: Response) => {
+  try {
+    const { email, password, fullName, phone } = req.body;
+    if (!email || !password || !fullName) {
+      return res.status(400).json({ success: false, message: 'Email, password, and full name are required' });
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    const existing = Array.from(usersStore.values()).find(u => u.email === cleanEmail);
+
+    if (existing) {
+      return res.status(400).json({ success: false, message: 'Account with this email already exists. Please log in.' });
+    }
+
+    const { hash, salt } = authService.hashPassword(password);
+    const role = cleanEmail.includes('admin') ? 'ADMIN' : 'CUSTOMER';
+    const userId = `usr-${Date.now().toString().slice(-6)}`;
+
+    const newUser: DBUser = {
+      id: userId,
+      email: cleanEmail,
+      phone: phone ? phone.replace(/\D/g, '').slice(-10) : undefined,
+      fullName,
+      passwordHash: hash,
+      passwordSalt: salt,
+      role,
+      createdAt: new Date().toISOString(),
+    };
+
+    usersStore.set(userId, newUser);
+
+    const accessToken = authService.generateAccessToken(userId, role, cleanEmail, newUser.phone);
+    const refreshToken = authService.generateRefreshToken(userId, role, cleanEmail, newUser.phone);
+
+    recordAuditLog(cleanEmail, 'REGISTER', 'User', userId, `New user registered via email/password`);
+
+    res.status(201).json({
+      success: true,
+      message: 'Account registered successfully',
+      accessToken,
+      refreshToken,
+      user: {
+        id: userId,
+        fullName: newUser.fullName,
+        email: newUser.email,
+        phone: newUser.phone,
+        role: newUser.role,
+        createdAt: newUser.createdAt,
+      },
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+app.post('/api/auth/login', (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ success: false, message: 'Email and password are required' });
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+
+    // Check Login Rate Limiter (Max 5 failed attempts per email per 15 minutes)
+    if (authService.isRateLimited(cleanEmail)) {
+      return res.status(429).json({
+        success: false,
+        message: 'Account temporarily locked due to 5 consecutive failed login attempts. Please try again in 15 minutes.',
+      });
+    }
+
+    const user = Array.from(usersStore.values()).find(u => u.email === cleanEmail);
+    if (!user || !user.passwordHash || !user.passwordSalt) {
+      const attemptInfo = authService.recordFailedAttempt(cleanEmail);
+      return res.status(401).json({
+        success: false,
+        message: attemptInfo.blocked
+          ? 'Too many failed login attempts. Account locked for 15 minutes.'
+          : `Invalid email or password. ${attemptInfo.remainingAttempts} attempts remaining.`,
+      });
+    }
+
+    const isValid = authService.verifyPassword(password, user.passwordHash, user.passwordSalt);
+    if (!isValid) {
+      const attemptInfo = authService.recordFailedAttempt(cleanEmail);
+      return res.status(401).json({
+        success: false,
+        message: attemptInfo.blocked
+          ? 'Too many failed login attempts. Account locked for 15 minutes.'
+          : `Invalid email or password. ${attemptInfo.remainingAttempts} attempts remaining.`,
+      });
+    }
+
+    // Success -> Reset failed attempts
+    authService.resetFailedAttempts(cleanEmail);
+
+    const accessToken = authService.generateAccessToken(user.id, user.role, user.email, user.phone);
+    const refreshToken = authService.generateRefreshToken(user.id, user.role, user.email, user.phone);
+
+    recordAuditLog(user.email, 'LOGIN', 'User', user.id, `User logged in via email/password`);
+
+    res.json({
+      success: true,
+      message: 'Login successful',
+      accessToken,
+      refreshToken,
+      user: {
+        id: user.id,
+        fullName: user.fullName,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        createdAt: user.createdAt,
+      },
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// 5c. Token Rotation (/api/auth/refresh)
+app.post('/api/auth/refresh', (req: Request, res: Response) => {
+  try {
+    const refreshToken = req.body.refreshToken || req.headers['x-refresh-token'];
+    if (!refreshToken || typeof refreshToken !== 'string') {
+      return res.status(400).json({ success: false, message: 'Refresh token required' });
+    }
+
+    const result = authService.rotateRefreshToken(refreshToken);
+    if (!result.success) {
+      return res.status(401).json({ success: false, message: result.message });
+    }
+
+    res.json({
+      success: true,
+      message: 'Tokens rotated successfully',
+      accessToken: result.newAccessToken,
+      refreshToken: result.newRefreshToken,
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// 5d. Logout & Revocation (/api/auth/logout)
+app.post('/api/auth/logout', (req: Request, res: Response) => {
+  try {
+    const refreshToken = req.body.refreshToken || req.headers['x-refresh-token'];
+    if (refreshToken && typeof refreshToken === 'string') {
+      authService.revokeRefreshToken(refreshToken);
+    }
+
+    res.json({ success: true, message: 'Logged out successfully. Session invalidated.' });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// 5e. Get Current Auth User Info
+app.get('/api/auth/me', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
+  const userId = req.user?.userId;
+  const user = usersStore.get(userId || '');
+
+  if (!user) {
+    return res.status(404).json({ success: false, message: 'User profile not found' });
   }
 
-  if (otp !== '123456' && otp !== '654321') {
-    return res.status(400).json({ success: false, message: 'Invalid OTP entered' });
-  }
-
-  const user = {
-    id: `usr-${phone.slice(-6)}`,
-    phone,
-    fullName: name || 'Care Customer',
-    role: phone === '9999999999' ? 'ADMIN' : 'CUSTOMER',
-    addresses: [],
-    createdAt: new Date().toISOString(),
-  };
-
-  const mockToken = `jwt_token_care_${Buffer.from(JSON.stringify(user)).toString('base64')}`;
+  const userAddrs = addressService.getUserAddresses(user.id);
 
   res.json({
     success: true,
-    token: mockToken,
-    user,
+    user: {
+      id: user.id,
+      fullName: user.fullName,
+      email: user.email,
+      phone: user.phone,
+      role: user.role,
+      addresses: userAddrs,
+      createdAt: user.createdAt,
+    },
   });
+});
+
+// 5f. Address Book CRUD Endpoints
+app.get('/api/user/addresses', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
+  const userId = req.user?.userId || 'usr-default-customer';
+  const addrs = addressService.getUserAddresses(userId);
+  res.json({ success: true, count: addrs.length, data: addrs });
+});
+
+app.post('/api/user/addresses', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId || 'usr-default-customer';
+    const { fullName, phone, street, landmark, city, state, pincode, isDefault } = req.body;
+
+    if (!fullName || !phone || !street || !city || !state || !pincode) {
+      return res.status(400).json({ success: false, message: 'Full name, phone, street, city, state, and pincode are required' });
+    }
+
+    const newAddr = addressService.createAddress(userId, {
+      fullName,
+      phone,
+      street,
+      landmark,
+      city,
+      state,
+      pincode,
+      isDefault: Boolean(isDefault),
+    });
+
+    res.status(201).json({ success: true, data: newAddr });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+app.put('/api/user/addresses/:id', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId || 'usr-default-customer';
+    const { id } = req.params;
+
+    const updated = addressService.updateAddress(userId, id, req.body);
+    if (!updated) {
+      return res.status(404).json({ success: false, message: 'Address not found' });
+    }
+
+    res.json({ success: true, data: updated });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+app.delete('/api/user/addresses/:id', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId || 'usr-default-customer';
+    const { id } = req.params;
+
+    const deleted = addressService.deleteAddress(userId, id);
+    if (!deleted) {
+      return res.status(404).json({ success: false, message: 'Address not found' });
+    }
+
+    res.json({ success: true, message: 'Address removed successfully' });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+app.patch('/api/user/addresses/:id/default', authenticateToken, (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId || 'usr-default-customer';
+    const { id } = req.params;
+
+    const updated = addressService.setDefaultAddress(userId, id);
+    if (!updated) {
+      return res.status(404).json({ success: false, message: 'Address not found' });
+    }
+
+    res.json({ success: true, data: updated });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// 5g. OpenAPI Specification JSON & Interactive Documentation UI
+app.get('/api/openapi.json', (req: Request, res: Response) => {
+  const filePath = path.join(process.cwd(), 'public', 'openapi.json');
+  if (fs.existsSync(filePath)) {
+    return res.sendFile(filePath);
+  }
+  res.status(404).json({ success: false, message: 'OpenAPI spec file not found' });
+});
+
+app.get('/api/docs', (req: Request, res: Response) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <title>Care Beauty Solution API Documentation</title>
+      <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
+      <style>
+        body { margin: 0; padding: 0; background: #022c22; font-family: sans-serif; }
+        #swagger-ui { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 16px; margin-top: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        .header-bar { background: #022c22; color: white; padding: 16px 24px; text-align: center; border-bottom: 2px solid #059669; }
+        .header-bar h1 { margin: 0; font-size: 22px; font-family: serif; color: #fde68a; }
+      </style>
+    </head>
+    <body>
+      <div class="header-bar">
+        <h1>Care Beauty Solution — Phase 1 Auth & D2C E-Commerce OpenAPI Docs</h1>
+        <p style="margin:4px 0 0; font-size:12px; color:#a7f3d0;">Mobile OTP • Email/Password • JWT Token Rotation & Revocation • Address Book CRUD</p>
+      </div>
+      <div id="swagger-ui"></div>
+      <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+      <script>
+        SwaggerUIBundle({
+          url: '/api/openapi.json',
+          dom_id: '#swagger-ui',
+          presets: [SwaggerUIBundle.presets.apis],
+          layout: "BaseLayout"
+        });
+      </script>
+    </body>
+    </html>
+  `);
 });
 
 // ==========================================

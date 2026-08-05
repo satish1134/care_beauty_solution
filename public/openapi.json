@@ -1,0 +1,313 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Care Beauty Solution - Auth & D2C E-Commerce API",
+    "description": "Production OpenAPI 3.0 specification covering Phase 1 Mobile OTP, Email/Password auth, JWT Token Rotation/Revocation, Address Book CRUD, and E-commerce operations.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Care Beauty Engineering",
+      "email": "support@carebeautysolution.com",
+      "url": "https://www.carebeautysolution.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://www.carebeautysolution.com",
+      "description": "Production Cloud Server"
+    },
+    {
+      "url": "http://localhost:3000",
+      "description": "Local Development Server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Access Token issued by /api/auth/verify-otp or /api/auth/login"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "example": "usr-987654" },
+          "email": { "type": "string", "example": "priya@example.com" },
+          "phone": { "type": "string", "example": "9876543210" },
+          "fullName": { "type": "string", "example": "Priya Sharma" },
+          "role": { "type": "string", "enum": ["CUSTOMER", "ADMIN"], "example": "CUSTOMER" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Address": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "example": "addr-1785900" },
+          "userId": { "type": "string", "example": "usr-987654" },
+          "fullName": { "type": "string", "example": "Priya Sharma" },
+          "phone": { "type": "string", "example": "9876543210" },
+          "street": { "type": "string", "example": "Flat 402, Lotus Heights, 100ft Road" },
+          "landmark": { "type": "string", "example": "Near Toit Brewery" },
+          "city": { "type": "string", "example": "Bengaluru" },
+          "state": { "type": "string", "example": "Karnataka" },
+          "pincode": { "type": "string", "example": "560038" },
+          "isDefault": { "type": "boolean", "example": true }
+        }
+      },
+      "AuthTokenResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "example": true },
+          "accessToken": { "type": "string", "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." },
+          "refreshToken": { "type": "string", "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." },
+          "user": { "$ref": "#/components/schemas/User" }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/api/auth/send-otp": {
+      "post": {
+        "summary": "Send Mobile OTP Code",
+        "description": "Initiates mobile OTP login. Rate limited to 3 attempts per 15 minutes.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["phone"],
+                "properties": {
+                  "phone": { "type": "string", "example": "9876543210" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OTP sent successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "message": "OTP sent to 9876543210.",
+                  "otpHint": "123456"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          }
+        }
+      }
+    },
+    "/api/auth/verify-otp": {
+      "post": {
+        "summary": "Verify Mobile OTP & Issue Tokens",
+        "description": "Verifies 6-digit OTP code, returns short-lived Access Token & 7-day Refresh Token.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["phone", "otp"],
+                "properties": {
+                  "phone": { "type": "string", "example": "9876543210" },
+                  "otp": { "type": "string", "example": "123456" },
+                  "name": { "type": "string", "example": "Priya Sharma" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verification successful",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AuthTokenResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "summary": "Email & Password Registration",
+        "description": "Creates new user account with hashed password and issues JWT token pair.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password", "fullName"],
+                "properties": {
+                  "email": { "type": "string", "example": "priya@example.com" },
+                  "password": { "type": "string", "example": "CareBeauty2026!" },
+                  "fullName": { "type": "string", "example": "Priya Sharma" },
+                  "phone": { "type": "string", "example": "9876543210" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AuthTokenResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "summary": "Email & Password Login",
+        "description": "Authenticates user with email/password. Rate limited to 5 failed attempts per 15 minutes.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "example": "priya@example.com" },
+                  "password": { "type": "string", "example": "CareBeauty2026!" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AuthTokenResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/refresh": {
+      "post": {
+        "summary": "Refresh Access Token with Token Rotation",
+        "description": "Rotates refresh token, invalidates old refresh token, and issues NEW token pair.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["refreshToken"],
+                "properties": {
+                  "refreshToken": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tokens rotated successfully"
+          },
+          "401": {
+            "description": "Replay attack detected or invalid refresh token"
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "summary": "Logout & Invalidate Refresh Token",
+        "description": "Explicitly revokes refresh token in server revocation ledger.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["refreshToken"],
+                "properties": {
+                  "refreshToken": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Logged out successfully"
+          }
+        }
+      }
+    },
+    "/api/user/addresses": {
+      "get": {
+        "summary": "List Saved User Addresses",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "List of addresses",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Address" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create Saved Address",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["fullName", "phone", "street", "city", "state", "pincode"],
+                "properties": {
+                  "fullName": { "type": "string", "example": "Priya Sharma" },
+                  "phone": { "type": "string", "example": "9876543210" },
+                  "street": { "type": "string", "example": "Flat 402, Lotus Heights" },
+                  "landmark": { "type": "string", "example": "Near Toit Brewery" },
+                  "city": { "type": "string", "example": "Bengaluru" },
+                  "state": { "type": "string", "example": "Karnataka" },
+                  "pincode": { "type": "string", "example": "560038" },
+                  "isDefault": { "type": "boolean", "example": true }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Address created successfully"
+          }
+        }
+      }
+    }
+  }
+}

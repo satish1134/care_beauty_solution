@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingBag, Search, User, ShieldCheck, GitBranch, Sparkles, SlidersHorizontal } from 'lucide-react';
+import { ShoppingBag, Search, User, MapPin, SlidersHorizontal, LogOut } from 'lucide-react';
 import { Category, SkinConcern } from '../types';
 
 interface NavbarProps {
@@ -14,10 +14,11 @@ interface NavbarProps {
   onOpenCart: () => void;
   onOpenAuth: () => void;
   onOpenOrders: () => void;
-  onToggleAdmin: () => void;
-  isAdmin: boolean;
-  onOpenGitGuide: () => void;
+  onOpenAddresses: () => void;
   userPhone: string | null;
+  userEmail: string | null;
+  userName: string | null;
+  onLogout: () => void;
 }
 
 const SKIN_CONCERNS: SkinConcern[] = [
@@ -42,11 +43,14 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenCart,
   onOpenAuth,
   onOpenOrders,
-  onToggleAdmin,
-  isAdmin,
-  onOpenGitGuide,
+  onOpenAddresses,
   userPhone,
+  userEmail,
+  userName,
+  onLogout,
 }) => {
+  const isLoggedIn = Boolean(userPhone || userEmail);
+
   return (
     <header className="sticky top-0 z-40 bg-emerald-950/95 backdrop-blur-md text-emerald-50 border-b border-emerald-800/50 shadow-lg">
       {/* Top Banner Bar */}
@@ -59,14 +63,10 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="mx-auto sm:mx-0 font-semibold text-amber-200">
           ✨ Special Offer: Free Express Shipping in India on Orders Above ₹499 | Use Code <span className="underline decoration-dashed font-bold">WELCOME10</span>
         </div>
-        <div className="hidden md:flex items-center space-x-3 text-[11px]">
-          <button
-            onClick={onOpenGitGuide}
-            className="flex items-center gap-1.5 text-teal-200 hover:text-white bg-teal-800/60 px-2 py-0.5 rounded transition"
-          >
-            <GitBranch className="w-3 h-3 text-amber-300" />
-            Git Push Guide
-          </button>
+        <div className="hidden md:flex items-center space-x-3 text-[11px] text-emerald-300">
+          <a href="/api/docs" target="_blank" rel="noreferrer" className="hover:text-amber-300 transition underline">
+            OpenAPI Specs
+          </a>
         </div>
       </div>
 
@@ -101,37 +101,45 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Action Controls */}
         <div className="flex items-center space-x-2 sm:space-x-3">
-          {/* Git Guide Mobile */}
-          <button
-            onClick={onOpenGitGuide}
-            className="md:hidden flex items-center gap-1 text-xs bg-teal-800/80 px-2.5 py-1.5 rounded-full text-amber-200 font-medium"
-            title="Git Setup Instructions"
-          >
-            <GitBranch className="w-3.5 h-3.5" />
-            Git
-          </button>
+          {isLoggedIn ? (
+            <>
+              {/* Saved Address Book */}
+              <button
+                onClick={onOpenAddresses}
+                className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-full bg-emerald-900/80 border border-emerald-700/60 text-emerald-200 hover:bg-emerald-800 transition"
+                title="Manage Addresses"
+              >
+                <MapPin className="w-3.5 h-3.5 text-amber-300" />
+                <span>Address Book</span>
+              </button>
 
-          {/* Customer Orders */}
-          <button
-            onClick={userPhone ? onOpenOrders : onOpenAuth}
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-full bg-emerald-900/80 border border-emerald-700/60 text-emerald-100 hover:bg-emerald-800 transition"
-          >
-            <User className="w-3.5 h-3.5 text-amber-300" />
-            <span>{userPhone ? `My Orders (${userPhone.slice(-4)})` : 'Sign In'}</span>
-          </button>
+              {/* Customer Orders */}
+              <button
+                onClick={onOpenOrders}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-full bg-emerald-900/80 border border-emerald-700/60 text-emerald-100 hover:bg-emerald-800 transition"
+              >
+                <User className="w-3.5 h-3.5 text-amber-300" />
+                <span>{userName || (userPhone ? `My Orders (${userPhone.slice(-4)})` : 'My Account')}</span>
+              </button>
 
-          {/* Admin Switcher */}
-          <button
-            onClick={onToggleAdmin}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full transition border ${
-              isAdmin
-                ? 'bg-amber-400 text-emerald-950 border-amber-300 shadow-md'
-                : 'bg-emerald-900/80 text-emerald-200 border-emerald-700 hover:text-white hover:bg-emerald-800'
-            }`}
-          >
-            <ShieldCheck className="w-3.5 h-3.5" />
-            <span>{isAdmin ? 'Exit Admin' : 'Admin Console'}</span>
-          </button>
+              {/* Logout */}
+              <button
+                onClick={onLogout}
+                className="p-1.5 rounded-full text-emerald-300 hover:text-red-300 hover:bg-emerald-800 transition"
+                title="Sign Out"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={onOpenAuth}
+              className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold rounded-full bg-amber-400 text-emerald-950 hover:bg-amber-300 transition shadow-sm"
+            >
+              <User className="w-3.5 h-3.5" />
+              <span>Sign In / Register</span>
+            </button>
+          )}
 
           {/* Cart Icon */}
           <button

@@ -26,7 +26,7 @@ interface AdminPanelProps {
   auditLogs: AuditLog[];
   orders: Order[];
   onRefreshData: () => void;
-  onOpenGitGuide: () => void;
+  onOpenGitGuide?: () => void;
 }
 
 const SALES_CHART_DATA = [

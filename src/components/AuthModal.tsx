@@ -1,22 +1,33 @@
 import React, { useState } from 'react';
-import { X, Smartphone, KeyRound, ShieldCheck, ArrowRight } from 'lucide-react';
+import { X, Smartphone, Mail, Lock, ArrowRight, CheckCircle2 } from 'lucide-react';
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onLoginSuccess: (phone: string, name?: string) => void;
+  onLoginSuccess: (user: { id: string; phone?: string; email?: string; fullName: string; accessToken: string; refreshToken: string }) => void;
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSuccess }) => {
   if (!isOpen) return null;
 
-  const [step, setStep] = useState<'PHONE' | 'OTP'>('PHONE');
+  const [authMethod, setAuthMethod] = useState<'OTP' | 'EMAIL'>('OTP');
+  const [emailMode, setEmailMode] = useState<'LOGIN' | 'REGISTER'>('LOGIN');
+
+  // OTP State
+  const [otpStep, setOtpStep] = useState<'PHONE' | 'OTP'>('PHONE');
   const [phone, setPhone] = useState('');
-  const [name, setName] = useState('');
   const [otp, setOtp] = useState('');
+  const [otpName, setOtpName] = useState('');
+
+  // Email State
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Send OTP
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!phone || phone.length < 10) {
@@ -36,7 +47,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
       const data = await res.json();
       setIsLoading(false);
       if (data.success) {
-        setStep('OTP');
+        setOtpStep('OTP');
       } else {
         setError(data.message);
       }
@@ -46,6 +57,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
     }
   };
 
+  // Verify OTP
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -55,13 +67,21 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
       const res = await fetch('/api/auth/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, otp, name }),
+        body: JSON.stringify({ phone, otp, name: otpName }),
       });
       const data = await res.json();
       setIsLoading(false);
 
       if (data.success) {
-        onLoginSuccess(phone, name);
+        localStorage.setItem('care_access_token', data.accessToken);
+        localStorage.setItem('care_refresh_token', data.refreshToken);
+        onLoginSuccess({
+          id: data.user.id,
+          phone: data.user.phone,
+          fullName: data.user.fullName,
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken,
+        });
         onClose();
       } else {
         setError(data.message || 'Invalid OTP code');
@@ -72,8 +92,79 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
     }
   };
 
+  // Email Login
+  const handleEmailLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      setIsLoading(false);
+
+      if (data.success) {
+        localStorage.setItem('care_access_token', data.accessToken);
+        localStorage.setItem('care_refresh_token', data.refreshToken);
+        onLoginSuccess({
+          id: data.user.id,
+          email: data.user.email,
+          fullName: data.user.fullName,
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken,
+        });
+        onClose();
+      } else {
+        setError(data.message);
+      }
+    } catch (err: any) {
+      setIsLoading(false);
+      setError('Login request failed');
+    }
+  };
+
+  // Email Register
+  const handleEmailRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, fullName, phone }),
+      });
+      const data = await res.json();
+      setIsLoading(false);
+
+      if (data.success) {
+        localStorage.setItem('care_access_token', data.accessToken);
+        localStorage.setItem('care_refresh_token', data.refreshToken);
+        onLoginSuccess({
+          id: data.user.id,
+          email: data.user.email,
+          phone: data.user.phone,
+          fullName: data.user.fullName,
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken,
+        });
+        onClose();
+      } else {
+        setError(data.message);
+      }
+    } catch (err: any) {
+      setIsLoading(false);
+      setError('Registration failed');
+    }
+  };
+
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-emerald-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-emerald-950/75 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl relative border border-emerald-100 space-y-4">
         <button onClick={onClose} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
           <X className="w-5 h-5" />
@@ -81,77 +172,217 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
 
         <div className="text-center space-y-1">
           <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-900 mx-auto font-bold">
-            <Smartphone className="w-6 h-6" />
+            {authMethod === 'OTP' ? <Smartphone className="w-6 h-6" /> : <Mail className="w-6 h-6" />}
           </div>
-          <h3 className="font-serif font-bold text-xl text-slate-900">Care Beauty Account Login</h3>
-          <p className="text-xs text-slate-500">Sign in with mobile OTP to track orders & earn rewards</p>
+          <h3 className="font-serif font-bold text-xl text-slate-900">Care Beauty Account</h3>
+          <p className="text-xs text-slate-500">Sign in to track orders, save delivery addresses & earn rewards</p>
         </div>
 
-        {error && <div className="bg-red-50 text-red-600 text-xs p-2.5 rounded-xl font-medium">{error}</div>}
+        {/* Auth Method Selector Tabs */}
+        <div className="flex bg-slate-100 p-1 rounded-2xl text-xs font-bold text-slate-600">
+          <button
+            onClick={() => { setAuthMethod('OTP'); setError(null); }}
+            className={`flex-1 py-2 rounded-xl transition ${authMethod === 'OTP' ? 'bg-white text-emerald-950 shadow-sm' : 'hover:text-slate-900'}`}
+          >
+            Mobile OTP
+          </button>
+          <button
+            onClick={() => { setAuthMethod('EMAIL'); setError(null); }}
+            className={`flex-1 py-2 rounded-xl transition ${authMethod === 'EMAIL' ? 'bg-white text-emerald-950 shadow-sm' : 'hover:text-slate-900'}`}
+          >
+            Email & Password
+          </button>
+        </div>
 
-        {step === 'PHONE' ? (
-          <form onSubmit={handleSendOtp} className="space-y-3">
-            <div>
-              <label className="text-xs font-semibold text-slate-600">Full Name (Optional)</label>
-              <input
-                type="text"
-                placeholder="e.g. Radhika Sharma"
-                value={name}
-                onChange={e => setName(e.target.value)}
-                className="w-full text-xs border border-slate-300 rounded-xl p-2.5 mt-1"
-              />
-            </div>
+        {error && <div className="bg-red-50 text-red-600 text-xs p-2.5 rounded-xl font-medium leading-relaxed">{error}</div>}
 
-            <div>
-              <label className="text-xs font-semibold text-slate-600">Mobile Number *</label>
-              <div className="flex gap-2 mt-1">
-                <span className="bg-slate-100 border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 flex items-center">
-                  +91
-                </span>
+        {authMethod === 'OTP' ? (
+          /* ================= MOBILE OTP FLOW ================= */
+          otpStep === 'PHONE' ? (
+            <form onSubmit={handleSendOtp} className="space-y-3">
+              <div>
+                <label className="text-xs font-semibold text-slate-600">Full Name (Optional)</label>
                 <input
-                  type="tel"
-                  required
-                  placeholder="9876543210"
-                  value={phone}
-                  onChange={e => setPhone(e.target.value)}
-                  className="flex-1 text-xs border border-slate-300 rounded-xl p-2.5 font-mono"
+                  type="text"
+                  placeholder="e.g. Radhika Sharma"
+                  value={otpName}
+                  onChange={e => setOtpName(e.target.value)}
+                  className="w-full text-xs border border-slate-300 rounded-xl p-2.5 mt-1"
                 />
               </div>
-            </div>
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-emerald-950 hover:bg-emerald-900 text-white font-bold text-xs py-3 rounded-xl flex items-center justify-center gap-1.5 shadow-md"
-            >
-              <span>{isLoading ? 'Sending Code...' : 'Send OTP Code'}</span>
-              <ArrowRight className="w-4 h-4 text-amber-300" />
-            </button>
-          </form>
+              <div>
+                <label className="text-xs font-semibold text-slate-600">Mobile Number *</label>
+                <div className="flex gap-2 mt-1">
+                  <span className="bg-slate-100 border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 flex items-center">
+                    +91
+                  </span>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="9876543210"
+                    value={phone}
+                    onChange={e => setPhone(e.target.value)}
+                    className="flex-1 text-xs border border-slate-300 rounded-xl p-2.5 font-mono"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-emerald-950 hover:bg-emerald-900 text-white font-bold text-xs py-3 rounded-xl flex items-center justify-center gap-1.5 shadow-md"
+              >
+                <span>{isLoading ? 'Sending Code...' : 'Send OTP Code'}</span>
+                <ArrowRight className="w-4 h-4 text-amber-300" />
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleVerifyOtp} className="space-y-3">
+              <div>
+                <label className="text-xs font-semibold text-slate-600">Enter 6-Digit OTP Code *</label>
+                <p className="text-[11px] text-slate-400 mt-0.5">Code sent to +91 {phone}</p>
+                <input
+                  type="text"
+                  required
+                  placeholder="123456"
+                  value={otp}
+                  onChange={e => setOtp(e.target.value)}
+                  maxLength={6}
+                  className="w-full text-center tracking-widest text-lg font-mono border border-slate-300 rounded-xl p-2.5 mt-2 text-slate-900 font-bold"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-emerald-950 hover:bg-emerald-900 text-white font-bold text-xs py-3 rounded-xl shadow-md"
+              >
+                {isLoading ? 'Verifying...' : 'Verify OTP & Login'}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setOtpStep('PHONE')}
+                className="w-full text-center text-[11px] text-slate-500 hover:text-slate-800 underline"
+              >
+                Change mobile number
+              </button>
+            </form>
+          )
         ) : (
-          <form onSubmit={handleVerifyOtp} className="space-y-3">
-            <div>
-              <label className="text-xs font-semibold text-slate-600">Enter 6-Digit OTP Code *</label>
-              <p className="text-[11px] text-slate-400">Code sent to +91 {phone} (Test OTP: <span className="font-bold text-emerald-900">123456</span>)</p>
-              <input
-                type="text"
-                required
-                placeholder="123456"
-                value={otp}
-                onChange={e => setOtp(e.target.value)}
-                maxLength={6}
-                className="w-full text-center tracking-widest text-lg font-mono border border-slate-300 rounded-xl p-2.5 mt-1 text-slate-900 font-bold"
-              />
+          /* ================= EMAIL & PASSWORD FLOW ================= */
+          <div className="space-y-3">
+            <div className="flex text-xs font-semibold border-b border-slate-200 pb-2">
+              <button
+                type="button"
+                onClick={() => setEmailMode('LOGIN')}
+                className={`flex-1 text-center py-1 ${emailMode === 'LOGIN' ? 'text-emerald-900 font-bold border-b-2 border-emerald-900' : 'text-slate-400'}`}
+              >
+                Sign In
+              </button>
+              <button
+                type="button"
+                onClick={() => setEmailMode('REGISTER')}
+                className={`flex-1 text-center py-1 ${emailMode === 'REGISTER' ? 'text-emerald-900 font-bold border-b-2 border-emerald-900' : 'text-slate-400'}`}
+              >
+                Create Account
+              </button>
             </div>
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-emerald-950 hover:bg-emerald-900 text-white font-bold text-xs py-3 rounded-xl shadow-md"
-            >
-              {isLoading ? 'Verifying...' : 'Verify OTP & Login'}
-            </button>
-          </form>
+            {emailMode === 'LOGIN' ? (
+              <form onSubmit={handleEmailLogin} className="space-y-3">
+                <div>
+                  <label className="text-xs font-semibold text-slate-600">Email Address *</label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="priya@example.com"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    className="w-full text-xs border border-slate-300 rounded-xl p-2.5 mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-slate-600">Password *</label>
+                  <input
+                    type="password"
+                    required
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    className="w-full text-xs border border-slate-300 rounded-xl p-2.5 mt-1"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full bg-emerald-950 hover:bg-emerald-900 text-white font-bold text-xs py-3 rounded-xl shadow-md"
+                >
+                  {isLoading ? 'Signing In...' : 'Sign In with Email'}
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={handleEmailRegister} className="space-y-3">
+                <div>
+                  <label className="text-xs font-semibold text-slate-600">Full Name *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Priya Sharma"
+                    value={fullName}
+                    onChange={e => setFullName(e.target.value)}
+                    className="w-full text-xs border border-slate-300 rounded-xl p-2.5 mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-slate-600">Email Address *</label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="priya@example.com"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    className="w-full text-xs border border-slate-300 rounded-xl p-2.5 mt-1"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-slate-600">Mobile Number (Optional)</label>
+                  <input
+                    type="tel"
+                    placeholder="9876543210"
+                    value={phone}
+                    onChange={e => setPhone(e.target.value)}
+                    className="w-full text-xs border border-slate-300 rounded-xl p-2.5 mt-1 font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-slate-600">Password *</label>
+                  <input
+                    type="password"
+                    required
+                    placeholder="Minimum 6 characters"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    className="w-full text-xs border border-slate-300 rounded-xl p-2.5 mt-1"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full bg-emerald-950 hover:bg-emerald-900 text-white font-bold text-xs py-3 rounded-xl shadow-md"
+                >
+                  {isLoading ? 'Registering...' : 'Create Account'}
+                </button>
+              </form>
+            )}
+          </div>
         )}
       </div>
     </div>
