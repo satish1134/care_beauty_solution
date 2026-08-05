@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Filter, SlidersHorizontal, ArrowUpDown, Search, X, ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import { Product, ProductVariant, Category, SkinConcern, SkinType } from '../types';
 import { ProductCard } from './ProductCard';
+import { ProductSlider } from './ProductSlider';
 
 interface ProductListingPageProps {
   products: Product[];

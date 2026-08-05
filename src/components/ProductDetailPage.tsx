@@ -1,28 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import { Star, ShoppingBag, ShieldCheck, CheckCircle2, MessageSquare, Send, ChevronRight, Share2, ArrowLeft, Check, Sparkles } from 'lucide-react';
+import { Star, ShoppingBag, ShieldCheck, CheckCircle2, MessageSquare, Send, ChevronRight, ChevronLeft, Share2, ArrowLeft, Check, Sparkles, Maximize2, Eye } from 'lucide-react';
 import { Product, ProductVariant, Review } from '../types';
+import { ProductSlider } from './ProductSlider';
 
 interface ProductDetailPageProps {
   product: Product;
+  allProducts?: Product[];
   onBackToCatalog: () => void;
   onAddToCart: (product: Product, variant: ProductVariant, quantity: number) => void;
+  onSelectProduct?: (product: Product) => void;
   reviews: Review[];
   onAddReview: (reviewData: { productId: string; userName: string; rating: number; comment: string }) => void;
 }
 
 export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   product,
+  allProducts = [],
   onBackToCatalog,
   onAddToCart,
+  onSelectProduct,
   reviews,
   onAddReview,
 }) => {
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant>(product.variants[0]);
-  const [selectedImage, setSelectedImage] = useState<string>(product.images[0]?.url || '');
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
   const [quantity, setQuantity] = useState<number>(1);
   const [activeTab, setActiveTab] = useState<'benefits' | 'ingredients' | 'howToUse' | 'reviews'>('benefits');
   const [copiedLink, setCopiedLink] = useState(false);
   const [addedAnimation, setAddedAnimation] = useState(false);
+  const [isFullscreenImage, setIsFullscreenImage] = useState(false);
 
   // Review Form State
   const [reviewName, setReviewName] = useState('');
@@ -31,6 +37,16 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
 
   const productReviews = reviews.filter(r => r.productId === product.id);
+  const images = product.images.length > 0 ? product.images : [{ id: 'default', url: 'https://images.unsplash.com/photo-1608248597261-e4d354714552', altText: product.name, isPrimary: true }];
+  const currentImage = images[selectedImageIndex] || images[0];
+
+  const handlePrevImage = () => {
+    setSelectedImageIndex(prev => (prev === 0 ? images.length - 1 : prev - 1));
+  };
+
+  const handleNextImage = () => {
+    setSelectedImageIndex(prev => (prev === images.length - 1 ? 0 : prev + 1));
+  };
 
   // Update URL and document title for SSR / SPA parity
   useEffect(() => {
@@ -122,30 +138,70 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
       {/* Hero PDP Layout Grid */}
       <div className="bg-white rounded-3xl p-6 sm:p-10 border border-emerald-100 shadow-sm grid grid-cols-1 lg:grid-cols-12 gap-10">
-        {/* Left: Gallery Column */}
+        {/* Left: Gallery Column with Interactive Image Slider */}
         <div className="lg:col-span-6 space-y-4">
-          <div className="aspect-square bg-emerald-50/50 rounded-2xl overflow-hidden border border-emerald-100 relative group shadow-sm">
+          <div className="aspect-square bg-emerald-50/50 rounded-3xl overflow-hidden border border-emerald-100 relative group shadow-sm">
             <img
-              src={selectedImage || product.images[0]?.url}
-              alt={product.name}
-              className="w-full h-full object-cover object-center group-hover:scale-105 transition duration-500"
+              src={currentImage.url}
+              alt={currentImage.altText || product.name}
+              className="w-full h-full object-cover object-center transition-all duration-500 group-hover:scale-105"
               referrerPolicy="no-referrer"
             />
-            {product.isBestSeller && (
-              <span className="absolute top-4 left-4 bg-amber-400 text-emerald-950 font-bold text-xs uppercase tracking-wider px-3 py-1 rounded-full shadow-md">
-                Best Seller
+
+            {/* Badges Overlay */}
+            <div className="absolute top-4 left-4 flex flex-col gap-1 z-10">
+              {product.isBestSeller && (
+                <span className="bg-amber-400 text-emerald-950 font-bold text-xs uppercase tracking-wider px-3 py-1 rounded-full shadow-md">
+                  Best Seller
+                </span>
+              )}
+            </div>
+
+            {/* Slider Image Count Indicator */}
+            {images.length > 1 && (
+              <span className="absolute bottom-4 right-4 bg-emerald-950/80 backdrop-blur text-white text-[11px] font-bold px-3 py-1 rounded-full border border-emerald-700/50">
+                {selectedImageIndex + 1} / {images.length}
               </span>
             )}
+
+            {/* Overlay Navigation Arrows (Minimalist Style) */}
+            {images.length > 1 && (
+              <>
+                <button
+                  onClick={handlePrevImage}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-white/90 backdrop-blur text-emerald-950 hover:bg-white shadow-lg transition transform -translate-x-2 group-hover:translate-x-0 opacity-80 group-hover:opacity-100"
+                  aria-label="Previous Image"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={handleNextImage}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-white/90 backdrop-blur text-emerald-950 hover:bg-white shadow-lg transition transform translate-x-2 group-hover:translate-x-0 opacity-80 group-hover:opacity-100"
+                  aria-label="Next Image"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </>
+            )}
+
+            {/* Fullscreen Preview Icon */}
+            <button
+              onClick={() => setIsFullscreenImage(true)}
+              className="absolute top-4 right-4 p-2 rounded-full bg-white/80 hover:bg-white text-emerald-950 shadow transition opacity-0 group-hover:opacity-100"
+              title="Expand Image"
+            >
+              <Maximize2 className="w-4 h-4" />
+            </button>
           </div>
 
-          {/* Gallery Thumbnails */}
-          <div className="flex gap-3 overflow-x-auto pb-2">
-            {product.images.map(img => (
+          {/* Gallery Thumbnails Carousel Bar */}
+          <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-none">
+            {images.map((img, idx) => (
               <button
-                key={img.id}
-                onClick={() => setSelectedImage(img.url)}
-                className={`w-20 h-20 rounded-xl overflow-hidden border-2 transition ${
-                  selectedImage === img.url ? 'border-emerald-700 shadow-md scale-105' : 'border-slate-200 opacity-70 hover:opacity-100'
+                key={img.id || idx}
+                onClick={() => setSelectedImageIndex(idx)}
+                className={`w-20 h-20 rounded-2xl overflow-hidden border-2 transition shrink-0 ${
+                  selectedImageIndex === idx ? 'border-emerald-800 shadow-md scale-105 ring-2 ring-emerald-300/50' : 'border-slate-200 opacity-70 hover:opacity-100'
                 }`}
               >
                 <img src={img.url} alt={img.altText} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
@@ -470,6 +526,41 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           )}
         </div>
       </div>
+
+      {/* Recommended / Complementary Formulations Slider */}
+      {allProducts.length > 0 && (
+        <div className="bg-white rounded-3xl p-6 sm:p-10 border border-emerald-100 shadow-sm">
+          <ProductSlider
+            title="Complete Your Skincare Ritual"
+            subtitle="Dermatologist-curated active formulations designed to layer seamlessly with this product."
+            products={allProducts.filter(p => p.id !== product.id)}
+            onAddToCart={onAddToCart}
+            onOpenQuickView={p => {
+              if (onSelectProduct) onSelectProduct(p);
+            }}
+            badgeText="Pairs Well With"
+          />
+        </div>
+      )}
+
+      {/* Fullscreen Image Lightbox Modal */}
+      {isFullscreenImage && (
+        <div className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
+          <button
+            onClick={() => setIsFullscreenImage(false)}
+            className="absolute top-6 right-6 bg-white/20 text-white hover:bg-white/40 p-3 rounded-full font-bold transition text-xs"
+          >
+            ✕ Close Preview
+          </button>
+          <div className="max-w-4xl max-h-[90vh] overflow-hidden rounded-3xl border border-white/20">
+            <img
+              src={currentImage.url}
+              alt={currentImage.altText || product.name}
+              className="w-full h-full object-contain"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

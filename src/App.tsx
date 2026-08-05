@@ -5,6 +5,8 @@ import { ProductCard } from './components/ProductCard';
 import { ProductDetailModal } from './components/ProductDetailModal';
 import { ProductListingPage } from './components/ProductListingPage';
 import { ProductDetailPage } from './components/ProductDetailPage';
+import { ProductSlider } from './components/ProductSlider';
+import { CustomerEngagementHub } from './components/CustomerEngagementHub';
 import { CartDrawer } from './components/CartDrawer';
 import { CheckoutModal } from './components/CheckoutModal';
 import { UserOrdersModal } from './components/UserOrdersModal';
@@ -436,8 +438,10 @@ export default function App() {
         {activePdpProduct ? (
           <ProductDetailPage
             product={activePdpProduct}
+            allProducts={products}
             onBackToCatalog={() => navigateTo('/')}
             onAddToCart={handleAddToCart}
+            onSelectProduct={p => navigateTo(`/product/${p.slug}`)}
             reviews={reviews}
             onAddReview={handleAddReview}
           />
@@ -455,9 +459,20 @@ export default function App() {
             onOpenProductDetail={p => navigateTo(`/product/${p.slug}`)}
           />
         ) : (
-          /* Home View: Banner + Bestsellers + Full PLP Catalog Grid */
+          /* Home View: Hero Banner + Interactive Customer Engagement Hub + Full PLP Catalog Grid */
           <div>
-            <Banner />
+            <Banner
+              products={products}
+              onAddToCart={handleAddToCart}
+              onSelectProduct={p => navigateTo(`/product/${p.slug}`)}
+            />
+
+            {/* Interactive Clinical Customer Engagement Hub */}
+            <CustomerEngagementHub
+              products={products}
+              onAddToCart={handleAddToCart}
+              onSelectProduct={p => navigateTo(`/product/${p.slug}`)}
+            />
 
             {/* Core Featured Formulations Section */}
             <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
