@@ -1,1 +1,60 @@
 @import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    background-color: #faf9f5;
+    color: #1a2e26;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .font-serif {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+}
+
+/* Custom Utilities for Luxury Skincare Aesthetic */
+.bg-porcelain {
+  background-color: #faf9f5;
+}
+
+.bg-emerald-gradient {
+  background: linear-gradient(135deg, #05231a 0%, #0a3a2c 50%, #041c15 100%);
+}
+
+.text-gold-accent {
+  color: #e5c184;
+}
+
+.bg-gold-accent {
+  background-color: #e5c184;
+}
+
+.border-gold-accent {
+  border-color: #e5c184;
+}
+
+/* Marquee Animation for Announcement Bar */
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: flex;
+  width: 200%;
+  animation: marquee 25s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Custom Scrollbars */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

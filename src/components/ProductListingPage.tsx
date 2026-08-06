@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Filter, SlidersHorizontal, ArrowUpDown, Search, X, ChevronLeft, ChevronRight, Check } from 'lucide-react';
+import { Filter, SlidersHorizontal, ArrowUpDown, Search, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Product, ProductVariant, Category, SkinConcern, SkinType } from '../types';
 import { ProductCard } from './ProductCard';
-import { ProductSlider } from './ProductSlider';
 
 interface ProductListingPageProps {
   products: Product[];
@@ -134,36 +133,36 @@ export const ProductListingPage: React.FC<ProductListingPageProps> = ({
   const skinTypesList: SkinType[] = ['All Skin Types', 'Dry', 'Oily', 'Sensitive', 'Combination'];
 
   return (
-    <div id="product-listing-page" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Header Banner */}
-      <div className="bg-gradient-to-r from-emerald-950 via-emerald-900 to-teal-900 text-white rounded-3xl p-6 sm:p-10 shadow-xl relative overflow-hidden">
+    <div id="product-listing-page" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+      {/* Editorial Header Banner */}
+      <div className="bg-gradient-to-r from-emerald-950 via-teal-950 to-emerald-950 text-white rounded-3xl p-8 sm:p-12 shadow-2xl relative overflow-hidden border border-emerald-800/80">
         <div className="relative z-10 max-w-2xl space-y-3">
-          <span className="bg-amber-400 text-emerald-950 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full inline-block shadow-sm">
-            Clinical Storefront Catalog
+          <span className="bg-amber-400 text-emerald-950 text-[10px] font-bold uppercase tracking-widest px-3.5 py-1 rounded-full inline-block shadow-md border border-amber-200">
+            Dermatological Catalog
           </span>
-          <h1 className="text-3xl sm:text-4xl font-serif font-bold tracking-tight text-emerald-50">
-            Dermatologist-Formulated Skincare Solutions
+          <h1 className="text-3xl sm:text-5xl font-serif font-bold tracking-tight text-emerald-50">
+            Clinical Active Skincare Formulations
           </h1>
-          <p className="text-emerald-200 text-sm sm:text-base leading-relaxed">
+          <p className="text-emerald-100 text-sm sm:text-base leading-relaxed font-light">
             High-potency clinical actives, 100% fragrance-free, non-comedogenic, and engineered specifically for Indian skin barrier resilience.
           </p>
         </div>
-        <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-emerald-800/30 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -right-10 -bottom-10 w-80 h-80 bg-emerald-700/20 rounded-full blur-3xl pointer-events-none" />
       </div>
 
-      {/* Main Grid: Sidebar + Product Grid */}
+      {/* Main Grid Layout: Desktop Sidebar + Catalog Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Desktop Sidebar Filters */}
-        <aside className="hidden lg:block lg:col-span-1 space-y-6 bg-white p-6 rounded-3xl border border-emerald-100 shadow-sm h-fit sticky top-24">
-          <div className="flex items-center justify-between pb-4 border-b border-emerald-100">
-            <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-              <Filter className="w-4 h-4 text-emerald-700" />
+        <aside className="hidden lg:block lg:col-span-1 space-y-6 bg-white p-6 rounded-3xl border border-stone-200/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] h-fit sticky top-28">
+          <div className="flex items-center justify-between pb-4 border-b border-stone-200">
+            <h2 className="text-sm font-serif font-bold text-stone-900 flex items-center gap-2">
+              <Filter className="w-4 h-4 text-emerald-800" />
               Filter Catalog
             </h2>
             {activeFilterCount > 0 && (
               <button
                 onClick={clearAllFilters}
-                className="text-xs text-emerald-700 font-semibold hover:underline"
+                className="text-xs text-amber-700 font-semibold hover:underline"
               >
                 Reset All
               </button>
@@ -172,27 +171,27 @@ export const ProductListingPage: React.FC<ProductListingPageProps> = ({
 
           {/* Search Filter */}
           <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">Search Products</label>
+            <label className="text-[10px] font-bold text-stone-500 uppercase tracking-widest">Search Actives</label>
             <div className="relative">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+              <Search className="w-4 h-4 text-stone-400 absolute left-3 top-2.5" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder="Search Ceramides, SPF..."
-                className="w-full text-xs pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:border-emerald-700"
+                className="w-full text-xs pl-9 pr-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-stone-800 focus:outline-none focus:border-emerald-800"
               />
             </div>
           </div>
 
           {/* Category Filter */}
           <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">Category</label>
+            <label className="text-[10px] font-bold text-stone-500 uppercase tracking-widest">Category</label>
             <div className="space-y-1">
               <button
                 onClick={() => onSelectCategory(null)}
-                className={`w-full text-left text-xs font-medium px-3 py-2 rounded-xl transition flex items-center justify-between ${
-                  selectedCategory === null ? 'bg-emerald-950 text-white font-bold' : 'text-slate-600 hover:bg-emerald-50'
+                className={`w-full text-left text-xs font-semibold px-3 py-2 rounded-xl transition flex items-center justify-between ${
+                  selectedCategory === null ? 'bg-emerald-950 text-amber-300 font-bold shadow-md' : 'text-stone-700 hover:bg-stone-100'
                 }`}
               >
                 <span>All Categories</span>
@@ -204,8 +203,8 @@ export const ProductListingPage: React.FC<ProductListingPageProps> = ({
                   <button
                     key={cat.id}
                     onClick={() => onSelectCategory(cat.id)}
-                    className={`w-full text-left text-xs font-medium px-3 py-2 rounded-xl transition flex items-center justify-between ${
-                      selectedCategory === cat.id ? 'bg-emerald-950 text-white font-bold' : 'text-slate-600 hover:bg-emerald-50'
+                    className={`w-full text-left text-xs font-semibold px-3 py-2 rounded-xl transition flex items-center justify-between ${
+                      selectedCategory === cat.id ? 'bg-emerald-950 text-amber-300 font-bold shadow-md' : 'text-stone-700 hover:bg-stone-100'
                     }`}
                   >
                     <span>{cat.name}</span>
@@ -218,16 +217,16 @@ export const ProductListingPage: React.FC<ProductListingPageProps> = ({
 
           {/* Skin Concern Filter */}
           <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">Skin Concern</label>
+            <label className="text-[10px] font-bold text-stone-500 uppercase tracking-widest">Skin Concern</label>
             <div className="flex flex-wrap gap-1.5">
               {skinConcernsList.map(concern => (
                 <button
                   key={concern}
                   onClick={() => onSelectSkinConcern(selectedSkinConcern === concern ? null : concern)}
-                  className={`text-[11px] px-2.5 py-1 rounded-xl border transition ${
+                  className={`text-[11px] px-3 py-1 rounded-xl border transition ${
                     selectedSkinConcern === concern
-                      ? 'bg-teal-800 text-white border-teal-800 font-bold'
-                      : 'bg-white text-slate-700 border-slate-200 hover:border-emerald-600'
+                      ? 'bg-emerald-950 text-amber-300 border-emerald-950 font-bold shadow-sm'
+                      : 'bg-white text-stone-700 border-stone-200 hover:border-emerald-700'
                   }`}
                 >
                   {concern}
@@ -238,16 +237,16 @@ export const ProductListingPage: React.FC<ProductListingPageProps> = ({
 
           {/* Skin Type Filter */}
           <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">Skin Type</label>
+            <label className="text-[10px] font-bold text-stone-500 uppercase tracking-widest">Skin Type</label>
             <div className="flex flex-wrap gap-1.5">
               {skinTypesList.map(st => (
                 <button
                   key={st}
                   onClick={() => setSelectedSkinType(selectedSkinType === st ? null : st)}
-                  className={`text-[11px] px-2.5 py-1 rounded-xl border transition ${
+                  className={`text-[11px] px-3 py-1 rounded-xl border transition ${
                     selectedSkinType === st
-                      ? 'bg-emerald-800 text-white border-emerald-800 font-bold'
-                      : 'bg-white text-slate-700 border-slate-200 hover:border-emerald-600'
+                      ? 'bg-teal-900 text-white border-teal-900 font-bold shadow-sm'
+                      : 'bg-white text-stone-700 border-stone-200 hover:border-emerald-700'
                   }`}
                 >
                   {st}
@@ -257,10 +256,10 @@ export const ProductListingPage: React.FC<ProductListingPageProps> = ({
           </div>
 
           {/* Price Range Slider */}
-          <div className="space-y-2 pt-2 border-t border-slate-100">
-            <div className="flex justify-between items-center text-xs font-bold text-slate-700">
-              <span className="uppercase tracking-wider">Max Price</span>
-              <span className="text-emerald-900 font-extrabold">₹{priceRange[1]}</span>
+          <div className="space-y-2 pt-2 border-t border-stone-100">
+            <div className="flex justify-between items-center text-xs font-bold text-stone-700">
+              <span className="uppercase tracking-widest text-[10px] text-stone-500">Max Price</span>
+              <span className="text-emerald-950 font-extrabold text-sm">₹{priceRange[1]}</span>
             </div>
             <input
               type="range"
@@ -269,47 +268,47 @@ export const ProductListingPage: React.FC<ProductListingPageProps> = ({
               step="50"
               value={priceRange[1]}
               onChange={e => setPriceRange([priceRange[0], Number(e.target.value)])}
-              className="w-full accent-emerald-800 cursor-pointer"
+              className="w-full accent-emerald-950 cursor-pointer"
             />
           </div>
 
-          {/* Best Sellers Only Checkbox */}
-          <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer pt-2">
+          {/* Best Sellers Checkbox */}
+          <label className="flex items-center gap-2 text-xs font-semibold text-stone-700 cursor-pointer pt-2">
             <input
               type="checkbox"
               checked={onlyBestsellers}
               onChange={e => setOnlyBestsellers(e.target.checked)}
-              className="w-4 h-4 accent-emerald-800 rounded"
+              className="w-4 h-4 accent-emerald-950 rounded"
             />
             <span>Best Sellers Only</span>
           </label>
         </aside>
 
-        {/* Product Grid & Controls Area */}
+        {/* Product Grid & Sorting Controls */}
         <div className="lg:col-span-3 space-y-6">
-          {/* Top Bar: Controls & Active Badges */}
-          <div className="bg-white p-4 rounded-2xl border border-emerald-100 shadow-sm flex flex-wrap items-center justify-between gap-4">
+          {/* Top Bar Controls */}
+          <div className="bg-white p-4 sm:p-5 rounded-3xl border border-stone-200/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setIsMobileFilterOpen(true)}
-                className="lg:hidden bg-emerald-950 text-white text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-sm"
+                className="lg:hidden bg-emerald-950 text-amber-300 text-xs font-bold px-4 py-2.5 rounded-2xl flex items-center gap-2 shadow-md"
               >
-                <SlidersHorizontal className="w-3.5 h-3.5 text-amber-300" />
-                Filters {activeFilterCount > 0 && `(${activeFilterCount})`}
+                <SlidersHorizontal className="w-4 h-4 text-amber-300" />
+                Filter Options {activeFilterCount > 0 && `(${activeFilterCount})`}
               </button>
-              <p className="text-xs font-semibold text-slate-700">
-                Showing <span className="text-emerald-950 font-bold">{sortedProducts.length}</span> formulations
+              <p className="text-xs font-semibold text-stone-700">
+                Showing <span className="text-emerald-950 font-bold text-sm">{sortedProducts.length}</span> clinical formulations
               </p>
             </div>
 
-            {/* Sort Dropdown */}
+            {/* Sort Selector */}
             <div className="flex items-center gap-2">
-              <ArrowUpDown className="w-3.5 h-3.5 text-emerald-800 hidden sm:block" />
-              <label className="text-xs font-semibold text-slate-500 hidden sm:block">Sort by:</label>
+              <ArrowUpDown className="w-4 h-4 text-emerald-800 hidden sm:block" />
+              <label className="text-xs font-semibold text-stone-500 hidden sm:block">Sort by:</label>
               <select
                 value={sortOption}
                 onChange={e => setSortOption(e.target.value)}
-                className="text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-semibold text-slate-800 focus:outline-none focus:border-emerald-700"
+                className="text-xs bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 font-semibold text-stone-800 focus:outline-none focus:border-emerald-800 shadow-sm"
               >
                 <option value="recommended">Featured / Recommended</option>
                 <option value="bestseller">Best Sellers First</option>
@@ -321,62 +320,62 @@ export const ProductListingPage: React.FC<ProductListingPageProps> = ({
             </div>
           </div>
 
-          {/* Active Filter Badges */}
+          {/* Active Filter Chips */}
           {activeFilterCount > 0 && (
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs text-slate-500 font-semibold">Active Filters:</span>
+              <span className="text-xs text-stone-500 font-semibold">Active Filters:</span>
               {selectedCategory && (
-                <span className="bg-emerald-100 text-emerald-900 text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 border border-emerald-200">
+                <span className="bg-emerald-950 text-amber-300 text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
                   Category: {categories.find(c => c.id === selectedCategory)?.name || selectedCategory}
-                  <X className="w-3 h-3 cursor-pointer hover:text-emerald-950" onClick={() => onSelectCategory(null)} />
+                  <X className="w-3.5 h-3.5 cursor-pointer hover:text-white" onClick={() => onSelectCategory(null)} />
                 </span>
               )}
               {selectedSkinConcern && (
-                <span className="bg-teal-100 text-teal-900 text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 border border-teal-200">
-                  Concern: {selectedSkinConcern}
-                  <X className="w-3 h-3 cursor-pointer hover:text-teal-950" onClick={() => onSelectSkinConcern(null)} />
+                <span className="bg-teal-900 text-teal-100 text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
+                  Target: {selectedSkinConcern}
+                  <X className="w-3.5 h-3.5 cursor-pointer hover:text-white" onClick={() => onSelectSkinConcern(null)} />
                 </span>
               )}
               {selectedSkinType && (
-                <span className="bg-slate-100 text-slate-800 text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 border border-slate-200">
+                <span className="bg-stone-200 text-stone-900 text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1.5 border border-stone-300">
                   Type: {selectedSkinType}
-                  <X className="w-3 h-3 cursor-pointer hover:text-slate-950" onClick={() => setSelectedSkinType(null)} />
+                  <X className="w-3.5 h-3.5 cursor-pointer hover:text-stone-950" onClick={() => setSelectedSkinType(null)} />
                 </span>
               )}
               {onlyBestsellers && (
-                <span className="bg-amber-100 text-amber-900 text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 border border-amber-200">
+                <span className="bg-amber-400 text-emerald-950 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
                   Best Sellers Only
-                  <X className="w-3 h-3 cursor-pointer hover:text-amber-950" onClick={() => setOnlyBestsellers(false)} />
+                  <X className="w-3.5 h-3.5 cursor-pointer hover:text-stone-950" onClick={() => setOnlyBestsellers(false)} />
                 </span>
               )}
               {searchQuery && (
-                <span className="bg-emerald-100 text-emerald-900 text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 border border-emerald-200">
+                <span className="bg-emerald-100 text-emerald-950 text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1.5 border border-emerald-200">
                   Search: "{searchQuery}"
-                  <X className="w-3 h-3 cursor-pointer hover:text-emerald-950" onClick={() => setSearchQuery('')} />
+                  <X className="w-3.5 h-3.5 cursor-pointer hover:text-emerald-950" onClick={() => setSearchQuery('')} />
                 </span>
               )}
               <button
                 onClick={clearAllFilters}
-                className="text-xs text-slate-500 hover:text-emerald-800 underline font-semibold ml-2"
+                className="text-xs text-amber-700 hover:text-emerald-900 underline font-semibold ml-2"
               >
                 Clear All
               </button>
             </div>
           )}
 
-          {/* Product Grid */}
+          {/* Product Cards Grid */}
           {paginatedProducts.length === 0 ? (
-            <div className="bg-white rounded-3xl p-12 text-center border border-emerald-100 space-y-4">
-              <div className="w-16 h-16 bg-emerald-50 text-emerald-800 rounded-full flex items-center justify-center mx-auto">
+            <div className="bg-white rounded-3xl p-12 text-center border border-stone-200 shadow-lg space-y-4">
+              <div className="w-16 h-16 bg-stone-100 text-emerald-900 rounded-full flex items-center justify-center mx-auto shadow-inner">
                 <Search className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-serif font-bold text-slate-900">No Formulations Match Your Filters</h3>
-              <p className="text-sm text-slate-600 max-w-md mx-auto">
-                Try adjusting your category, price range, or skin concern filters to see available CARe products.
+              <h3 className="text-2xl font-serif font-bold text-stone-900">No Formulations Match Your Filters</h3>
+              <p className="text-sm text-stone-600 max-w-md mx-auto font-light">
+                Try adjusting your active category, price limit, or skin concern options to discover available CARE products.
               </p>
               <button
                 onClick={clearAllFilters}
-                className="bg-emerald-950 hover:bg-emerald-900 text-white font-semibold text-xs px-5 py-2.5 rounded-xl shadow-md transition"
+                className="bg-emerald-950 hover:bg-emerald-900 text-amber-300 font-bold text-xs px-6 py-3 rounded-2xl shadow-lg transition active:scale-95"
               >
                 Reset Catalog Filters
               </button>
@@ -396,11 +395,11 @@ export const ProductListingPage: React.FC<ProductListingPageProps> = ({
 
           {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div className="bg-white p-4 rounded-2xl border border-emerald-100 shadow-sm flex items-center justify-between">
+            <div className="bg-white p-4 rounded-3xl border border-stone-200/80 shadow-sm flex items-center justify-between">
               <button
                 onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="px-3 py-2 text-xs font-semibold rounded-xl border border-slate-200 text-slate-700 hover:bg-emerald-50 disabled:opacity-40 disabled:hover:bg-transparent flex items-center gap-1"
+                className="px-4 py-2.5 text-xs font-bold rounded-2xl border border-stone-200 text-stone-700 hover:bg-stone-100 disabled:opacity-40 disabled:hover:bg-transparent flex items-center gap-1 transition"
               >
                 <ChevronLeft className="w-4 h-4" /> Previous
               </button>
@@ -410,8 +409,8 @@ export const ProductListingPage: React.FC<ProductListingPageProps> = ({
                   <button
                     key={i}
                     onClick={() => setCurrentPage(i + 1)}
-                    className={`w-8 h-8 rounded-xl text-xs font-bold transition ${
-                      currentPage === i + 1 ? 'bg-emerald-950 text-white' : 'text-slate-600 hover:bg-slate-100'
+                    className={`w-9 h-9 rounded-xl text-xs font-bold transition ${
+                      currentPage === i + 1 ? 'bg-emerald-950 text-amber-300 shadow-md' : 'text-stone-600 hover:bg-stone-100'
                     }`}
                   >
                     {i + 1}
@@ -422,7 +421,7 @@ export const ProductListingPage: React.FC<ProductListingPageProps> = ({
               <button
                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
-                className="px-3 py-2 text-xs font-semibold rounded-xl border border-slate-200 text-slate-700 hover:bg-emerald-50 disabled:opacity-40 disabled:hover:bg-transparent flex items-center gap-1"
+                className="px-4 py-2.5 text-xs font-bold rounded-2xl border border-stone-200 text-stone-700 hover:bg-stone-100 disabled:opacity-40 disabled:hover:bg-transparent flex items-center gap-1 transition"
               >
                 Next <ChevronRight className="w-4 h-4" />
               </button>
@@ -433,24 +432,24 @@ export const ProductListingPage: React.FC<ProductListingPageProps> = ({
 
       {/* Mobile Filters Drawer */}
       {isMobileFilterOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm lg:hidden flex justify-end">
-          <div className="w-full max-w-xs bg-white h-full p-6 space-y-6 overflow-y-auto">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-200">
-              <h3 className="font-bold text-slate-900 flex items-center gap-2">
-                <Filter className="w-4 h-4 text-emerald-700" /> Filter Options
+        <div className="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm lg:hidden flex justify-end">
+          <div className="w-full max-w-xs bg-white h-full p-6 space-y-6 overflow-y-auto shadow-2xl">
+            <div className="flex items-center justify-between pb-4 border-b border-stone-200">
+              <h3 className="font-serif font-bold text-stone-900 flex items-center gap-2">
+                <Filter className="w-4 h-4 text-emerald-800" /> Filter Options
               </h3>
-              <button onClick={() => setIsMobileFilterOpen(false)} className="p-1 rounded-full text-slate-500 hover:bg-slate-100">
+              <button onClick={() => setIsMobileFilterOpen(false)} className="p-1 rounded-full text-stone-500 hover:bg-stone-100">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Mobile Category */}
             <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-700 uppercase">Category</label>
+              <label className="text-[10px] font-bold text-stone-500 uppercase tracking-widest">Category</label>
               <div className="space-y-1">
                 <button
                   onClick={() => { onSelectCategory(null); setIsMobileFilterOpen(false); }}
-                  className={`w-full text-left text-xs p-2 rounded-xl ${selectedCategory === null ? 'bg-emerald-950 text-white font-bold' : 'text-slate-700 bg-slate-50'}`}
+                  className={`w-full text-left text-xs p-2.5 rounded-xl font-semibold ${selectedCategory === null ? 'bg-emerald-950 text-amber-300 font-bold' : 'text-stone-700 bg-stone-50'}`}
                 >
                   All Categories
                 </button>
@@ -458,7 +457,7 @@ export const ProductListingPage: React.FC<ProductListingPageProps> = ({
                   <button
                     key={cat.id}
                     onClick={() => { onSelectCategory(cat.id); setIsMobileFilterOpen(false); }}
-                    className={`w-full text-left text-xs p-2 rounded-xl ${selectedCategory === cat.id ? 'bg-emerald-950 text-white font-bold' : 'text-slate-700 bg-slate-50'}`}
+                    className={`w-full text-left text-xs p-2.5 rounded-xl font-semibold ${selectedCategory === cat.id ? 'bg-emerald-950 text-amber-300 font-bold' : 'text-stone-700 bg-stone-50'}`}
                   >
                     {cat.name}
                   </button>
@@ -468,9 +467,9 @@ export const ProductListingPage: React.FC<ProductListingPageProps> = ({
 
             <button
               onClick={() => setIsMobileFilterOpen(false)}
-              className="w-full bg-emerald-950 text-white py-2.5 rounded-xl text-xs font-bold shadow-md"
+              className="w-full bg-emerald-950 text-amber-300 py-3 rounded-2xl text-xs font-bold shadow-lg"
             >
-              Apply Filters ({sortedProducts.length} Results)
+              Apply Filters ({sortedProducts.length} Formulations)
             </button>
           </div>
         </div>
@@ -478,3 +477,4 @@ export const ProductListingPage: React.FC<ProductListingPageProps> = ({
     </div>
   );
 };
+
