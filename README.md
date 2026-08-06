@@ -1,84 +1,90 @@
 # CARe Beauty Solution — Full-Stack E-Commerce Platform
 
-CARe Beauty Solution is an enterprise-grade, secure, scalable D2C e-commerce platform custom-engineered for clinical skincare in India.
+CARe Beauty Solution is an enterprise-grade D2C clinical skincare e-commerce platform engineered for Indian skin formulations.
 
 ---
 
-## Technical Stack Architecture
+## Production Deployment Stack
 
-| Layer | Primary Technology | Description / Role |
-| :--- | :--- | :--- |
-| **Frontend Storefront** | React 18, TypeScript, Tailwind CSS, Lucide Icons | Responsive single-page application with high-contrast UI, custom product filters, and real-time state |
-| **Admin Panel** | React 18, RBAC UI Components, Recharts | Back-office management for products, orders, refunds, coupons, live visitor telemetry, and marketplace channels |
-| **Backend API Server** | Node.js, Express.js | Full-stack REST API with DTO validation, rate limiting, and security header middleware |
-| **Database & Cache Layer**| PostgreSQL (Drizzle ORM), Redis (BullMQ Queue) | Permanent relational storage and ultra-fast session/job caching |
-| **Payments** | Razorpay Gateway | UPI, cards, netbanking, HMAC SHA256 signature verification, and automated refund API |
-| **Image & Asset Storage** | AWS S3 / Cloudflare R2 | Presigned URL generation for secure direct image uploads |
-| **Email & Marketing** | Email Service Abstraction | Transactional order confirmations, newsletter campaigns, and abandoned cart recovery |
-| **Monitoring & Telemetry**| GA4, Sentry, Prometheus, Uptime Kuma | Full-stack telemetry monitoring and live online visitor tracker |
+| Component | Target Platform | Free Tier | Infrastructure Role |
+| :--- | :--- | :--- | :--- |
+| **Storefront & Admin UI** | **Vercel** | Yes (Hobby Tier) | High-speed Global Edge CDN, SPA Routing |
+| **Backend API Service** | **Render / Railway** | Yes | Always-on Express Node.js application server |
+| **Database** | **Neon** | Yes | Managed serverless PostgreSQL database |
+| **Redis & Queue** | **Upstash** | Yes | Serverless Redis store for BullMQ job queue |
+| **Payments** | **Razorpay** | Pay-per-use | India payment gateway (UPI, Netbanking, Cards) |
 
 ---
 
-## Quick Start & Local Execution
+## Step-by-Step Deployment Guide
 
-### 1. Install Dependencies & Build
+### 1. Database Setup (Neon PostgreSQL)
+1. Sign up at [Neon.tech](https://neon.tech).
+2. Create a new PostgreSQL database project named `care-beauty-db`.
+3. Copy the Connection String URI and set it as `DATABASE_URL` in your backend environment variables.
+
+### 2. Redis & Job Queue Setup (Upstash Redis)
+1. Sign up at [Upstash.com](https://upstash.com).
+2. Create a Redis database instance.
+3. Copy the Redis Connection URL (`redis://...`) and set it as `REDIS_URL`.
+
+### 3. Deploy Backend API Server (Render or Railway)
+1. Push your repository to GitHub.
+2. Connect your repository to **Render** (New Web Service) or **Railway**.
+3. Set the build and start commands:
+   - **Build Command**: `npm run build`
+   - **Start Command**: `npm start`
+4. Configure environment variables in the Render/Railway dashboard:
+   - `NODE_ENV=production`
+   - `DATABASE_URL` (From Neon)
+   - `REDIS_URL` (From Upstash)
+   - `JWT_SECRET`
+   - `RAZORPAY_KEY_ID` & `RAZORPAY_SECRET`
+   - `GEMINI_API_KEY`
+5. Note your deployed Backend API URL (e.g., `https://care-beauty-api.onrender.com`).
+
+### 4. Deploy Storefront & Admin UI (Vercel)
+1. Connect your repository to **Vercel**.
+2. Select **Vite** as the Framework Preset.
+3. Set the Environment Variables:
+   - `VITE_API_BASE_URL` = `https://care-beauty-api.onrender.com`
+4. Click **Deploy**. Vercel will build and distribute your frontend across global edge nodes.
+
+---
+
+## Local Development & Testing
+
 ```bash
+# Install dependencies
 npm install
-npm run build
-```
 
-### 2. Start Development Server
-```bash
+# Run build
+npm run build
+
+# Start dev server
 npm run dev
 ```
-The server will boot on `http://localhost:3000`.
 
-### 3. Run Automated Integration Tests
-You can run automated E2E test suites for each implementation phase via simple HTTP endpoints or Node scripts:
-
+### Automated Integration Tests & Load Testing
 ```bash
-# Phase 3: Checkout & Payments E2E Test
+# Execute Phase 3-6 E2E Integration Test Suite
 curl -s http://localhost:3000/api/tests/phase3
-
-# Phase 4: Admin Panel, RBAC & S3/R2 Upload Test
 curl -s http://localhost:3000/api/tests/phase4
-
-# Phase 5: Marketing, SEO & Abandoned Cart Test
 curl -s http://localhost:3000/api/tests/phase5
-
-# Phase 6: Hardening, Security Headers & Rate Limit Test
 curl -s http://localhost:3000/api/tests/phase6
 
-# High-Concurrency Checkout Load Test
+# Run Load Test Script (50 concurrent checkouts)
 node load-test-checkout.js
 ```
 
 ---
 
-## Phase-by-Phase Technical Implementation Summary
+## Environment Variables Reference (`.env.example`)
 
-### Phase 1 & 2: Core Storefront & Catalog Management
-* **Features Built**: Product catalog, multi-criteria filtering (Skin Type, Skin Concern, Ingredients), product search with auto-suggest, cart drawer with persistent guest-to-user session merge, and dynamic AI Routine Builder powered by Google Gemini.
-* **Testing**: Verified via UI cart interactions, item quantity updates, and cart persistence.
-
-### Phase 3: Checkout & Payments Engine
-* **Features Built**: Complete checkout pipeline with address validation, GST (18%) computation, coupon discount application, Razorpay order creation, HMAC SHA256 signature validation, and email dispatch.
-* **Testing**: `curl -s http://localhost:3000/api/tests/phase3`
-
-### Phase 4: Admin Panel, RBAC & Telemetry
-* **Features Built**: Multi-role admin portal (Super Admin, Catalog Manager, Order Manager) with TOTP 2FA, strict RBAC enforcement (blocking unauthorized refunds), AWS S3/R2 presigned upload URLs, live visitor counter, and marketplace sync connectors.
-* **Testing**: `curl -s http://localhost:3000/api/tests/phase4`
-
-### Phase 5: Marketing, SEO & Notifications
-* **Features Built**: Newsletter subscription with welcome discount vouchers, broadcast email campaign engine, BullMQ/Redis abandoned cart job queue, dynamic `sitemap.xml`, `robots.txt`, and Google Analytics 4 tags.
-* **Testing**: `curl -s http://localhost:3000/api/tests/phase5`
-
-### Phase 6: Hardening & Launch Readiness
-* **Features Built**: Global & route-specific rate limiting (100 req/min global, 10 req/min auth), security headers middleware (HSTS, CSP, X-Frame-Options, X-Content-Type-Options), load-testing suite, and `SECURITY.md`.
-* **Testing**: `curl -s http://localhost:3000/api/tests/phase6` and `node load-test-checkout.js`
-
----
-
-## Environment Variables (`.env.example`)
-
-See `.env.example` for all configurable environment variables including `GEMINI_API_KEY`, `JWT_SECRET`, `RAZORPAY_KEY_ID`, `RAZORPAY_SECRET`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and `GA4_MEASUREMENT_ID`.
+See `.env.example` for all required production variables:
+- `JWT_SECRET`
+- `RAZORPAY_KEY_ID` / `RAZORPAY_SECRET` / `RAZORPAY_WEBHOOK_SECRET`
+- `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` / `S3_BUCKET_NAME`
+- `DATABASE_URL` (Neon PostgreSQL)
+- `REDIS_URL` (Upstash Redis)
+- `GA4_MEASUREMENT_ID`
