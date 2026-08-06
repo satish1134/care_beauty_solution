@@ -161,6 +161,67 @@ export interface Review {
   createdAt: string;
 }
 
+export type AdminRole = 'SUPER_ADMIN' | 'CATALOG_MANAGER' | 'ORDER_MANAGER';
+
+export type AdminPermission =
+  | 'PRODUCT_WRITE'
+  | 'PRODUCT_DELETE'
+  | 'ORDER_READ'
+  | 'ORDER_STATUS_UPDATE'
+  | 'ORDER_REFUND'
+  | 'COUPON_WRITE'
+  | 'SEO_CAMPAIGN'
+  | 'MARKETPLACE_SYNC'
+  | 'MONITORING_TOGGLE'
+  | 'LIVE_VISITORS';
+
+export interface AdminUser {
+  id: string;
+  email: string;
+  fullName: string;
+  role: AdminRole;
+  twoFactorEnabled: boolean;
+  twoFactorSecret?: string;
+  permissions: AdminPermission[];
+  createdAt: string;
+}
+
+export interface MonitoringToolConfig {
+  id: string;
+  name: string;
+  category: 'Error Tracking' | 'Telemetry Metrics' | 'Privacy Analytics' | 'Uptime Check';
+  provider: 'Sentry' | 'Prometheus' | 'Plausible' | 'Uptime Kuma';
+  enabled: boolean;
+  dsnUrl?: string;
+  status: 'CONNECTED' | 'DISCONNECTED' | 'PAUSED';
+  lastPing?: string;
+}
+
+export interface SeoCampaign {
+  id: string;
+  title: string;
+  targetKeywords: string[];
+  googleMerchantStatus: 'SYNCED' | 'PENDING' | 'ERROR';
+  metaTitle: string;
+  metaDescription: string;
+  canonicalUrl: string;
+  schemaType: string;
+  createdByName: string;
+  createdAt: string;
+}
+
+export interface MarketplaceChannel {
+  id: string;
+  name: 'Amazon' | 'Flipkart' | 'Nykaa' | 'Myntra' | 'Meesho' | 'Blinkit' | 'Zepto';
+  category: 'E-Commerce Marketplace' | 'Quick Commerce (10-Min Delivery)';
+  connected: boolean;
+  apiKeySet: boolean;
+  autoSyncStock: boolean;
+  activeOrdersToday: number;
+  revenueToday: number;
+  lastSyncedAt: string;
+}
+
 export interface AuditLog {
   id: string;
   actorEmail: string;
@@ -170,3 +231,4 @@ export interface AuditLog {
   details: string;
   timestamp: string;
 }
+

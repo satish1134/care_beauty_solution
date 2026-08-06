@@ -39,8 +39,8 @@ export const Footer: React.FC = () => {
           </ul>
         </div>
 
-        {/* Customer Care Column */}
-        <div className="md:col-span-5 space-y-3">
+        {/* Customer Care & Newsletter Column */}
+        <div className="md:col-span-5 space-y-4">
           <h4 className="font-serif font-bold text-white text-sm">Customer Support & Inquiries (India)</h4>
           <div className="space-y-2 text-xs text-emerald-200">
             <div className="flex items-center gap-2">
@@ -55,6 +55,46 @@ export const Footer: React.FC = () => {
               <MapPin className="w-4 h-4 text-amber-300" />
               <span>Clinical Lab HQ: Indiranagar 100ft Road, Bengaluru, Karnataka - 560038</span>
             </div>
+          </div>
+
+          {/* Newsletter Signup Form */}
+          <div className="pt-2">
+            <h5 className="text-xs font-bold text-amber-300 uppercase tracking-wider mb-2">Subscribe for ₹100 Off Voucher</h5>
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                const form = e.currentTarget;
+                const emailInput = form.querySelector('input') as HTMLInputElement;
+                if (!emailInput || !emailInput.value) return;
+
+                try {
+                  const res = await fetch('/api/newsletter/subscribe', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: emailInput.value, source: 'Footer Signup' }),
+                  });
+                  const data = await res.json();
+                  alert(data.message || 'Subscribed successfully!');
+                  emailInput.value = '';
+                } catch (err) {
+                  alert('Subscription failed. Please try again.');
+                }
+              }}
+              className="flex items-center gap-2"
+            >
+              <input
+                type="email"
+                placeholder="Enter your email address"
+                required
+                className="bg-emerald-900 border border-emerald-800 rounded-lg px-3 py-1.5 text-xs text-white placeholder-emerald-400 focus:outline-none focus:border-amber-400 w-full"
+              />
+              <button
+                type="submit"
+                className="px-4 py-1.5 bg-amber-400 hover:bg-amber-300 text-emerald-950 font-bold text-xs rounded-lg transition-all shrink-0"
+              >
+                Join
+              </button>
+            </form>
           </div>
         </div>
       </div>

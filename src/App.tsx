@@ -129,6 +129,25 @@ export default function App() {
     }
   }, [cart]);
 
+  // Send Heartbeat to Live Visitor Counter Backend
+  useEffect(() => {
+    const sendHeartbeat = () => {
+      fetch('/api/analytics/heartbeat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId: guestSessionId,
+          path: currentPath,
+        }),
+      }).catch(() => {});
+    };
+
+    sendHeartbeat();
+    const interval = setInterval(sendHeartbeat, 15000);
+    return () => clearInterval(interval);
+  }, [guestSessionId, currentPath]);
+
+
   // Sync Data from Backend API
   const fetchBackendData = async () => {
     try {
