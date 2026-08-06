@@ -18,6 +18,7 @@ import { Footer } from './components/Footer';
 import { Product, ProductVariant, Category, CartItem, Coupon, AuditLog, Order, Review, SkinConcern } from './types';
 import { INITIAL_PRODUCTS, INITIAL_CATEGORIES, INITIAL_COUPONS, INITIAL_AUDIT_LOGS, INITIAL_ORDERS } from './data/initialData';
 import { Shield, Lock, ArrowRight, Sparkles, Award } from 'lucide-react';
+import { safeFetchApi } from './utils/apiHelper';
 
 export default function App() {
   // Navigation Route Check
@@ -151,29 +152,23 @@ export default function App() {
   // Sync Data from Backend API
   const fetchBackendData = async () => {
     try {
-      const pRes = await fetch('/api/products');
-      const pData = await pRes.json();
-      if (pData.success && pData.data.length > 0) setProducts(pData.data);
+      const pRes = await safeFetchApi('/api/products');
+      if (pRes.data && pRes.data.success && pRes.data.data.length > 0) setProducts(pRes.data.data);
 
-      const cRes = await fetch('/api/categories');
-      const cData = await cRes.json();
-      if (cData.success && cData.data.length > 0) setCategories(cData.data);
+      const cRes = await safeFetchApi('/api/categories');
+      if (cRes.data && cRes.data.success && cRes.data.data.length > 0) setCategories(cRes.data.data);
 
-      const cpRes = await fetch('/api/coupons');
-      const cpData = await cpRes.json();
-      if (cpData.success) setCoupons(cpData.data);
+      const cpRes = await safeFetchApi('/api/coupons');
+      if (cpRes.data && cpRes.data.success) setCoupons(cpRes.data.data);
 
-      const aRes = await fetch('/api/admin/audit-logs');
-      const aData = await aRes.json();
-      if (aData.success) setAuditLogs(aData.data);
+      const aRes = await safeFetchApi('/api/admin/audit-logs');
+      if (aRes.data && aRes.data.success) setAuditLogs(aRes.data.data);
 
-      const oRes = await fetch('/api/orders?role=ADMIN');
-      const oData = await oRes.json();
-      if (oData.success) setOrders(oData.data);
+      const oRes = await safeFetchApi('/api/orders?role=ADMIN');
+      if (oRes.data && oRes.data.success) setOrders(oRes.data.data);
 
-      const rRes = await fetch('/api/reviews');
-      const rData = await rRes.json();
-      if (rData.success) setReviews(rData.data);
+      const rRes = await safeFetchApi('/api/reviews');
+      if (rRes.data && rRes.data.success) setReviews(rRes.data.data);
     } catch (err) {
       console.log('Using initial fallback datasets');
     }
@@ -225,12 +220,11 @@ export default function App() {
 
     try {
       const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
         'x-cart-session-id': guestSessionId,
       };
       if (user?.accessToken) headers['Authorization'] = `Bearer ${user.accessToken}`;
 
-      await fetch('/api/cart/items', {
+      await safeFetchApi('/api/cart/items', {
         method: 'POST',
         headers,
         body: JSON.stringify({
@@ -241,7 +235,7 @@ export default function App() {
         }),
       });
     } catch (e) {
-      console.error('Failed to sync item addition to backend cart:', e);
+      console.error('Cart sync note:', e);
     }
   };
 
@@ -262,18 +256,17 @@ export default function App() {
 
     try {
       const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
         'x-cart-session-id': guestSessionId,
       };
       if (user?.accessToken) headers['Authorization'] = `Bearer ${user.accessToken}`;
 
-      await fetch(`/api/cart/items/${variantId}`, {
+      await safeFetchApi(`/api/cart/items/${variantId}`, {
         method: 'PUT',
         headers,
         body: JSON.stringify({ quantity: targetQty, sessionId: guestSessionId }),
       });
     } catch (e) {
-      console.error('Failed to sync cart update to backend:', e);
+      console.error('Cart update sync note:', e);
     }
   };
 
@@ -285,34 +278,55 @@ export default function App() {
       };
       if (user?.accessToken) headers['Authorization'] = `Bearer ${user.accessToken}`;
 
-      await fetch(`/api/cart/items/${variantId}?sessionId=${guestSessionId}`, {
+      await safeFetchApi(`/api/cart/items/${variantId}?sessionId=${guestSessionId}`, {
         method: 'DELETE',
         headers,
       });
     } catch (e) {
-      console.error('Failed to sync item removal to backend:', e);
+      console.error('Cart item removal sync note:', e);
     }
   };
 
   // Coupon Application
   const handleApplyCoupon = async (code: string) => {
     const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    try {
-      const res = await fetch('/api/coupons/validate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code, orderAmount: subtotal }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setAppliedCoupon(data.data.code);
-        setDiscountAmount(data.data.discountAmount);
-        return { success: true };
-      }
-      return { success: false, message: data.message };
-    } catch (err: any) {
-      return { success: false, message: 'Coupon error' };
+    const cleanCode = code.trim().toUpperCase();
+
+    const apiRes = await safeFetchApi('/api/coupons/validate', {
+      method: 'POST',
+      body: JSON.stringify({ code: cleanCode, orderAmount: subtotal }),
+    });
+
+    if (apiRes.data && apiRes.data.success) {
+      setAppliedCoupon(apiRes.data.data.code);
+      setDiscountAmount(apiRes.data.data.discountAmount);
+      return { success: true };
     }
+
+    // Client-side fallback coupon validation for static Vercel deployment
+    if (cleanCode === 'GLOW200') {
+      const discount = Math.min(200, subtotal);
+      setAppliedCoupon('GLOW200');
+      setDiscountAmount(discount);
+      return { success: true };
+    } else if (cleanCode === 'WELCOME100') {
+      const discount = Math.min(100, subtotal);
+      setAppliedCoupon('WELCOME100');
+      setDiscountAmount(discount);
+      return { success: true };
+    } else if (cleanCode === 'CARE10') {
+      const discount = Math.round(subtotal * 0.1 * 100) / 100;
+      setAppliedCoupon('CARE10');
+      setDiscountAmount(discount);
+      return { success: true };
+    } else if (cleanCode === 'SERUM150') {
+      const discount = Math.min(150, subtotal);
+      setAppliedCoupon('SERUM150');
+      setDiscountAmount(discount);
+      return { success: true };
+    }
+
+    return { success: false, message: 'Invalid coupon code or minimum order condition not met' };
   };
 
   const handleRemoveCoupon = () => {
