@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <defs>
+    <linearGradient id="marbleBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc" />
+      <stop offset="50%" stop-color="#f1f5f9" />
+      <stop offset="100%" stop-color="#e2e8f0" />
+    </linearGradient>
+
+    <linearGradient id="glassRim" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9" />
+      <stop offset="50%" stop-color="#cbd5e1" stop-opacity="0.5" />
+      <stop offset="100%" stop-color="#94a3b8" stop-opacity="0.8" />
+    </linearGradient>
+
+    <radialGradient id="gelTexture" cx="40%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95" />
+      <stop offset="30%" stop-color="#ccfbf1" stop-opacity="0.8" />
+      <stop offset="70%" stop-color="#99f6e4" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#2dd4bf" stop-opacity="0.4" />
+    </radialGradient>
+
+    <filter id="gelGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="10"/>
+      <feOffset dx="0" dy="12"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.2"/></feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Marble Counter Background -->
+  <rect width="800" height="800" fill="url(#marbleBg)" />
+
+  <!-- Marble Veining -->
+  <path d="M 0 300 Q 300 200 800 500" stroke="#cbd5e1" stroke-width="12" fill="none" opacity="0.3" />
+  <path d="M 200 0 Q 500 600 800 800" stroke="#94a3b8" stroke-width="8" fill="none" opacity="0.25" />
+
+  <!-- Glass Petri Dish -->
+  <ellipse cx="400" cy="450" rx="260" ry="160" fill="none" stroke="url(#glassRim)" stroke-width="14" filter="url(#gelGlow)" />
+  <ellipse cx="400" cy="450" rx="248" ry="150" fill="#f8fafc" opacity="0.4" />
+
+  <!-- Hydrating Gel Texture Swirl -->
+  <ellipse cx="380" cy="440" rx="180" ry="100" fill="url(#gelTexture)" filter="url(#gelGlow)" />
+  
+  <!-- Micro Gel Bubbles (Showing Hydrating Niacinamide Micro-Droplets) -->
+  <circle cx="320" cy="420" r="12" fill="#ffffff" opacity="0.8" />
+  <circle cx="340" cy="400" r="8" fill="#ffffff" opacity="0.9" />
+  <circle cx="420" cy="460" r="16" fill="#ffffff" opacity="0.75" />
+  <circle cx="450" cy="430" r="10" fill="#ffffff" opacity="0.85" />
+  <circle cx="380" cy="470" r="14" fill="#ffffff" opacity="0.7" />
+
+  <!-- Specular Light Reflection Ring -->
+  <path d="M 260 400 A 160 80 0 0 1 500 390" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" opacity="0.9" />
+
+  <!-- Label Overlay Badge -->
+  <rect x="220" y="660" width="360" height="70" rx="35" fill="#0f766e" />
+  <text x="400" y="692" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-size="16" font-weight="800" fill="#ffffff" letter-spacing="1">SOAP-FREE HYDRATING GEL TEXTURE</text>
+  <text x="400" y="714" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-size="12" font-weight="600" fill="#99f6e4">With Niacinamide &amp; Panthenol (Pro-Vitamin B5)</text>
+</svg>

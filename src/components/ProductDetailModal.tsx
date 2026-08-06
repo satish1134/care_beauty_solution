@@ -48,12 +48,12 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-emerald-950/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 animate-fadeIn">
-      <div className="bg-white rounded-3xl max-w-4xl w-full overflow-hidden shadow-2xl relative max-h-[92vh] flex flex-col my-auto border border-emerald-100">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-stone-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 animate-fadeIn">
+      <div className="bg-white rounded-3xl max-w-4xl w-full overflow-hidden shadow-2xl relative max-h-[92vh] flex flex-col my-auto border border-stone-200">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-20 bg-slate-100 hover:bg-slate-200 text-slate-700 p-2 rounded-full transition"
+          className="absolute top-4 right-4 z-20 bg-stone-100 hover:bg-stone-200 text-stone-700 p-2 rounded-full transition"
         >
           <X className="w-5 h-5" />
         </button>
@@ -63,22 +63,25 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
             {/* Image Gallery Column */}
             <div className="md:col-span-6 space-y-4">
-              <div className="aspect-square bg-emerald-50 rounded-2xl overflow-hidden border border-emerald-100 shadow-inner">
+              <div className="aspect-square bg-stone-50 rounded-2xl overflow-hidden border border-stone-200 shadow-inner relative">
                 <img
                   src={selectedImage || product.images[0]?.url}
                   alt={product.name}
                   className="w-full h-full object-cover"
                 />
+                <div className="absolute top-3 left-3 bg-stone-900/80 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                  {product.images.length} Photoshoot Views
+                </div>
               </div>
 
-              {/* Thumbnails */}
-              <div className="flex gap-3 overflow-x-auto pb-1">
+              {/* Thumbnails Strip */}
+              <div className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-none">
                 {product.images.map(img => (
                   <button
                     key={img.id}
                     onClick={() => setSelectedImage(img.url)}
-                    className={`w-16 h-16 rounded-xl overflow-hidden border-2 transition ${
-                      selectedImage === img.url ? 'border-emerald-700 shadow-md' : 'border-slate-200 opacity-70 hover:opacity-100'
+                    className={`w-16 h-16 rounded-xl overflow-hidden border-2 transition shrink-0 ${
+                      selectedImage === img.url ? 'border-amber-800 shadow-md ring-2 ring-amber-500/30' : 'border-stone-200 opacity-60 hover:opacity-100'
                     }`}
                   >
                     <img src={img.url} alt={img.altText} className="w-full h-full object-cover" />
@@ -90,34 +93,34 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
             {/* Product Header & Variant Purchasing */}
             <div className="md:col-span-6 space-y-5">
               <div>
-                <span className="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full uppercase tracking-wider">
+                <span className="text-xs font-bold text-amber-900 bg-amber-50 border border-amber-200 px-3 py-1 rounded-full uppercase tracking-wider">
                   {product.categoryName}
                 </span>
 
-                <h2 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900 mt-2">
+                <h2 className="text-2xl sm:text-3xl font-serif font-bold text-stone-900 mt-2">
                   {product.name}
                 </h2>
 
-                <p className="text-sm text-slate-600 mt-1 font-medium">{product.tagline}</p>
+                <p className="text-sm text-stone-600 mt-1 font-normal">{product.tagline}</p>
 
                 {/* Rating */}
                 <div className="flex items-center gap-2 mt-2">
-                  <div className="flex text-amber-400">
+                  <div className="flex text-amber-500">
                     {[1, 2, 3, 4, 5].map(star => (
                       <Star
                         key={star}
-                        className={`w-4 h-4 ${star <= Math.round(product.rating) ? 'fill-amber-400' : 'text-slate-300'}`}
+                        className={`w-4 h-4 ${star <= Math.round(product.rating) ? 'fill-amber-500' : 'text-stone-300'}`}
                       />
                     ))}
                   </div>
-                  <span className="text-xs font-bold text-slate-700">{product.rating}</span>
-                  <span className="text-xs text-slate-400">({product.reviewCount} Reviews)</span>
+                  <span className="text-xs font-bold text-stone-800">{product.rating}</span>
+                  <span className="text-xs text-stone-400">({product.reviewCount} Reviews)</span>
                 </div>
               </div>
 
               {/* Variant Selector */}
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">Select Size / Variant:</label>
+                <label className="text-xs font-bold text-stone-700 uppercase tracking-wider">Select Size / Variant:</label>
                 <div className="flex flex-wrap gap-2">
                   {product.variants.map(v => (
                     <button
@@ -125,8 +128,8 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                       onClick={() => setSelectedVariant(v)}
                       className={`px-4 py-2 text-xs font-semibold rounded-xl border transition ${
                         selectedVariant.id === v.id
-                          ? 'bg-emerald-950 text-white border-emerald-900 shadow-sm'
-                          : 'bg-white text-slate-700 border-slate-200 hover:border-emerald-600'
+                          ? 'bg-amber-800 text-amber-50 border-amber-900 shadow-sm'
+                          : 'bg-white text-stone-700 border-stone-200 hover:border-amber-700'
                       }`}
                     >
                       {v.name} - ₹{v.price}
@@ -136,11 +139,11 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               </div>
 
               {/* Price & Quantity */}
-              <div className="bg-emerald-50/60 p-4 rounded-2xl border border-emerald-100 flex flex-wrap items-center justify-between gap-4">
+              <div className="bg-amber-50/60 p-4 rounded-2xl border border-amber-200/80 flex flex-wrap items-center justify-between gap-4">
                 <div>
-                  <div className="text-2xl font-bold text-emerald-950">₹{selectedVariant.price}</div>
+                  <div className="text-2xl font-bold text-amber-900">₹{selectedVariant.price}</div>
                   {selectedVariant.compareAtPrice && (
-                    <div className="text-xs text-slate-400 line-through">
+                    <div className="text-xs text-stone-400 line-through">
                       MRP: ₹{selectedVariant.compareAtPrice} (Incl. of all taxes)
                     </div>
                   )}
@@ -169,22 +172,22 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                       onClose();
                     }}
                     disabled={selectedVariant.stock <= 0}
-                    className="flex-1 sm:flex-initial bg-emerald-900 hover:bg-emerald-800 text-white font-semibold text-sm px-6 py-2.5 rounded-xl flex items-center justify-center gap-2 shadow-md transition active:scale-95"
+                    className="flex-1 sm:flex-initial bg-amber-800 hover:bg-amber-900 text-amber-50 font-bold text-sm px-6 py-2.5 rounded-xl flex items-center justify-center gap-2 shadow-md transition active:scale-95"
                   >
-                    <ShoppingBag className="w-4 h-4 text-amber-300" />
+                    <ShoppingBag className="w-4 h-4 text-amber-200" />
                     Add to Bag
                   </button>
                 </div>
               </div>
 
               {/* Trust Badges */}
-              <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-600 font-medium">
+              <div className="grid grid-cols-2 gap-2 text-[11px] text-stone-600 font-medium">
                 <div className="flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-emerald-700" />
+                  <ShieldCheck className="w-4 h-4 text-amber-700" />
                   <span>Dermatologically Tested</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-700" />
+                  <CheckCircle2 className="w-4 h-4 text-amber-700" />
                   <span>Non-Comedogenic</span>
                 </div>
               </div>
@@ -192,44 +195,44 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           </div>
 
           {/* Tab Navigation */}
-          <div className="border-t border-slate-200 pt-6">
-            <div className="flex space-x-6 border-b border-slate-200 text-sm font-semibold pb-2">
+          <div className="border-t border-stone-200 pt-6">
+            <div className="flex space-x-6 border-b border-stone-200 text-sm font-semibold pb-2">
               <button
                 onClick={() => setActiveTab('benefits')}
-                className={`transition ${activeTab === 'benefits' ? 'text-emerald-900 border-b-2 border-emerald-900 pb-2' : 'text-slate-400 hover:text-slate-700'}`}
+                className={`transition ${activeTab === 'benefits' ? 'text-amber-900 border-b-2 border-amber-800 pb-2 font-bold' : 'text-stone-400 hover:text-stone-700'}`}
               >
                 Key Benefits
               </button>
               <button
                 onClick={() => setActiveTab('ingredients')}
-                className={`transition ${activeTab === 'ingredients' ? 'text-emerald-900 border-b-2 border-emerald-900 pb-2' : 'text-slate-400 hover:text-slate-700'}`}
+                className={`transition ${activeTab === 'ingredients' ? 'text-amber-900 border-b-2 border-amber-800 pb-2 font-bold' : 'text-stone-400 hover:text-stone-700'}`}
               >
                 Ingredients
               </button>
               <button
                 onClick={() => setActiveTab('howToUse')}
-                className={`transition ${activeTab === 'howToUse' ? 'text-emerald-900 border-b-2 border-emerald-900 pb-2' : 'text-slate-400 hover:text-slate-700'}`}
+                className={`transition ${activeTab === 'howToUse' ? 'text-amber-900 border-b-2 border-amber-800 pb-2 font-bold' : 'text-stone-400 hover:text-stone-700'}`}
               >
                 How to Use
               </button>
               <button
                 onClick={() => setActiveTab('reviews')}
-                className={`transition ${activeTab === 'reviews' ? 'text-emerald-900 border-b-2 border-emerald-900 pb-2' : 'text-slate-400 hover:text-slate-700'}`}
+                className={`transition ${activeTab === 'reviews' ? 'text-amber-900 border-b-2 border-amber-800 pb-2 font-bold' : 'text-stone-400 hover:text-stone-700'}`}
               >
                 Reviews ({productReviews.length})
               </button>
             </div>
 
             {/* Tab Contents */}
-            <div className="py-4 text-sm text-slate-700 leading-relaxed">
+            <div className="py-4 text-sm text-stone-700 leading-relaxed">
               {activeTab === 'benefits' && (
                 <div className="space-y-4">
                   <p>{product.description}</p>
                   <div>
-                    <h4 className="font-bold text-slate-900 mb-2">Suitable Skin Types:</h4>
+                    <h4 className="font-bold text-stone-900 mb-2">Suitable Skin Types:</h4>
                     <div className="flex flex-wrap gap-2">
                       {product.skinTypes.map(st => (
-                        <span key={st} className="bg-emerald-50 text-emerald-900 font-semibold text-xs px-3 py-1 rounded-full border border-emerald-200">
+                        <span key={st} className="bg-amber-50 text-amber-900 font-semibold text-xs px-3 py-1 rounded-full border border-amber-200">
                           {st}
                         </span>
                       ))}

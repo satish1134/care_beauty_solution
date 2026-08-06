@@ -3,8 +3,8 @@
 @layer base {
   body {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-    background-color: #faf9f5;
-    color: #1a2e26;
+    background-color: #FFFFFF;
+    color: #1C1917;
     overflow-x: hidden;
   }
 
@@ -13,28 +13,38 @@
   }
 }
 
-/* Custom Utilities for Luxury Skincare Aesthetic */
+/* Luxury White Packaging & Gold Accent Custom Utilities */
 .bg-porcelain {
-  background-color: #faf9f5;
+  background-color: #FFFFFF;
 }
 
-.bg-emerald-gradient {
-  background: linear-gradient(135deg, #05231a 0%, #0a3a2c 50%, #041c15 100%);
+.bg-offwhite {
+  background-color: #FAF8F5;
 }
 
 .text-gold-accent {
-  color: #e5c184;
+  color: #B45309;
 }
 
 .bg-gold-accent {
-  background-color: #e5c184;
+  background-color: #B45309;
 }
 
 .border-gold-accent {
-  border-color: #e5c184;
+  border-color: #D97706;
 }
 
-/* Marquee Animation for Announcement Bar */
+/* Slow spin animation for brand emblem ring */
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+  animation: spinSlow 20s linear infinite;
+}
+
+/* Marquee Animation for Announcement Ticker */
 @keyframes marquee {
   0% { transform: translateX(0%); }
   100% { transform: translateX(-50%); }
@@ -58,3 +68,4 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+

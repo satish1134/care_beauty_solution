@@ -1,0 +1,220 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient: Clean Marble Spa Scene -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8f9f7" />
+      <stop offset="40%" stop-color="#f2f5f1" />
+      <stop offset="100%" stop-color="#e8ede6" />
+    </linearGradient>
+
+    <!-- Marble Texture Lines -->
+    <linearGradient id="marbleVein" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#334155" stop-opacity="0.03" />
+      <stop offset="50%" stop-color="#0f172a" stop-opacity="0.06" />
+      <stop offset="100%" stop-color="#334155" stop-opacity="0.02" />
+    </linearGradient>
+
+    <!-- Bottle Body 3D Gradient -->
+    <linearGradient id="bottleBody" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#e2e8f0" />
+      <stop offset="15%" stop-color="#f8fafc" />
+      <stop offset="50%" stop-color="#ffffff" />
+      <stop offset="85%" stop-color="#f1f5f9" />
+      <stop offset="100%" stop-color="#cbd5e1" />
+    </linearGradient>
+
+    <!-- Bottle Cap & Pump Gradient -->
+    <linearGradient id="pumpGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#cbd5e1" />
+      <stop offset="30%" stop-color="#f8fafc" />
+      <stop offset="70%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#94a3b8" />
+    </linearGradient>
+
+    <!-- Gold Foil Logo Gradient -->
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d97706" />
+      <stop offset="30%" stop-color="#fbbf24" />
+      <stop offset="60%" stop-color="#b45309" />
+      <stop offset="100%" stop-color="#78350f" />
+    </linearGradient>
+
+    <!-- Teal Label Bar Gradient -->
+    <linearGradient id="tealBar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#99f6e4" />
+      <stop offset="50%" stop-color="#5eead4" />
+      <stop offset="100%" stop-color="#2dd4bf" />
+    </linearGradient>
+
+    <!-- Soft Drop Shadow -->
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="25" stdDeviation="20" flood-color="#0f172a" flood-opacity="0.12" />
+    </filter>
+
+    <filter id="contactShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="8" />
+      <feOffset dx="0" dy="6" />
+      <feComponentTransfer><feFuncA type="linear" slope="0.35"/></feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="800" fill="url(#bgGrad)" />
+
+  <!-- Marble Countertop Surface Base -->
+  <path d="M 0 580 L 800 580 L 800 800 L 0 800 Z" fill="#e2e8f0" opacity="0.4" />
+  <path d="M 0 580 L 800 580" stroke="#cbd5e1" stroke-width="2" opacity="0.6" />
+
+  <!-- Marble Subtle Veins -->
+  <path d="M -50 200 Q 200 150 400 300 T 850 250" fill="none" stroke="url(#marbleVein)" stroke-width="18" />
+  <path d="M 100 600 Q 300 680 600 620 T 900 700" fill="none" stroke="url(#marbleVein)" stroke-width="24" />
+
+  <!-- Botanical Leaves Accents (Left Background) -->
+  <g opacity="0.85">
+    <path d="M 40 100 C 90 80 140 120 160 180 C 110 200 60 160 40 100 Z" fill="#14532d" opacity="0.8" />
+    <path d="M 40 100 Q 100 140 160 180" stroke="#22c55e" stroke-width="2" fill="none" opacity="0.5" />
+    
+    <path d="M 10 180 C 70 150 130 180 140 260 C 80 290 20 260 10 180 Z" fill="#166534" opacity="0.75" />
+    <path d="M 10 180 Q 75 220 140 260" stroke="#4ade80" stroke-width="2" fill="none" opacity="0.5" />
+
+    <path d="M 80 240 C 130 220 180 270 190 340 C 140 360 90 310 80 240 Z" fill="#042f2e" opacity="0.65" />
+  </g>
+
+  <!-- Rolled White Towel (Right Background) -->
+  <g opacity="0.9" filter="url(#contactShadow)">
+    <rect x="580" y="420" width="180" height="140" rx="20" fill="#ffffff" />
+    <rect x="580" y="420" width="180" height="140" rx="20" fill="none" stroke="#e2e8f0" stroke-width="2" />
+    <path d="M 580 460 Q 670 470 760 460" stroke="#f1f5f9" stroke-width="4" fill="none" />
+    <path d="M 580 500 Q 670 510 760 500" stroke="#f1f5f9" stroke-width="4" fill="none" />
+  </g>
+
+  <!-- Bottle Base Contact Shadow -->
+  <ellipse cx="400" cy="710" rx="160" ry="22" fill="#0f172a" opacity="0.22" filter="blur(10px)" />
+  <ellipse cx="400" cy="705" rx="120" ry="12" fill="#020617" opacity="0.3" filter="blur(4px)" />
+
+  <!-- BOTTLE GROUP -->
+  <g filter="url(#softShadow)">
+    <!-- Main Bottle Body -->
+    <!-- Curved ergonomic 120ml pump bottle -->
+    <path d="
+      M 310 280 
+      C 350 260, 450 260, 490 280
+      C 525 320, 535 440, 530 620
+      C 525 680, 480 700, 400 700
+      C 320 700, 275 680, 270 620
+      C 265 440, 275 320, 310 280 Z
+    " fill="url(#bottleBody)" />
+
+    <!-- Bottle Highlights & Surface Specular Light -->
+    <path d="
+      M 315 285 
+      C 340 270, 390 265, 410 265
+      C 380 275, 310 320, 300 620
+      C 295 650, 285 620, 285 580
+      C 280 440, 290 320, 315 285 Z
+    " fill="#ffffff" opacity="0.75" />
+
+    <!-- Pump Neck Ring -->
+    <rect x="360" y="245" width="80" height="20" rx="4" fill="url(#pumpGrad)" />
+    <rect x="360" y="245" width="80" height="20" rx="4" fill="none" stroke="#cbd5e1" stroke-width="1" />
+
+    <rect x="370" y="220" width="60" height="28" rx="3" fill="url(#pumpGrad)" />
+    <line x1="370" y1="234" x2="430" y2="234" stroke="#94a3b8" stroke-width="1.5" opacity="0.6" />
+
+    <!-- Pump Spout (Dispenser Head) -->
+    <path d="
+      M 400 220 
+      L 400 170
+      C 400 155, 370 145, 320 155
+      C 305 158, 300 168, 305 178
+      C 310 185, 325 185, 340 180
+      L 400 185 Z
+    " fill="url(#pumpGrad)" />
+    <!-- Pump top ergonomic indentation -->
+    <ellipse cx="380" cy="155" rx="25" ry="6" fill="#f8fafc" opacity="0.8" />
+  </g>
+
+  <!-- BOTTLE LABELS & TYPOGRAPHY (Matching Real Product Photo Exactly) -->
+  <g>
+    <!-- Gold Ornate Emblem Ring -->
+    <g transform="translate(400, 340)">
+      <!-- Outer Filigree Ring -->
+      <circle cx="0" cy="0" r="32" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" stroke-dasharray="3 2" />
+      <circle cx="0" cy="0" r="28" fill="none" stroke="url(#goldGrad)" stroke-width="2" />
+      <circle cx="0" cy="0" r="24" fill="none" stroke="url(#goldGrad)" stroke-width="0.8" />
+      
+      <!-- Center Leaf & 'C' Icon -->
+      <path d="M -6 -2 C -10 -10, -2 -14, -2 -6 C -2 -2, -6 0, -6 -2 Z" fill="url(#goldGrad)" />
+      <path d="M -2 -6 Q 4 -12 8 -4 Q 4 2 -2 -6" fill="url(#goldGrad)" />
+      <line x1="0" y1="-12" x2="0" y2="12" stroke="url(#goldGrad)" stroke-width="1.2" />
+      <text x="7" y="5" font-family="'Playfair Display', serif" font-size="15" font-weight="bold" fill="url(#goldGrad)">C</text>
+    </g>
+
+    <!-- CARe Brand Name -->
+    <text x="400" y="398" text-anchor="middle" font-family="'Playfair Display', Georgia, serif" font-size="26" font-weight="bold" letter-spacing="2" fill="url(#goldGrad)">CARe</text>
+    <text x="400" y="412" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-size="8.5" font-weight="700" letter-spacing="3" fill="#92400e">A BEAUTY SOLUTION</text>
+    
+    <line x1="340" y1="422" x2="460" y2="422" stroke="url(#goldGrad)" stroke-width="0.8" opacity="0.6" />
+
+    <!-- REFRESHING SKIN CLEANSER Headline -->
+    <text x="400" y="445" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-size="17" font-weight="800" letter-spacing="1.5" fill="#0f766e">REFRESHING</text>
+    <text x="400" y="466" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-size="18" font-weight="800" letter-spacing="1.5" fill="#0f766e">SKIN CLEANSER</text>
+    
+    <!-- For Face & Body -->
+    <text x="400" y="485" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" font-weight="600" fill="#334155">For Face &amp; Body</text>
+
+    <!-- Sub claims -->
+    <text x="400" y="504" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-size="9.5" font-weight="600" fill="#475569">Soap-Free  |  pH Balanced  |  Barrier-Friendly</text>
+
+    <!-- Teal Pill Bar: With Niacinamide & Panthenol -->
+    <rect x="305" y="515" width="190" height="22" rx="4" fill="#ccfbf1" stroke="#0d9488" stroke-width="0.8" />
+    <text x="400" y="530" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="800" fill="#0f766e">With Niacinamide &amp; Panthenol</text>
+
+    <!-- Fragrance-Free Non-Comedogenic -->
+    <text x="400" y="552" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-size="9.5" font-weight="600" fill="#334155">Fragrance-Free  •  Non-Comedogenic</text>
+
+    <line x1="320" y1="562" x2="480" y2="562" stroke="#0f766e" stroke-width="1" opacity="0.6" />
+    <text x="400" y="575" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="700" fill="#0f766e">Gently Cleanses Without Drying</text>
+    <line x1="320" y1="582" x2="480" y2="582" stroke="#0f766e" stroke-width="1" opacity="0.6" />
+
+    <!-- For All Skin Types & 120 ml -->
+    <text x="400" y="598" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="600" fill="#475569">For All Skin Types</text>
+    <text x="400" y="615" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" font-weight="800" fill="#0f766e">120 ml</text>
+
+    <!-- 4 Bottom Icons Row -->
+    <g transform="translate(325, 630)">
+      <!-- Icon 1: Soap Free -->
+      <g transform="translate(0, 0)">
+        <circle cx="16" cy="16" r="14" fill="#f0fdf4" stroke="#0d9488" stroke-width="1" />
+        <path d="M 12 18 C 12 12, 18 10, 20 14 C 20 18, 14 20, 12 18 Z" fill="none" stroke="#0d9488" stroke-width="1.2" />
+        <text x="16" y="36" text-anchor="middle" font-size="6" font-weight="800" fill="#0f766e">SOAP FREE</text>
+      </g>
+
+      <!-- Icon 2: pH Balanced -->
+      <g transform="translate(42, 0)">
+        <circle cx="16" cy="16" r="14" fill="#f0fdf4" stroke="#0d9488" stroke-width="1" />
+        <path d="M 16 10 C 16 10, 21 16, 21 19 C 21 22, 18.7 24, 16 24 C 13.3 24, 11 22, 11 19 C 11 16, 16 10, 16 10 Z" fill="none" stroke="#0d9488" stroke-width="1.2" />
+        <text x="16" y="36" text-anchor="middle" font-size="6" font-weight="800" fill="#0f766e">pH BALANCED</text>
+      </g>
+
+      <!-- Icon 3: Barrier Friendly -->
+      <g transform="translate(84, 0)">
+        <circle cx="16" cy="16" r="14" fill="#f0fdf4" stroke="#0d9488" stroke-width="1" />
+        <path d="M 11 12 L 16 10 L 21 12 L 21 18 C 21 21, 16 24, 16 24 C 16 24, 11 21, 11 18 Z" fill="none" stroke="#0d9488" stroke-width="1.2" />
+        <path d="M 14 16 L 16 18 L 19 14" fill="none" stroke="#0d9488" stroke-width="1.2" />
+        <text x="16" y="36" text-anchor="middle" font-size="6" font-weight="800" fill="#0f766e">BARRIER FRIENDLY</text>
+      </g>
+
+      <!-- Icon 4: Non Comedogenic -->
+      <g transform="translate(126, 0)">
+        <circle cx="16" cy="16" r="14" fill="#f0fdf4" stroke="#0d9488" stroke-width="1" />
+        <path d="M 16 22 C 16 22, 10 18, 10 14 C 10 12, 12 10, 14 10 C 15.2 10, 16 11, 16 11 C 16 11, 16.8 10, 18 10 C 20 10, 22 12, 22 14 C 22 18, 16 22, 16 22 Z" fill="none" stroke="#0d9488" stroke-width="1.2" />
+        <text x="16" y="36" text-anchor="middle" font-size="5.5" font-weight="800" fill="#0f766e">NON-COMEDOGENIC</text>
+      </g>
+    </g>
+  </g>
+</svg>

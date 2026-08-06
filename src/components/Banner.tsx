@@ -10,14 +10,39 @@ interface BannerProps {
 
 export const Banner: React.FC<BannerProps> = ({ products = [], onAddToCart, onSelectProduct }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [activePhotoIndex, setActivePhotoIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Define 3 Full-Size Hero Slides for our 3 Core Products
+  // Define 3 Full-Size Hero Slides for our 3 Core Products with CARe Refreshing Skin Cleanser as #1 Flagship
   const slides = [
     {
+      id: 'prod-refreshing-skin-cleanser',
+      badge: '01 / FLAGSHIP SKIN CLEANSER',
+      title: 'Soap-Free Barrier Gel Cleanser',
+      subtitle: 'CARe A BEAUTY SOLUTION — Formulated for Face & Body with Niacinamide & Panthenol. pH Balanced at 5.5 to gently cleanse without drying or compromising your skin barrier.',
+      highlights: ['Soap-Free & pH 5.5', 'With Niacinamide & Panthenol', 'Fragrance-Free & Non-Comedogenic'],
+      imageUrl: '/images/care-cleanser-1-hero-marble.svg',
+      price: 499,
+      originalPrice: 699,
+      discount: '28% OFF',
+      slug: 'refreshing-skin-cleanser',
+      photoAngles: [
+        { title: 'Marble Counter', url: '/images/care-cleanser-1-hero-marble.svg' },
+        { title: 'Studio View', url: '/images/care-cleanser-2-studio-isolated.svg' },
+        { title: 'Bathroom Vanity', url: '/images/care-cleanser-3-lifestyle-vanity.svg' },
+        { title: 'Gel Swatch', url: '/images/care-cleanser-texture.svg' },
+        { title: 'Pump Detail', url: '/images/care-cleanser-5-pump-closeup.svg' },
+        { title: 'Label Detail', url: '/images/care-cleanser-6-label-detail.svg' },
+        { title: 'Top Angle', url: '/images/care-cleanser-7-top-view.svg' },
+        { title: 'Left Angle', url: '/images/care-cleanser-8-quarter-left.svg' },
+        { title: 'Right Angle', url: '/images/care-cleanser-9-quarter-right.svg' },
+        { title: 'Ambient Spa', url: '/images/care-cleanser-10-bathroom-ambient.svg' },
+      ]
+    },
+    {
       id: 'prod-hydrating-moisturizer',
-      badge: '01 / BARRIER REPAIR & HYDRATION',
+      badge: '02 / BARRIER REPAIR & HYDRATION',
       title: '72-Hour Ceramide Moisture Lock',
       subtitle: 'Fast-absorbing barrier cream powered by Ceramides (NP/AP/EOP) + Niacinamide to repair compromised skin barriers and deeply nourish.',
       highlights: ['3x Ceramide Complex', '0% Artificial Fragrances', 'Non-Comedogenic'],
@@ -25,34 +50,25 @@ export const Banner: React.FC<BannerProps> = ({ products = [], onAddToCart, onSe
       price: 599,
       originalPrice: 799,
       discount: '25% OFF',
-      gradient: 'from-emerald-950 via-teal-950 to-emerald-900',
       slug: 'hydrating-moisturizer',
+      photoAngles: [
+        { title: 'Front Jar', url: 'https://images.unsplash.com/photo-1608248597261-e4d354714552?auto=format&fit=crop&w=1000&q=80' },
+      ]
     },
     {
       id: 'prod-ray-barrier-sunscreen',
-      badge: '02 / SUN PROTECTION & UV DEFENSE',
+      badge: '03 / SUN PROTECTION & UV DEFENSE',
       title: 'Photostable Broad Spectrum SPF 50+ PA++++',
-      subtitle: 'Ultra-lightweight invisible gel sunscreen engineered for humid Indian tropical weather. Zero white cast, water-resistant for 80 mins.',
+      subtitle: 'Ultra-lightweight invisible gel sunscreen engineered for humid tropical weather. Zero white cast, water-resistant for 80 mins.',
       highlights: ['PA++++ Highest Protection', 'Zero White Cast Gel', '80-Min Water Resistant'],
       imageUrl: 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=1000&q=80',
       price: 649,
       originalPrice: 849,
       discount: '23% OFF',
-      gradient: 'from-teal-950 via-emerald-950 to-emerald-900',
       slug: 'ray-barrier-sunscreen',
-    },
-    {
-      id: 'prod-refreshing-skin-cleanser',
-      badge: '03 / pH BALANCED GENTLE CLEANSING',
-      title: 'Soap-Free Barrier Gel Cleanser',
-      subtitle: 'Enriched with Niacinamide & Panthenol (Pro-Vitamin B5) at pH 5.5. Washes away urban pollution and excess oil without stripping natural lipids.',
-      highlights: ['pH 5.5 Skin Identical', 'Sulfate & Soap Free', 'Niacinamide + Panthenol'],
-      imageUrl: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=1000&q=80',
-      price: 499,
-      originalPrice: 699,
-      discount: '28% OFF',
-      gradient: 'from-emerald-950 via-emerald-900 to-teal-950',
-      slug: 'refreshing-skin-cleanser',
+      photoAngles: [
+        { title: 'Front Bottle', url: 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=1000&q=80' },
+      ]
     },
   ];
 
@@ -60,10 +76,12 @@ export const Banner: React.FC<BannerProps> = ({ products = [], onAddToCart, onSe
 
   const nextSlide = () => {
     setCurrentSlide(prev => (prev + 1) % totalSlides);
+    setActivePhotoIndex(0);
   };
 
   const prevSlide = () => {
     setCurrentSlide(prev => (prev - 1 + totalSlides) % totalSlides);
+    setActivePhotoIndex(0);
   };
 
   // Auto slide effect
@@ -71,7 +89,7 @@ export const Banner: React.FC<BannerProps> = ({ products = [], onAddToCart, onSe
     if (!isPaused) {
       autoPlayRef.current = setInterval(() => {
         nextSlide();
-      }, 6000);
+      }, 7000);
     }
     return () => {
       if (autoPlayRef.current) clearInterval(autoPlayRef.current);
@@ -80,6 +98,10 @@ export const Banner: React.FC<BannerProps> = ({ products = [], onAddToCart, onSe
 
   const activeSlideData = slides[currentSlide];
   const activeProduct = products.find(p => p.id === activeSlideData.id || p.slug === activeSlideData.slug);
+
+  const displayImage = activeSlideData.photoAngles && activeSlideData.photoAngles[activePhotoIndex]
+    ? activeSlideData.photoAngles[activePhotoIndex].url
+    : activeSlideData.imageUrl;
 
   const handleAddToCartClick = () => {
     if (activeProduct && onAddToCart) {
@@ -98,132 +120,157 @@ export const Banner: React.FC<BannerProps> = ({ products = [], onAddToCart, onSe
     <div
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      className="relative overflow-hidden bg-gradient-to-br from-emerald-950 via-teal-950 to-emerald-950 text-emerald-50 border-b border-emerald-800/80 shadow-xl"
+      className="relative overflow-hidden bg-[#FAF8F5] text-stone-800 border-b border-stone-200/80 shadow-sm"
     >
-      {/* Dynamic Background Glow Layer */}
-      <div className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-emerald-600/15 rounded-full blur-3xl pointer-events-none transition-all duration-700" />
-      <div className="absolute -bottom-32 -right-32 w-[500px] h-[500px] bg-amber-500/10 rounded-full blur-3xl pointer-events-none transition-all duration-700" />
+      {/* Background Soft Glow Accents */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-amber-100/50 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-teal-100/40 rounded-full blur-3xl pointer-events-none" />
 
-      {/* Main Hero Slider Content Area */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-16 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center min-h-[440px]">
+      {/* Main Hero Showcase Container */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-14 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center min-h-[460px]">
           
-          {/* Left Column: Clinical Headline & Value Prop */}
-          <div className="lg:col-span-7 space-y-6 transition-all duration-500">
-            {/* Slide Index Badge */}
+          {/* Left Column: Title, Subtitle, Pricing, Action */}
+          <div className="lg:col-span-7 space-y-6">
+            {/* Badge & Index */}
             <div className="flex items-center gap-3">
-              <span className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-900/90 border border-amber-400/40 text-amber-300 text-[10px] font-bold uppercase tracking-widest shadow-md">
-                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-100/80 border border-amber-300 text-amber-900 text-[10px] font-bold uppercase tracking-widest shadow-sm">
+                <Sparkles className="w-3.5 h-3.5 text-amber-700" />
                 <span>{activeSlideData.badge}</span>
               </span>
-              <span className="text-xs font-mono text-emerald-300/80 bg-emerald-900/60 px-2.5 py-1 rounded-md border border-emerald-800">
+              <span className="text-xs font-mono font-semibold text-stone-500 bg-white px-2.5 py-1 rounded-md border border-stone-200">
                 0{currentSlide + 1} / 0{totalSlides}
               </span>
             </div>
 
             {/* Headline */}
-            <h1 className="text-3xl sm:text-5xl font-serif font-bold tracking-tight leading-tight text-white drop-shadow-sm">
+            <h1 className="text-3xl sm:text-5xl font-serif font-extrabold tracking-tight leading-tight text-stone-900">
               {activeSlideData.title}
             </h1>
 
             {/* Subtitle */}
-            <p className="text-emerald-100/90 text-base sm:text-lg max-w-2xl leading-relaxed font-light">
+            <p className="text-stone-600 text-base sm:text-lg max-w-2xl leading-relaxed font-normal">
               {activeSlideData.subtitle}
             </p>
 
-            {/* Spec Highlights Pills */}
-            <div className="pt-1 flex flex-wrap gap-2 text-xs font-medium text-emerald-200">
+            {/* Highlights */}
+            <div className="pt-1 flex flex-wrap gap-2 text-xs font-medium text-stone-700">
               {activeSlideData.highlights.map((spec, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center gap-2 bg-emerald-900/80 backdrop-blur px-3.5 py-1.5 rounded-xl border border-emerald-700/60 shadow-sm"
+                  className="flex items-center gap-2 bg-white/90 backdrop-blur px-3.5 py-1.5 rounded-xl border border-stone-200 shadow-sm"
                 >
-                  <CheckCircle2 className="w-3.5 h-3.5 text-amber-300" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-amber-600" />
                   <span>{spec}</span>
                 </div>
               ))}
             </div>
 
-            {/* Price & Action Buttons */}
+            {/* Pricing & Add to Bag CTA */}
             <div className="pt-4 flex flex-wrap items-center gap-4">
-              {/* Price Banner */}
-              <div className="flex items-baseline gap-2 bg-emerald-900/90 border border-emerald-700/80 px-4 py-2.5 rounded-2xl shadow-inner">
-                <span className="text-2xl font-bold text-amber-300">₹{activeSlideData.price}</span>
-                <span className="text-xs text-emerald-300/70 line-through">₹{activeSlideData.originalPrice}</span>
-                <span className="text-[10px] font-bold text-emerald-950 bg-amber-400 px-2 py-0.5 rounded-full uppercase ml-1">
+              <div className="flex items-baseline gap-2 bg-white border border-stone-200 px-4 py-2.5 rounded-2xl shadow-sm">
+                <span className="text-2xl font-bold text-amber-800">₹{activeSlideData.price}</span>
+                <span className="text-xs text-stone-400 line-through">₹{activeSlideData.originalPrice}</span>
+                <span className="text-[10px] font-bold text-white bg-amber-800 px-2 py-0.5 rounded-full uppercase ml-1">
                   {activeSlideData.discount}
                 </span>
               </div>
 
-              {/* Add to Bag CTA */}
               <button
                 onClick={handleAddToCartClick}
-                className="bg-amber-400 hover:bg-amber-300 text-emerald-950 font-bold text-sm px-6 py-3.5 rounded-2xl transition shadow-xl flex items-center gap-2.5 active:scale-95 cursor-pointer"
+                className="bg-amber-800 hover:bg-amber-900 text-amber-50 font-bold text-sm px-6 py-3.5 rounded-2xl transition shadow-md flex items-center gap-2.5 active:scale-95 cursor-pointer"
               >
-                <ShoppingBag className="w-4 h-4 text-emerald-950" />
+                <ShoppingBag className="w-4 h-4 text-amber-50" />
                 <span>Add to Bag — ₹{activeSlideData.price}</span>
               </button>
 
-              {/* Explore PDP Button */}
               <button
                 onClick={handleExploreClick}
-                className="bg-emerald-900/60 hover:bg-emerald-800/80 text-emerald-100 font-semibold text-sm px-5 py-3.5 rounded-2xl border border-emerald-700/70 transition flex items-center gap-2 cursor-pointer"
+                className="bg-white hover:bg-stone-50 text-stone-800 font-semibold text-sm px-5 py-3.5 rounded-2xl border border-stone-300 transition flex items-center gap-2 cursor-pointer shadow-sm"
               >
-                <span>Explore Details</span>
-                <ArrowRight className="w-4 h-4 text-amber-300" />
+                <span>View Full Details</span>
+                <ArrowRight className="w-4 h-4 text-amber-700" />
               </button>
             </div>
           </div>
 
-          {/* Right Column: Product Photography & Interactive Switcher */}
-          <div className="lg:col-span-5 flex flex-col items-center justify-center relative">
-            {/* Product Image Stage */}
-            <div className="relative w-full max-w-md aspect-square bg-gradient-to-b from-emerald-900/60 to-teal-950/80 rounded-3xl p-5 border border-emerald-700/60 shadow-2xl overflow-hidden group">
+          {/* Right Column: Interactive Photo Angle Gallery Showcase */}
+          <div className="lg:col-span-5 flex flex-col items-center justify-center">
+            {/* Stage Viewport */}
+            <div className="relative w-full max-w-md aspect-square bg-white rounded-3xl p-4 border border-stone-200 shadow-md overflow-hidden group">
               <img
-                src={activeSlideData.imageUrl}
+                src={displayImage}
                 alt={activeSlideData.title}
-                className="w-full h-full object-cover object-center rounded-2xl transition-all duration-700 group-hover:scale-105"
+                className="w-full h-full object-cover object-center rounded-2xl transition-all duration-500 group-hover:scale-105"
                 referrerPolicy="no-referrer"
               />
 
-              {/* Floating Quality Stamp */}
-              <div className="absolute top-4 right-4 bg-emerald-950/90 backdrop-blur border border-emerald-600/50 text-amber-300 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-md">
-                Dermatologist Formulated
+              {/* Angle Label Floating Badge */}
+              <div className="absolute top-4 left-4 bg-stone-900/80 backdrop-blur text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                📷 {activeSlideData.photoAngles && activeSlideData.photoAngles[activePhotoIndex] ? activeSlideData.photoAngles[activePhotoIndex].title : 'Official View'}
               </div>
 
-              {/* Quick View Button */}
+              {/* Quality Seal */}
+              <div className="absolute top-4 right-4 bg-amber-50/90 backdrop-blur border border-amber-300 text-amber-900 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                100% Authentic
+              </div>
+
               <button
                 onClick={handleExploreClick}
-                className="absolute bottom-4 left-4 bg-white/95 backdrop-blur text-emerald-950 text-xs font-bold px-4 py-2 rounded-xl shadow-lg flex items-center gap-2 hover:bg-white transition"
+                className="absolute bottom-4 left-4 bg-amber-800 text-amber-50 text-xs font-bold px-4 py-2 rounded-xl shadow-md flex items-center gap-2 hover:bg-amber-900 transition"
               >
-                <Eye className="w-3.5 h-3.5 text-emerald-900" />
+                <Eye className="w-3.5 h-3.5" />
                 <span>Quick View</span>
               </button>
             </div>
 
-            {/* 3-Product Mini Switcher Bar */}
-            <div className="w-full max-w-md grid grid-cols-3 gap-2 mt-4">
+            {/* Interactive Photo Thumbnails Strip (Utilizing all 10 photoshoot angles) */}
+            {activeSlideData.photoAngles && activeSlideData.photoAngles.length > 1 && (
+              <div className="w-full max-w-md mt-3 flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+                <span className="text-[10px] font-bold uppercase text-stone-400 shrink-0 pr-1">Angles ({activeSlideData.photoAngles.length}):</span>
+                {activeSlideData.photoAngles.map((angle, photoIdx) => (
+                  <button
+                    key={photoIdx}
+                    onClick={() => setActivePhotoIndex(photoIdx)}
+                    className={`w-10 h-10 rounded-xl overflow-hidden border transition shrink-0 ${
+                      activePhotoIndex === photoIdx
+                        ? 'border-amber-700 ring-2 ring-amber-500/40 scale-105'
+                        : 'border-stone-200 opacity-60 hover:opacity-100'
+                    }`}
+                    title={angle.title}
+                  >
+                    <img src={angle.url} alt={angle.title} className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* 3 Core Product Switcher Pills */}
+            <div className="w-full max-w-md grid grid-cols-3 gap-2 mt-3">
               {slides.map((slide, idx) => (
                 <button
                   key={slide.id}
-                  onClick={() => setCurrentSlide(idx)}
+                  onClick={() => {
+                    setCurrentSlide(idx);
+                    setActivePhotoIndex(0);
+                  }}
                   className={`p-2 rounded-2xl border text-left transition flex items-center gap-2 ${
                     currentSlide === idx
-                      ? 'bg-emerald-900 border-amber-400/80 shadow-md ring-1 ring-amber-400/50'
-                      : 'bg-emerald-950/60 border-emerald-800/80 text-emerald-300/70 hover:bg-emerald-900/50'
+                      ? 'bg-amber-50 border-amber-600 shadow-sm ring-1 ring-amber-500/30'
+                      : 'bg-white border-stone-200 text-stone-600 hover:bg-stone-50'
                   }`}
                 >
                   <img
                     src={slide.imageUrl}
                     alt={slide.title}
-                    className="w-10 h-10 object-cover rounded-xl shrink-0"
+                    className="w-9 h-9 object-cover rounded-xl shrink-0"
                     referrerPolicy="no-referrer"
                   />
                   <div className="overflow-hidden">
-                    <p className={`text-[10px] font-bold uppercase tracking-wider truncate ${currentSlide === idx ? 'text-amber-300' : 'text-emerald-200'}`}>
-                      0{idx + 1} Formulation
+                    <p className={`text-[9px] font-bold uppercase tracking-wider truncate ${currentSlide === idx ? 'text-amber-900' : 'text-stone-500'}`}>
+                      0{idx + 1} Product
                     </p>
-                    <p className="text-[11px] font-serif font-bold text-emerald-100 truncate">
+                    <p className="text-[11px] font-serif font-bold text-stone-900 truncate">
                       ₹{slide.price}
                     </p>
                   </div>
@@ -233,57 +280,49 @@ export const Banner: React.FC<BannerProps> = ({ products = [], onAddToCart, onSe
           </div>
         </div>
 
-        {/* Carousel Arrow Navigation Buttons */}
+        {/* Carousel Navigation Arrows */}
         <div className="absolute top-1/2 -translate-y-1/2 left-2 lg:left-4 z-20">
           <button
             onClick={prevSlide}
-            className="p-3 rounded-full bg-emerald-950/90 backdrop-blur text-emerald-100 hover:text-white border border-emerald-700/80 hover:bg-emerald-900 shadow-xl transition active:scale-90 cursor-pointer"
+            className="p-3 rounded-full bg-white text-stone-800 hover:bg-amber-50 border border-stone-200 shadow-md transition active:scale-90 cursor-pointer"
             aria-label="Previous Slide"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="w-5 h-5 text-amber-900" />
           </button>
         </div>
         <div className="absolute top-1/2 -translate-y-1/2 right-2 lg:right-4 z-20">
           <button
             onClick={nextSlide}
-            className="p-3 rounded-full bg-emerald-950/90 backdrop-blur text-emerald-100 hover:text-white border border-emerald-700/80 hover:bg-emerald-900 shadow-xl transition active:scale-90 cursor-pointer"
+            className="p-3 rounded-full bg-white text-stone-800 hover:bg-amber-50 border border-stone-200 shadow-md transition active:scale-90 cursor-pointer"
             aria-label="Next Slide"
           >
-            <ChevronRight className="w-5 h-5" />
+            <ChevronRight className="w-5 h-5 text-amber-900" />
           </button>
         </div>
 
-        {/* Slide Progress Timer Line */}
-        <div className="mt-8 w-full bg-emerald-900/60 h-1 rounded-full overflow-hidden">
-          <div
-            className="bg-gradient-to-r from-amber-400 to-emerald-400 h-full transition-all duration-300"
-            style={{ width: `${((currentSlide + 1) / totalSlides) * 100}%` }}
-          />
-        </div>
-
-        {/* Bottom Trust Features Row */}
-        <div className="mt-8 pt-6 border-t border-emerald-800/60 grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-emerald-900/40 backdrop-blur border border-emerald-800/80 p-4 rounded-2xl flex items-center gap-3.5">
-            <ShieldCheck className="w-7 h-7 text-amber-300 shrink-0" />
+        {/* Bottom Trust Row */}
+        <div className="mt-8 pt-6 border-t border-stone-200 grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="bg-white p-4 rounded-2xl border border-stone-200/80 shadow-sm flex items-center gap-3.5">
+            <ShieldCheck className="w-7 h-7 text-amber-700 shrink-0" />
             <div>
-              <h4 className="text-xs font-bold text-white">100% Authentic Guarantee</h4>
-              <p className="text-[11px] text-emerald-200/80">Sourced directly from our clinical lab in Bengaluru.</p>
+              <h4 className="text-xs font-bold text-stone-900">100% Authentic Guarantee</h4>
+              <p className="text-[11px] text-stone-500">Sourced directly from our clinical lab.</p>
             </div>
           </div>
 
-          <div className="bg-emerald-900/40 backdrop-blur border border-emerald-800/80 p-4 rounded-2xl flex items-center gap-3.5">
-            <Truck className="w-7 h-7 text-teal-300 shrink-0" />
+          <div className="bg-white p-4 rounded-2xl border border-stone-200/80 shadow-sm flex items-center gap-3.5">
+            <Truck className="w-7 h-7 text-teal-700 shrink-0" />
             <div>
-              <h4 className="text-xs font-bold text-white">Express Delivery in India</h4>
-              <p className="text-[11px] text-emerald-200/80">Free shipping over ₹499. Dispatched in 24 hours.</p>
+              <h4 className="text-xs font-bold text-stone-900">Express Delivery Across India</h4>
+              <p className="text-[11px] text-stone-500">Free express shipping on orders over ₹499.</p>
             </div>
           </div>
 
-          <div className="bg-emerald-900/40 backdrop-blur border border-emerald-800/80 p-4 rounded-2xl flex items-center gap-3.5">
-            <Award className="w-7 h-7 text-amber-300 shrink-0" />
+          <div className="bg-white p-4 rounded-2xl border border-stone-200/80 shadow-sm flex items-center gap-3.5">
+            <Award className="w-7 h-7 text-amber-700 shrink-0" />
             <div>
-              <h4 className="text-xs font-bold text-white">Dermatologist Recommended</h4>
-              <p className="text-[11px] text-emerald-200/80">Over 50,000+ satisfied customers across India.</p>
+              <h4 className="text-xs font-bold text-stone-900">Dermatologist Recommended</h4>
+              <p className="text-[11px] text-stone-500">Over 50,000+ satisfied customers.</p>
             </div>
           </div>
         </div>

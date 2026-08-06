@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgAngle" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FAF8F5" />
+      <stop offset="100%" stop-color="#E2E8F0" />
+    </linearGradient>
+    <linearGradient id="goldAngle" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D4AF37" />
+      <stop offset="100%" stop-color="#996515" />
+    </linearGradient>
+    <filter id="angleShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="-15" dy="25" stdDeviation="18" flood-color="#000" flood-opacity="0.1" />
+    </filter>
+  </defs>
+
+  <rect width="800" height="800" fill="url(#bgAngle)" />
+
+  <!-- Marble Surface -->
+  <path d="M 0 540 L 800 540 L 800 800 L 0 800 Z" fill="#FFFFFF" opacity="0.5" />
+
+  <!-- 3/4 Quarter Angle Bottle Left Facing -->
+  <g transform="translate(10, 0)" filter="url(#angleShadow)">
+    <!-- Asymmetric bottle body shape to simulate 3/4 depth -->
+    <path d="M 330 270 C 370 250, 460 250, 490 280 C 515 320, 520 440, 510 600 C 500 660, 460 680, 380 680 C 310 680, 275 650, 280 590 C 285 430, 295 310, 330 270 Z" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2" />
+
+    <!-- Side Contour Shadow for 3D depth -->
+    <path d="M 440 260 C 480 280, 515 320, 510 600 C 500 660, 460 680, 400 680 L 400 260 Z" fill="#CBD5E1" opacity="0.25" />
+
+    <!-- Pump Spout angled left -->
+    <path d="M 390 210 L 390 160 C 390 145, 340 135, 290 145 C 275 148, 270 158, 275 168 C 280 175, 295 175, 310 170 L 390 175 Z" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5" />
+
+    <!-- Label Artwork Perspective Transformed -->
+    <g transform="translate(380, 330) skewY(2)">
+      <circle cx="0" cy="0" r="28" fill="none" stroke="url(#goldAngle)" stroke-width="2" />
+      <text x="0" y="4" text-anchor="middle" font-family="'Playfair Display', serif" font-size="16" font-weight="bold" fill="url(#goldAngle)">C</text>
+      <text x="0" y="52" text-anchor="middle" font-family="'Playfair Display', serif" font-size="24" font-weight="bold" letter-spacing="2" fill="url(#goldAngle)">CARe</text>
+      <text x="0" y="96" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-size="16" font-weight="800" fill="#0F766E">REFRESHING</text>
+      <text x="0" y="116" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-size="16" font-weight="800" fill="#0F766E">SKIN CLEANSER</text>
+      <rect x="-90" y="150" width="180" height="20" rx="4" fill="#CCFBF1" stroke="#0D9488" stroke-width="0.8" />
+      <text x="0" y="164" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-size="9.5" font-weight="800" fill="#0F766E">With Niacinamide &amp; Panthenol</text>
+    </g>
+  </g>
+</svg>

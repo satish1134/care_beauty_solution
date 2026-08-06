@@ -14,10 +14,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   onOpenQuickView,
 }) => {
   const [selectedVariantId, setSelectedVariantId] = useState<string>(product.variants[0]?.id || '');
+  const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
   const [addedAnimation, setAddedAnimation] = useState(false);
 
   const currentVariant = product.variants.find(v => v.id === selectedVariantId) || product.variants[0];
-  const primaryImage = product.images.find(img => img.isPrimary)?.url || product.images[0]?.url;
+  const displayImage = product.images[activeImageIndex]?.url || product.images[0]?.url;
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -30,77 +31,98 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   return (
     <div
       onClick={() => onOpenQuickView(product)}
-      className="group bg-white rounded-3xl border border-stone-200/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_36px_rgba(12,59,46,0.12)] hover:border-emerald-300 transition-all duration-300 flex flex-col justify-between overflow-hidden cursor-pointer relative"
+      className="group bg-white rounded-3xl border border-stone-200 shadow-sm hover:shadow-xl hover:border-amber-400 transition-all duration-300 flex flex-col justify-between overflow-hidden cursor-pointer relative"
     >
       {/* Top Floating Badges */}
       <div className="absolute top-3.5 left-3.5 z-10 flex flex-col gap-1.5 items-start">
         {product.isBestSeller && (
-          <span className="bg-emerald-950 text-amber-300 font-semibold text-[10px] uppercase tracking-widest px-3 py-1 rounded-full shadow-md backdrop-blur border border-amber-400/30 flex items-center gap-1">
+          <span className="bg-amber-900 text-amber-100 font-semibold text-[10px] uppercase tracking-widest px-3 py-1 rounded-full shadow-md backdrop-blur border border-amber-400/40 flex items-center gap-1">
             <Sparkles className="w-3 h-3 text-amber-300" /> Best Seller
           </span>
         )}
         {product.isNewArrival && (
-          <span className="bg-teal-900/90 text-teal-100 font-semibold text-[10px] uppercase tracking-widest px-3 py-1 rounded-full shadow-md backdrop-blur border border-teal-500/30">
+          <span className="bg-stone-900/90 text-stone-100 font-semibold text-[10px] uppercase tracking-widest px-3 py-1 rounded-full shadow-md backdrop-blur">
             Clinical Formula
           </span>
         )}
       </div>
 
-      {/* Product Photography Display with Overlay & Quick View */}
-      <div className="relative aspect-[4/4] overflow-hidden bg-stone-100/60 p-4">
+      {/* Product Photography Display */}
+      <div className="relative aspect-square overflow-hidden bg-stone-50 p-3">
         <img
-          src={primaryImage}
+          src={displayImage}
           alt={product.name}
-          className="w-full h-full object-cover object-center rounded-2xl group-hover:scale-108 transition-transform duration-700 ease-out"
+          className="w-full h-full object-cover object-center rounded-2xl group-hover:scale-105 transition-transform duration-500 ease-out"
           loading="lazy"
         />
-        {/* Soft Clinical Vignette Overlay on Hover */}
-        <div className="absolute inset-0 bg-emerald-950/25 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center p-4">
+
+        {/* Hover Quick View Overlay */}
+        <div className="absolute inset-0 bg-stone-900/20 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center p-4">
           <button
             onClick={e => {
               e.stopPropagation();
               onOpenQuickView(product);
             }}
-            className="bg-white/95 text-emerald-950 font-semibold text-xs px-5 py-2.5 rounded-2xl shadow-xl flex items-center gap-2 hover:bg-emerald-950 hover:text-amber-300 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0"
+            className="bg-white text-stone-900 font-bold text-xs px-5 py-2.5 rounded-2xl shadow-xl flex items-center gap-2 hover:bg-amber-800 hover:text-white transition-all duration-300 transform translate-y-2 group-hover:translate-y-0"
           >
-            <Eye className="w-4 h-4 text-emerald-700 group-hover:text-amber-300" /> Quick View
+            <Eye className="w-4 h-4 text-amber-800 group-hover:text-amber-100" /> Quick View ({product.images.length} Photos)
           </button>
         </div>
 
-        {/* Dermatologist Formula Stamp */}
-        <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-lg border border-stone-200 shadow-sm text-[10px] font-medium text-emerald-900 flex items-center gap-1">
-          <ShieldCheck className="w-3 h-3 text-emerald-600" /> Derm Tested
+        {/* Derm Tested Badge */}
+        <div className="absolute bottom-3 right-3 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-lg border border-stone-200 shadow-sm text-[10px] font-bold text-stone-800 flex items-center gap-1">
+          <ShieldCheck className="w-3 h-3 text-amber-700" /> Derm Tested
         </div>
       </div>
+
+      {/* Multi-Angle Image Swatches Strip */}
+      {product.images.length > 1 && (
+        <div className="px-4 pt-2 flex items-center gap-1 overflow-x-auto scrollbar-none" onClick={e => e.stopPropagation()}>
+          {product.images.map((img, idx) => (
+            <button
+              key={img.id}
+              onClick={() => setActiveImageIndex(idx)}
+              className={`w-7 h-7 rounded-lg overflow-hidden border transition shrink-0 ${
+                activeImageIndex === idx
+                  ? 'border-amber-700 ring-2 ring-amber-500/40'
+                  : 'border-stone-200 opacity-60 hover:opacity-100'
+              }`}
+              title={img.altText}
+            >
+              <img src={img.url} alt={img.altText} className="w-full h-full object-cover" />
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Details Body */}
       <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
         <div>
           {/* Category Tag & Rating */}
           <div className="flex items-center justify-between text-xs text-stone-500 mb-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-100">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-900 bg-amber-50 px-2.5 py-0.5 rounded-md border border-amber-200">
               {product.categoryName}
             </span>
 
-            <div className="flex items-center gap-1 text-amber-500 font-bold text-xs bg-amber-50/80 px-2 py-0.5 rounded-full border border-amber-200/60">
-              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+            <div className="flex items-center gap-1 text-amber-700 font-bold text-xs bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+              <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
               <span>{product.rating}</span>
               <span className="text-stone-400 font-normal text-[11px]">({product.reviewCount})</span>
             </div>
           </div>
 
-          <h3 className="font-serif font-bold text-stone-900 text-lg group-hover:text-emerald-900 transition-colors duration-200 line-clamp-1 leading-snug">
+          <h3 className="font-serif font-bold text-stone-900 text-lg group-hover:text-amber-900 transition-colors duration-200 line-clamp-1 leading-snug">
             {product.name}
           </h3>
 
-          <p className="text-xs text-stone-600 line-clamp-2 mt-1 leading-relaxed font-light">
+          <p className="text-xs text-stone-600 line-clamp-2 mt-1 leading-relaxed font-normal">
             {product.tagline}
           </p>
 
           {/* Key Ingredient / Concern Pills */}
           <div className="flex flex-wrap gap-1.5 mt-2.5">
             {product.skinConcerns.slice(0, 2).map(concern => (
-              <span key={concern} className="text-[10px] font-medium bg-stone-100 text-stone-700 px-2.5 py-0.5 rounded-md border border-stone-200/60">
+              <span key={concern} className="text-[10px] font-medium bg-stone-100 text-stone-700 px-2.5 py-0.5 rounded-md border border-stone-200">
                 {concern}
               </span>
             ))}
@@ -115,7 +137,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               <select
                 value={selectedVariantId}
                 onChange={e => setSelectedVariantId(e.target.value)}
-                className="text-xs border border-stone-200 rounded-lg px-2.5 py-1 bg-stone-50 text-stone-800 focus:outline-none focus:border-emerald-600 font-medium"
+                className="text-xs border border-stone-200 rounded-lg px-2.5 py-1 bg-stone-50 text-stone-800 focus:outline-none focus:border-amber-700 font-medium"
               >
                 {product.variants.map(v => (
                   <option key={v.id} value={v.id}>
@@ -128,7 +150,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
           <div className="flex items-baseline justify-between">
             <div>
-              <span className="text-xl font-bold text-emerald-950">₹{currentVariant?.price}</span>
+              <span className="text-xl font-bold text-stone-900">₹{currentVariant?.price}</span>
               {currentVariant?.compareAtPrice && (
                 <span className="text-xs text-stone-400 line-through ml-2">
                   ₹{currentVariant.compareAtPrice}
@@ -137,7 +159,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             </div>
 
             {currentVariant?.compareAtPrice && (
-              <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100/80 px-2 py-0.5 rounded-full">
+              <span className="text-[10px] font-bold text-amber-900 bg-amber-100 px-2 py-0.5 rounded-full">
                 SAVE ₹{currentVariant.compareAtPrice - currentVariant.price}
               </span>
             )}
@@ -149,9 +171,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             disabled={!currentVariant || currentVariant.stock <= 0}
             className={`w-full py-2.5 px-4 rounded-xl font-bold text-xs transition-all duration-300 flex items-center justify-center gap-2 shadow-sm ${
               addedAnimation
-                ? 'bg-emerald-700 text-white'
+                ? 'bg-amber-800 text-white'
                 : currentVariant && currentVariant.stock > 0
-                ? 'bg-emerald-950 hover:bg-emerald-900 text-amber-300 hover:text-white active:scale-98 shadow-md'
+                ? 'bg-amber-800 hover:bg-amber-900 text-amber-50 active:scale-98 shadow-md'
                 : 'bg-stone-200 text-stone-400 cursor-not-allowed'
             }`}
           >
@@ -161,7 +183,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               </>
             ) : currentVariant && currentVariant.stock > 0 ? (
               <>
-                <ShoppingBag className="w-4 h-4 text-amber-300" /> Add to Cart — ₹{currentVariant?.price}
+                <ShoppingBag className="w-4 h-4 text-amber-100" /> Add to Cart — ₹{currentVariant?.price}
               </>
             ) : (
               'Out of Stock'
