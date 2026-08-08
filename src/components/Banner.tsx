@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, ShieldCheck, Truck, Award, CheckCircle2, ChevronLeft, ChevronRight, ShoppingBag, ArrowRight, Eye } from 'lucide-react';
 import { Product, ProductVariant } from '../types';
 
@@ -120,7 +121,7 @@ export const Banner: React.FC<BannerProps> = ({ products = [], onAddToCart, onSe
     <div
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      className="relative overflow-hidden bg-[#FAF8F5] text-stone-800 border-b border-stone-200/80 shadow-sm"
+      className="Banner relative overflow-hidden bg-[#FAF8F5] text-stone-800 border-b border-stone-200/80 shadow-sm"
     >
       {/* Background Soft Glow Accents */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-amber-100/50 rounded-full blur-3xl pointer-events-none" />
@@ -132,97 +133,157 @@ export const Banner: React.FC<BannerProps> = ({ products = [], onAddToCart, onSe
           
           {/* Left Column: Title, Subtitle, Pricing, Action */}
           <div className="lg:col-span-7 space-y-6">
-            {/* Badge & Index */}
-            <div className="flex items-center gap-3">
-              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-100/80 border border-amber-300 text-amber-900 text-[10px] font-bold uppercase tracking-widest shadow-sm">
-                <Sparkles className="w-3.5 h-3.5 text-amber-700" />
-                <span>{activeSlideData.badge}</span>
-              </span>
-              <span className="text-xs font-mono font-semibold text-stone-500 bg-white px-2.5 py-1 rounded-md border border-stone-200">
-                0{currentSlide + 1} / 0{totalSlides}
-              </span>
-            </div>
-
-            {/* Headline */}
-            <h1 className="text-3xl sm:text-5xl font-serif font-extrabold tracking-tight leading-tight text-stone-900">
-              {activeSlideData.title}
-            </h1>
-
-            {/* Subtitle */}
-            <p className="text-stone-600 text-base sm:text-lg max-w-2xl leading-relaxed font-normal">
-              {activeSlideData.subtitle}
-            </p>
-
-            {/* Highlights */}
-            <div className="pt-1 flex flex-wrap gap-2 text-xs font-medium text-stone-700">
-              {activeSlideData.highlights.map((spec, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center gap-2 bg-white/90 backdrop-blur px-3.5 py-1.5 rounded-xl border border-stone-200 shadow-sm"
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentSlide}
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -16 }}
+                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                className="space-y-6"
+              >
+                {/* Badge & Index */}
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
+                  className="flex items-center gap-3"
                 >
-                  <CheckCircle2 className="w-3.5 h-3.5 text-amber-600" />
-                  <span>{spec}</span>
-                </div>
-              ))}
-            </div>
+                  <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-100/80 border border-amber-300 text-amber-900 text-[10px] font-bold uppercase tracking-widest shadow-sm">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-700" />
+                    <span>{activeSlideData.badge}</span>
+                  </span>
+                  <span className="text-xs font-mono font-semibold text-stone-500 bg-white px-2.5 py-1 rounded-md border border-stone-200">
+                    0{currentSlide + 1} / 0{totalSlides}
+                  </span>
+                </motion.div>
 
-            {/* Pricing & Add to Bag CTA */}
-            <div className="pt-4 flex flex-wrap items-center gap-4">
-              <div className="flex items-baseline gap-2 bg-white border border-stone-200 px-4 py-2.5 rounded-2xl shadow-sm">
-                <span className="text-2xl font-bold text-amber-800">₹{activeSlideData.price}</span>
-                <span className="text-xs text-stone-400 line-through">₹{activeSlideData.originalPrice}</span>
-                <span className="text-[10px] font-bold text-white bg-amber-800 px-2 py-0.5 rounded-full uppercase ml-1">
-                  {activeSlideData.discount}
-                </span>
-              </div>
+                {/* Headline */}
+                <motion.h1
+                  initial={{ opacity: 0, y: 28 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
+                  className="text-3xl sm:text-5xl font-serif font-extrabold tracking-tight leading-tight text-stone-900"
+                >
+                  {activeSlideData.title}
+                </motion.h1>
 
-              <button
-                onClick={handleAddToCartClick}
-                className="bg-amber-800 hover:bg-amber-900 text-amber-50 font-bold text-sm px-6 py-3.5 rounded-2xl transition shadow-md flex items-center gap-2.5 active:scale-95 cursor-pointer"
-              >
-                <ShoppingBag className="w-4 h-4 text-amber-50" />
-                <span>Add to Bag — ₹{activeSlideData.price}</span>
-              </button>
+                {/* Subtitle */}
+                <motion.p
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.55, delay: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                  className="text-stone-600 text-base sm:text-lg max-w-2xl leading-relaxed font-normal"
+                >
+                  {activeSlideData.subtitle}
+                </motion.p>
 
-              <button
-                onClick={handleExploreClick}
-                className="bg-white hover:bg-stone-50 text-stone-800 font-semibold text-sm px-5 py-3.5 rounded-2xl border border-stone-300 transition flex items-center gap-2 cursor-pointer shadow-sm"
-              >
-                <span>View Full Details</span>
-                <ArrowRight className="w-4 h-4 text-amber-700" />
-              </button>
-            </div>
+                {/* Highlights */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                  className="pt-1 flex flex-wrap gap-2 text-xs font-medium text-stone-700"
+                >
+                  {activeSlideData.highlights.map((spec, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center gap-2 bg-white/90 backdrop-blur px-3.5 py-1.5 rounded-xl border border-stone-200 shadow-sm"
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5 text-amber-600" />
+                      <span>{spec}</span>
+                    </div>
+                  ))}
+                </motion.div>
+
+                {/* Pricing & Add to Bag CTA */}
+                <motion.div
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.55, delay: 0.38, ease: [0.16, 1, 0.3, 1] }}
+                  className="pt-4 flex flex-wrap items-center gap-4"
+                >
+                  <div className="flex items-baseline gap-2 bg-white border border-stone-200 px-4 py-2.5 rounded-2xl shadow-sm">
+                    <span className="text-2xl font-bold text-amber-800">₹{activeSlideData.price}</span>
+                    <span className="text-xs text-stone-400 line-through">₹{activeSlideData.originalPrice}</span>
+                    <span className="text-[10px] font-bold text-white bg-amber-800 px-2 py-0.5 rounded-full uppercase ml-1">
+                      {activeSlideData.discount}
+                    </span>
+                  </div>
+
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={handleAddToCartClick}
+                    className="group relative bg-stone-900 hover:bg-stone-950 text-amber-400 border border-amber-500/40 font-bold text-sm px-6 py-3.5 rounded-2xl transition-all duration-300 shadow-[0_0_16px_rgba(217,119,6,0.22)] hover:shadow-[0_0_32px_rgba(245,158,11,0.55)] hover:border-amber-400 flex items-center gap-2.5 cursor-pointer overflow-hidden"
+                  >
+                    <ShoppingBag className="w-4 h-4 text-amber-400 transition-transform duration-300 group-hover:scale-110" />
+                    <span className="relative inline-block">
+                      Add to Bag — ₹{activeSlideData.price}
+                      <span className="absolute bottom-[-2px] left-0 w-0 h-[2px] bg-amber-400 transition-all duration-300 group-hover:w-full"></span>
+                    </span>
+                  </motion.button>
+
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={handleExploreClick}
+                    className="group bg-stone-900/90 hover:bg-stone-900 text-amber-300 font-semibold text-sm px-5 py-3.5 rounded-2xl border border-stone-700/80 transition-all duration-300 shadow-[0_0_12px_rgba(217,119,6,0.18)] hover:shadow-[0_0_24px_rgba(245,158,11,0.45)] hover:border-amber-500/60 flex items-center gap-2 cursor-pointer"
+                  >
+                    <span className="relative inline-block text-amber-300">
+                      View Full Details
+                      <span className="absolute bottom-[-2px] left-0 w-0 h-[2px] bg-amber-400 transition-all duration-300 group-hover:w-full"></span>
+                    </span>
+                    <ArrowRight className="w-4 h-4 text-amber-400 transition-transform duration-300 group-hover:translate-x-1" />
+                  </motion.button>
+                </motion.div>
+              </motion.div>
+            </AnimatePresence>
           </div>
 
           {/* Right Column: Interactive Photo Angle Gallery Showcase */}
           <div className="lg:col-span-5 flex flex-col items-center justify-center">
             {/* Stage Viewport */}
-            <div className="relative w-full max-w-md aspect-square bg-white rounded-3xl p-4 border border-stone-200 shadow-md overflow-hidden group">
-              <img
-                src={displayImage}
-                alt={activeSlideData.title}
-                className="w-full h-full object-cover object-center rounded-2xl transition-all duration-500 group-hover:scale-105"
-                referrerPolicy="no-referrer"
-              />
-
-              {/* Angle Label Floating Badge */}
-              <div className="absolute top-4 left-4 bg-stone-900/80 backdrop-blur text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
-                📷 {activeSlideData.photoAngles && activeSlideData.photoAngles[activePhotoIndex] ? activeSlideData.photoAngles[activePhotoIndex].title : 'Official View'}
-              </div>
-
-              {/* Quality Seal */}
-              <div className="absolute top-4 right-4 bg-amber-50/90 backdrop-blur border border-amber-300 text-amber-900 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
-                100% Authentic
-              </div>
-
-              <button
-                onClick={handleExploreClick}
-                className="absolute bottom-4 left-4 bg-amber-800 text-amber-50 text-xs font-bold px-4 py-2 rounded-xl shadow-md flex items-center gap-2 hover:bg-amber-900 transition"
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`${currentSlide}-${activePhotoIndex}`}
+                initial={{ opacity: 0, scale: 0.96, y: 16 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.96 }}
+                transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                className="relative w-full max-w-md aspect-square bg-white rounded-3xl p-4 border border-stone-200 shadow-md overflow-hidden group"
               >
-                <Eye className="w-3.5 h-3.5" />
-                <span>Quick View</span>
-              </button>
-            </div>
+                <img
+                  src={displayImage}
+                  alt={activeSlideData.title}
+                  className="w-full h-full object-cover object-center rounded-2xl transition-all duration-500 group-hover:scale-105"
+                  referrerPolicy="no-referrer"
+                />
+
+                {/* Angle Label Floating Badge */}
+                <div className="absolute top-4 left-4 bg-stone-900/80 backdrop-blur text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                  📷 {activeSlideData.photoAngles && activeSlideData.photoAngles[activePhotoIndex] ? activeSlideData.photoAngles[activePhotoIndex].title : 'Official View'}
+                </div>
+
+                {/* Quality Seal */}
+                <div className="absolute top-4 right-4 bg-amber-50/90 backdrop-blur border border-amber-300 text-amber-900 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                  100% Authentic
+                </div>
+
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleExploreClick}
+                  className="group absolute bottom-4 left-4 bg-stone-900 text-amber-400 border border-amber-500/30 text-xs font-bold px-4 py-2 rounded-xl shadow-[0_0_12px_rgba(217,119,6,0.2)] hover:shadow-[0_0_22px_rgba(245,158,11,0.5)] hover:border-amber-400 flex items-center gap-2 hover:bg-stone-950 transition-all duration-300"
+                >
+                  <Eye className="w-3.5 h-3.5 text-amber-400 group-hover:scale-110 transition-transform" />
+                  <span className="relative inline-block">
+                    Quick View
+                    <span className="absolute bottom-[-1px] left-0 w-0 h-[1.5px] bg-amber-400 transition-all duration-300 group-hover:w-full"></span>
+                  </span>
+                </motion.button>
+              </motion.div>
+            </AnimatePresence>
 
             {/* Interactive Photo Thumbnails Strip (Utilizing all 10 photoshoot angles) */}
             {activeSlideData.photoAngles && activeSlideData.photoAngles.length > 1 && (
