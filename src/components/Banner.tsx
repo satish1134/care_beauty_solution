@@ -212,7 +212,7 @@ export const Banner: React.FC<BannerProps> = ({ products = [], onAddToCart, onSe
                   </div>
 
                   <motion.button
-                    whileHover={{ scale: 1.02 }}
+                    whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.97 }}
                     onClick={handleAddToCartClick}
                     className="group relative bg-stone-900 hover:bg-stone-950 text-amber-400 border border-amber-500/40 font-bold text-sm px-6 py-3.5 rounded-2xl transition-all duration-300 shadow-[0_0_16px_rgba(217,119,6,0.22)] hover:shadow-[0_0_32px_rgba(245,158,11,0.55)] hover:border-amber-400 flex items-center gap-2.5 cursor-pointer overflow-hidden"
@@ -225,7 +225,7 @@ export const Banner: React.FC<BannerProps> = ({ products = [], onAddToCart, onSe
                   </motion.button>
 
                   <motion.button
-                    whileHover={{ scale: 1.02 }}
+                    whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.97 }}
                     onClick={handleExploreClick}
                     className="group bg-stone-900/90 hover:bg-stone-900 text-amber-300 font-semibold text-sm px-5 py-3.5 rounded-2xl border border-stone-700/80 transition-all duration-300 shadow-[0_0_12px_rgba(217,119,6,0.18)] hover:shadow-[0_0_24px_rgba(245,158,11,0.45)] hover:border-amber-500/60 flex items-center gap-2 cursor-pointer"

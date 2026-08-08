@@ -69,13 +69,28 @@
   scrollbar-width: none;
 }
 
-/* Gold Glow Effects for Banner CTA Buttons */
+/* Gold Glow, Entrance Animation & Scale Transform Effects for Banner CTA Buttons */
+@keyframes bannerButtonEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .Banner button {
+  animation: bannerButtonEntrance 0.6s cubic-bezier(0.16, 1, 0.3, 1) ease-out forwards;
   box-shadow: 0 0 14px rgba(217, 119, 6, 0.22), 0 0 4px rgba(245, 158, 11, 0.15);
+  letter-spacing: normal;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .Banner button:hover {
+  transform: scale(1.05);
+  letter-spacing: 0.05em;
   box-shadow: 0 0 28px rgba(217, 119, 6, 0.55), 0 0 12px rgba(245, 158, 11, 0.38);
 }
 
