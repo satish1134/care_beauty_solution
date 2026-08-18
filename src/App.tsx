@@ -10,7 +10,7 @@ import { CustomerEngagementHub } from './components/CustomerEngagementHub';
 import { CartDrawer } from './components/CartDrawer';
 import { CheckoutModal } from './components/CheckoutModal';
 import { UserOrdersModal } from './components/UserOrdersModal';
-import { AdminPanel } from './components/AdminPanel';
+import { AdminPortal } from './admin/AdminPortal';
 import { AuthModal } from './components/AuthModal';
 import { AddressBookModal } from './components/AddressBookModal';
 import { Footer } from './components/Footer';
@@ -374,66 +374,18 @@ export default function App() {
 
   const totalCartItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
-  // SEPARATE ADMIN PORTAL VIEW ROUTE (/admin)
+  // SEPARATE STANDALONE ADMIN PORTAL ROUTE (/admin)
   if (isDirectAdminRoute) {
     return (
-      <div className="min-h-screen bg-slate-900 text-white flex flex-col">
-        <header className="bg-emerald-950 border-b border-emerald-800 p-4 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <Shield className="w-6 h-6 text-amber-300" />
-            <h1 className="font-serif text-lg font-bold">Care Beauty Solution — Admin Back-Office</h1>
-          </div>
-          <a href="/" className="text-xs bg-emerald-900 hover:bg-emerald-800 px-3 py-1.5 rounded-lg border border-emerald-700 text-emerald-200">
-            ← Exit to Customer Storefront
-          </a>
-        </header>
-
-        {isAdminAuthenticated ? (
-          <main className="flex-1 p-6">
-            <AdminPanel
-              products={products}
-              categories={categories}
-              coupons={coupons}
-              auditLogs={auditLogs}
-              orders={orders}
-              onRefreshData={fetchBackendData}
-              onOpenGitGuide={() => {}}
-            />
-          </main>
-        ) : (
-          <div className="flex-1 flex items-center justify-center p-4">
-            <div className="bg-slate-800 border border-slate-700 p-8 rounded-3xl max-w-sm w-full space-y-4 text-center shadow-2xl">
-              <div className="w-12 h-12 bg-amber-400/10 text-amber-300 rounded-full flex items-center justify-center mx-auto">
-                <Lock className="w-6 h-6" />
-              </div>
-              <h2 className="font-serif font-bold text-xl text-amber-200">Staff Portal Authentication</h2>
-              <p className="text-xs text-slate-400">Enter administrator credentials to access inventory & order logs</p>
-
-              {adminAuthError && (
-                <div className="bg-red-900/50 text-red-200 border border-red-700 text-xs p-2.5 rounded-xl font-medium">
-                  {adminAuthError}
-                </div>
-              )}
-
-              <form onSubmit={handleAdminLogin} className="space-y-3">
-                <input
-                  type="password"
-                  placeholder="Enter Passcode (e.g. admin123)"
-                  value={adminPasscode}
-                  onChange={e => setAdminPasscode(e.target.value)}
-                  className="w-full text-xs bg-slate-900 border border-slate-700 rounded-xl p-3 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
-                />
-                <button
-                  type="submit"
-                  className="w-full bg-amber-400 hover:bg-amber-300 text-emerald-950 font-bold text-xs py-3 rounded-xl transition"
-                >
-                  Authorize Admin Access
-                </button>
-              </form>
-            </div>
-          </div>
-        )}
-      </div>
+      <AdminPortal
+        products={products}
+        categories={categories}
+        coupons={coupons}
+        auditLogs={auditLogs}
+        orders={orders}
+        onRefreshData={fetchBackendData}
+        onExitToStore={() => navigateTo('/')}
+      />
     );
   }
 
