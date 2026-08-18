@@ -7,6 +7,9 @@ import { OrderFulfillment } from './components/OrderFulfillment';
 import { ReviewModerator } from './components/ReviewModerator';
 import { CouponManager } from './components/CouponManager';
 import { AuditLogViewer } from './components/AuditLogViewer';
+import { SeoMetaManager } from './components/SeoMetaManager';
+import { MarketplaceIntegrator } from './components/MarketplaceIntegrator';
+import { RbacManager } from './components/RbacManager';
 import { Product, Category, Coupon, AuditLog, Order, AdminRole } from '../types';
 
 interface AdminPortalProps {
@@ -292,15 +295,13 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
           {activeTab === 'audit' && <AuditLogViewer auditLogs={auditLogs} isDarkMode={isDarkMode} />}
 
-          {(activeTab === 'seo' || activeTab === 'marketplaces' || activeTab === 'rbac') && (
-            <div className="bg-slate-900 p-8 rounded-3xl border border-slate-800 text-center space-y-3">
-              <Sparkles className="w-8 h-8 text-amber-400 mx-auto" />
-              <h3 className="text-lg font-bold text-white capitalize">{activeTab} Manager</h3>
-              <p className="text-xs text-slate-400 max-w-md mx-auto">
-                Advanced management panel connected to live backend APIs for {activeTab}.
-              </p>
-            </div>
+          {activeTab === 'seo' && <SeoMetaManager products={products} isDarkMode={isDarkMode} />}
+
+          {activeTab === 'marketplaces' && (
+            <MarketplaceIntegrator products={products} isDarkMode={isDarkMode} />
           )}
+
+          {activeTab === 'rbac' && <RbacManager isDarkMode={isDarkMode} />}
         </main>
       </div>
     </div>
