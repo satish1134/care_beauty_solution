@@ -1,0 +1,140 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient: Pure White Studio with Soft Drop Shadow -->
+    <linearGradient id="moistBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fdfcfd" />
+      <stop offset="50%" stop-color="#f7f6f9" />
+      <stop offset="100%" stop-color="#efedf2" />
+    </linearGradient>
+
+    <!-- Tube Body 3D Cylindrical Gradient -->
+    <linearGradient id="tubeBody" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#e1e3e8" />
+      <stop offset="15%" stop-color="#f8f9fa" />
+      <stop offset="50%" stop-color="#ffffff" />
+      <stop offset="85%" stop-color="#f1f3f6" />
+      <stop offset="100%" stop-color="#cbd0d8" />
+    </linearGradient>
+
+    <!-- Flip Top Cap Gradient -->
+    <linearGradient id="capGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#d1d5db" />
+      <stop offset="25%" stop-color="#f3f4f6" />
+      <stop offset="75%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#9ca3af" />
+    </linearGradient>
+
+    <!-- Gold Foil Accents -->
+    <linearGradient id="goldMoist" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#b45309" />
+      <stop offset="30%" stop-color="#d97706" />
+      <stop offset="60%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#92400e" />
+    </linearGradient>
+
+    <!-- Gold Highlight Box -->
+    <linearGradient id="goldBox" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#fef3c7" />
+      <stop offset="50%" stop-color="#fde68a" />
+      <stop offset="100%" stop-color="#fef3c7" />
+    </linearGradient>
+
+    <!-- Soft Floor Shadow -->
+    <filter id="floorShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="16" />
+      <feOffset dx="0" dy="24" result="offsetblur" />
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.25" />
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="800" height="800" fill="url(#moistBg)" />
+
+  <!-- Floor Contact Shadow -->
+  <ellipse cx="400" cy="735" rx="120" ry="18" fill="#1e293b" opacity="0.25" filter="blur(10px)" />
+  <ellipse cx="400" cy="730" rx="80" ry="8" fill="#0f172a" opacity="0.4" filter="blur(4px)" />
+
+  <!-- MAIN TUBE CONTAINER GROUP -->
+  <g filter="url(#floorShadow)">
+    
+    <!-- TUBE TOP CRIMP -->
+    <path d="M 280 180 L 520 180 L 515 200 L 285 200 Z" fill="#d1d5db" />
+    <line x1="285" y1="184" x2="515" y2="184" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="3,3" />
+    <line x1="285" y1="190" x2="515" y2="190" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="3,3" />
+    <line x1="285" y1="196" x2="515" y2="196" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="3,3" />
+
+    <!-- TUBE BODY MAIN CURVE -->
+    <!-- From crimp top (285, 200) to shoulder (320, 620) -->
+    <path d="M 285 200 
+             Q 285 380 320 620 
+             L 480 620 
+             Q 515 380 515 200 
+             Z" 
+          fill="url(#tubeBody)" />
+
+    <!-- Tube Body 3D Specular Highlight Line -->
+    <path d="M 360 205 Q 365 380 375 615 L 415 615 Q 400 380 390 205 Z" fill="#ffffff" opacity="0.6" />
+
+    <!-- GOLD ACCENT RING AT SHOULDER -->
+    <rect x="320" y="620" width="160" height="6" rx="2" fill="url(#goldMoist)" />
+
+    <!-- TUBE SHOULDER TAPER -->
+    <path d="M 320 626 L 480 626 L 465 650 L 335 650 Z" fill="#e5e7eb" />
+
+    <!-- FLIP TOP CAP -->
+    <rect x="335" y="650" width="130" height="70" rx="12" fill="url(#capGrad)" stroke="#d1d5db" stroke-width="1" />
+    <!-- Cap Flip Seam Line -->
+    <line x1="335" y1="685" x2="465" y2="685" stroke="#9ca3af" stroke-width="1.5" />
+    <!-- Cap Thumb Indentation Notch -->
+    <path d="M 380 685 Q 400 695 420 685 Z" fill="#d1d5db" opacity="0.8" />
+
+    <!-- ==================== FRONT LABEL GRAPHICS ==================== -->
+    <g transform="translate(0, 30)">
+      <!-- ORNATE GOLD CIRCULAR CREST LOGO -->
+      <g transform="translate(400, 260)">
+        <circle cx="0" cy="0" r="32" fill="none" stroke="url(#goldMoist)" stroke-width="1.5" />
+        <circle cx="0" cy="0" r="28" fill="none" stroke="url(#goldMoist)" stroke-width="0.75" stroke-dasharray="2,2" />
+        <!-- Leaf Icon Left -->
+        <path d="M -12 -2 Q -18 -10 -8 -16 Q -2 -10 -12 -2 Z" fill="url(#goldMoist)" />
+        <line x1="-10" y1="-4" x2="-14" y2="-12" stroke="#ffffff" stroke-width="0.5" />
+        <!-- Vertical Divider & C -->
+        <line x1="-2" y1="-14" x2="-2" y2="14" stroke="url(#goldMoist)" stroke-width="1" />
+        <text x="10" y="6" font-family="'Playfair Display', Georgia, serif" font-size="20" font-weight="bold" fill="url(#goldMoist)" text-anchor="middle">C</text>
+      </g>
+
+      <!-- BRAND NAME -->
+      <text x="400" y="322" font-family="'Playfair Display', Georgia, serif" font-size="28" font-weight="bold" fill="#1e293b" letter-spacing="4" text-anchor="middle">CARe</text>
+      <text x="400" y="338" font-family="'Montserrat', sans-serif" font-size="9" font-weight="700" fill="#b45309" letter-spacing="3" text-anchor="middle">A BEAUTY SOLUTION</text>
+      <line x1="330" y1="348" x2="470" y2="348" stroke="#d97706" stroke-width="0.8" opacity="0.6" />
+
+      <!-- PRODUCT TITLE -->
+      <text x="400" y="378" font-family="'Playfair Display', Georgia, serif" font-size="22" font-weight="bold" fill="#0f172a" text-anchor="middle">Hydrating</text>
+      <text x="400" y="402" font-family="'Playfair Display', Georgia, serif" font-size="22" font-weight="bold" fill="#0f172a" text-anchor="middle">Moisturizer</text>
+
+      <!-- HIGHLIGHT BOX: With Ceramides + Niacinamide -->
+      <rect x="295" y="420" width="210" height="22" rx="4" fill="url(#goldBox)" stroke="#f59e0b" stroke-width="0.5" />
+      <text x="400" y="435" font-family="'Montserrat', sans-serif" font-size="10" font-weight="700" fill="#92400e" text-anchor="middle">With Ceramides + Niacinamide</text>
+
+      <!-- SUBTITLE BOX: Fragrance Free | Non-Comedogenic -->
+      <rect x="300" y="450" width="200" height="20" rx="3" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="0.5" />
+      <text x="400" y="464" font-family="'Montserrat', sans-serif" font-size="9" font-weight="600" fill="#4b5563" text-anchor="middle">Fragrance Free | Non-Comedogenic</text>
+
+      <!-- HELPS STRENGTHEN SKIN BARRIER -->
+      <text x="400" y="490" font-family="'Montserrat', sans-serif" font-size="10" font-weight="500" fill="#374151" text-anchor="middle">Helps Strengthen Skin Barrier</text>
+      <line x1="320" y1="502" x2="480" y2="502" stroke="#d1d5db" stroke-width="0.75" />
+
+      <!-- FOR ALL SKIN TYPES -->
+      <text x="400" y="522" font-family="'Montserrat', sans-serif" font-size="10" font-weight="600" fill="#1f2937" text-anchor="middle">For All Skin Types</text>
+
+      <!-- NET WEIGHT: 50 g -->
+      <text x="400" y="546" font-family="'Montserrat', sans-serif" font-size="14" font-weight="700" fill="#111827" text-anchor="middle">50 g</text>
+    </g>
+
+  </g>
+</svg>

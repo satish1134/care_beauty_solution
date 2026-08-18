@@ -1,0 +1,151 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient: Clean White Marble Spa Scene with Bokeh Glints -->
+    <linearGradient id="sunBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fdfcfd" />
+      <stop offset="40%" stop-color="#f5f7f6" />
+      <stop offset="100%" stop-color="#e9eded" />
+    </linearGradient>
+
+    <!-- Bottle Body Cylindrical Gradient -->
+    <linearGradient id="sunBottleBody" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#dbe1e8" />
+      <stop offset="15%" stop-color="#f8fafc" />
+      <stop offset="50%" stop-color="#ffffff" />
+      <stop offset="85%" stop-color="#f1f5f9" />
+      <stop offset="100%" stop-color="#cbd5e1" />
+    </linearGradient>
+
+    <!-- Clear Acrylic Cap Gradient -->
+    <linearGradient id="clearCapGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.6" />
+      <stop offset="20%" stop-color="#ffffff" stop-opacity="0.2" />
+      <stop offset="50%" stop-color="#ffffff" stop-opacity="0.8" />
+      <stop offset="80%" stop-color="#cbd5e1" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#94a3b8" stop-opacity="0.5" />
+    </linearGradient>
+
+    <!-- Gold Foil Accents -->
+    <linearGradient id="goldSun" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#b45309" />
+      <stop offset="30%" stop-color="#d97706" />
+      <stop offset="60%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#92400e" />
+    </linearGradient>
+
+    <!-- Teal/Sage Highlight Bar -->
+    <linearGradient id="sageBar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ccfbf1" />
+      <stop offset="50%" stop-color="#99f6e4" />
+      <stop offset="100%" stop-color="#2dd4bf" />
+    </linearGradient>
+
+    <!-- Bottom Teal Strip -->
+    <linearGradient id="bottomTeal" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#115e59" />
+      <stop offset="50%" stop-color="#134e4a" />
+      <stop offset="100%" stop-color="#042f2e" />
+    </linearGradient>
+
+    <!-- Soft Floor Shadow -->
+    <filter id="sunFloorShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="16" />
+      <feOffset dx="0" dy="24" result="offsetblur" />
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.22" />
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="800" height="800" fill="url(#sunBg)" />
+
+  <!-- Ambient Marble Glint Spheres (Bokeh) -->
+  <circle cx="120" cy="160" r="48" fill="#ffffff" opacity="0.6" filter="blur(10px)" />
+  <circle cx="220" cy="220" r="70" fill="#ffffff" opacity="0.5" filter="blur(15px)" />
+  <circle cx="700" cy="260" r="60" fill="#ffffff" opacity="0.5" filter="blur(12px)" />
+  <circle cx="100" cy="680" r="50" fill="#ffffff" opacity="0.4" filter="blur(10px)" />
+  <circle cx="720" cy="620" r="65" fill="#ffffff" opacity="0.5" filter="blur(14px)" />
+
+  <!-- Floor Contact Shadow -->
+  <ellipse cx="400" cy="735" rx="110" ry="16" fill="#1e293b" opacity="0.22" filter="blur(10px)" />
+  <ellipse cx="400" cy="730" rx="75" ry="7" fill="#0f172a" opacity="0.38" filter="blur(4px)" />
+
+  <!-- MAIN BOTTLE CONTAINER GROUP -->
+  <g filter="url(#sunFloorShadow)">
+
+    <!-- CLEAR ACRYLIC CAP OVER PUMP NOZZLE -->
+    <rect x="330" y="140" width="140" height="150" rx="10" fill="url(#clearCapGrad)" stroke="#cbd5e1" stroke-width="1" />
+    <!-- Cap Highlight Specular Stripe -->
+    <rect x="345" y="145" width="15" height="140" rx="4" fill="#ffffff" opacity="0.5" />
+
+    <!-- INNER WHITE PUMP NOZZLE & ACTUATOR (Visible through transparent cap) -->
+    <rect x="370" y="160" width="60" height="70" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1" />
+    <!-- Dispenser Hole -->
+    <ellipse cx="400" cy="175" rx="4" ry="2" fill="#94a3b8" />
+    <rect x="360" y="230" width="80" height="25" rx="4" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1" />
+    <rect x="350" y="255" width="100" height="35" rx="4" fill="#e2e8f0" />
+
+    <!-- MAIN CYLINDRICAL BOTTLE BODY -->
+    <rect x="310" y="285" width="180" height="440" rx="20" fill="url(#sunBottleBody)" />
+
+    <!-- 3D Cylindrical Highlight Line -->
+    <rect x="350" y="290" width="40" height="430" fill="#ffffff" opacity="0.5" />
+
+    <!-- ==================== FRONT LABEL GRAPHICS ==================== -->
+    <g transform="translate(0, 20)">
+      <!-- ORNATE GOLD CIRCULAR CREST LOGO -->
+      <g transform="translate(400, 335)">
+        <circle cx="0" cy="0" r="30" fill="none" stroke="url(#goldSun)" stroke-width="1.5" />
+        <circle cx="0" cy="0" r="26" fill="none" stroke="url(#goldSun)" stroke-width="0.75" stroke-dasharray="2,2" />
+        <!-- Leaf Icon Left -->
+        <path d="M -11 -2 Q -16 -10 -7 -15 Q -2 -9 -11 -2 Z" fill="url(#goldSun)" />
+        <line x1="-9" y1="-4" x2="-13" y2="-11" stroke="#ffffff" stroke-width="0.5" />
+        <!-- Vertical Divider & C -->
+        <line x1="-2" y1="-13" x2="-2" y2="13" stroke="url(#goldSun)" stroke-width="1" />
+        <text x="9" y="6" font-family="'Playfair Display', Georgia, serif" font-size="19" font-weight="bold" fill="url(#goldSun)" text-anchor="middle">C</text>
+      </g>
+
+      <!-- BRAND NAME -->
+      <text x="400" y="392" font-family="'Playfair Display', Georgia, serif" font-size="26" font-weight="bold" fill="#1e293b" letter-spacing="4" text-anchor="middle">CARe</text>
+      <text x="400" y="408" font-family="'Montserrat', sans-serif" font-size="8.5" font-weight="700" fill="#b45309" letter-spacing="3" text-anchor="middle">A BEAUTY SOLUTION</text>
+      <line x1="335" y1="418" x2="465" y2="418" stroke="#d97706" stroke-width="0.75" opacity="0.6" />
+
+      <!-- PRODUCT TITLE -->
+      <text x="400" y="445" font-family="'Playfair Display', Georgia, serif" font-size="20" font-weight="bold" fill="#0f172a" text-anchor="middle">RAY BARRIER</text>
+      <text x="400" y="468" font-family="'Playfair Display', Georgia, serif" font-size="20" font-weight="bold" fill="#0f172a" text-anchor="middle">SUNSCREEN</text>
+
+      <!-- HIGHLIGHT BOX: Broad Spectrum SPF 50+ -->
+      <rect x="320" y="484" width="160" height="22" rx="4" fill="url(#sageBar)" stroke="#0d9488" stroke-width="0.5" />
+      <text x="400" y="499" font-family="'Montserrat', sans-serif" font-size="9.5" font-weight="700" fill="#0f766e" text-anchor="middle">Broad Spectrum SPF 50+</text>
+
+      <!-- BULLETED ATTRIBUTES -->
+      <text x="400" y="524" font-family="'Montserrat', sans-serif" font-size="9" font-weight="600" fill="#334155" text-anchor="middle">Broad Spectrum SPF 50+</text>
+      <text x="400" y="540" font-family="'Montserrat', sans-serif" font-size="9" font-weight="600" fill="#334155" text-anchor="middle">UVA-UVB Protection</text>
+      <text x="400" y="556" font-family="'Montserrat', sans-serif" font-size="9" font-weight="600" fill="#334155" text-anchor="middle">Water Resistant (80 minutes)</text>
+      <text x="400" y="572" font-family="'Montserrat', sans-serif" font-size="9" font-weight="600" fill="#334155" text-anchor="middle">Lightweight, Non-Greasy</text>
+
+      <line x1="335" y1="584" x2="465" y2="584" stroke="#cbd5e1" stroke-width="0.75" />
+
+      <!-- FOR ALL SKIN TYPES -->
+      <text x="400" y="602" font-family="'Montserrat', sans-serif" font-size="9.5" font-weight="600" fill="#1e293b" text-anchor="middle">For All Skin Types</text>
+
+      <!-- NET VOLUME: 100 ml -->
+      <text x="400" y="624" font-family="'Montserrat', sans-serif" font-size="13" font-weight="700" fill="#0f172a" text-anchor="middle">100 ml</text>
+    </g>
+
+    <!-- BOTTOM TEAL DECORATIVE STRIP WITH GOLD TRIM -->
+    <rect x="310" y="680" width="180" height="35" rx="0" fill="url(#sageBar)" opacity="0.4" />
+    <line x1="310" y1="680" x2="490" y2="680" stroke="url(#goldSun)" stroke-width="1.5" />
+    <!-- Water Droplet Graphics on Strip -->
+    <circle cx="340" cy="698" r="3" fill="#ffffff" opacity="0.8" />
+    <circle cx="370" cy="692" r="2" fill="#ffffff" opacity="0.6" />
+    <circle cx="430" cy="696" r="3.5" fill="#ffffff" opacity="0.7" />
+    <circle cx="460" cy="690" r="2.5" fill="#ffffff" opacity="0.8" />
+
+  </g>
+</svg>

@@ -219,27 +219,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           ))}
 
-          <span className="text-stone-300">|</span>
-          <span className="text-amber-800 text-[11px] font-bold uppercase tracking-wider flex items-center gap-1 pl-1">
-            <SlidersHorizontal className="w-3 h-3 text-amber-700" /> Skin Target:
-          </span>
 
-          {SKIN_CONCERNS.map(concern => (
-            <button
-              key={concern}
-              onClick={() => {
-                onSelectSkinConcern(selectedSkinConcern === concern ? null : concern);
-                onSelectCategory(null);
-              }}
-              className={`px-3 py-1 text-[11px] rounded-xl border transition ${
-                selectedSkinConcern === concern
-                  ? 'bg-teal-700 text-white font-bold border-teal-800 shadow-sm'
-                  : 'border-stone-300 text-stone-700 hover:border-amber-600 hover:bg-amber-50'
-              }`}
-            >
-              {concern}
-            </button>
-          ))}
         </div>
       </div>
     </header>

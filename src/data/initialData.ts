@@ -6,7 +6,7 @@ export const INITIAL_CATEGORIES: Category[] = [
     name: 'Moisturizers & Hydration',
     slug: 'moisturizers-hydration',
     description: 'Deeply nourish and repair your skin barrier with clinical-grade ceramides and hyaluronic acid.',
-    imageUrl: 'https://images.unsplash.com/photo-1608248597261-e4d354714552?auto=format&fit=crop&w=600&q=80',
+    imageUrl: '/images/care-hydrating-moisturizer.svg',
     productCount: 1,
   },
   {
@@ -14,7 +14,7 @@ export const INITIAL_CATEGORIES: Category[] = [
     name: 'Sun Protection (SPF)',
     slug: 'sun-protection',
     description: 'Ultra-lightweight broad spectrum UVA/UVB protection engineered for Indian tropical climates.',
-    imageUrl: 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=600&q=80',
+    imageUrl: '/images/care-ray-barrier-sunscreen.svg',
     productCount: 1,
   },
   {
@@ -22,7 +22,7 @@ export const INITIAL_CATEGORIES: Category[] = [
     name: 'Cleansers & Face Washes',
     slug: 'cleansers-facewash',
     description: 'Sulfate-free pH balanced cleansers that remove impurities without stripping essential moisture.',
-    imageUrl: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=600&q=80',
+    imageUrl: '/images/care-refreshing-skin-cleanser.svg',
     productCount: 1,
   },
 ];
@@ -58,7 +58,7 @@ export const INITIAL_PRODUCTS: Product[] = [
       {
         id: 'var-hm-50g',
         productId: 'prod-hydrating-moisturizer',
-        name: '50g Jar',
+        name: '50g Tube',
         sku: 'CBS-HM-50G',
         price: 599,
         compareAtPrice: 799,
@@ -67,7 +67,7 @@ export const INITIAL_PRODUCTS: Product[] = [
       {
         id: 'var-hm-100g',
         productId: 'prod-hydrating-moisturizer',
-        name: '100g Value Jar',
+        name: '100g Value Pack',
         sku: 'CBS-HM-100G',
         price: 999,
         compareAtPrice: 1399,
@@ -77,14 +77,14 @@ export const INITIAL_PRODUCTS: Product[] = [
     images: [
       {
         id: 'img-hm-1',
-        url: 'https://images.unsplash.com/photo-1608248597261-e4d354714552?auto=format&fit=crop&w=800&q=80',
-        altText: 'Care Beauty Hydrating Moisturizer 50g Jar',
+        url: '/images/care-hydrating-moisturizer.svg',
+        altText: 'CARe Hydrating Moisturizer 50g Tube — Ceramides + Niacinamide',
         isPrimary: true,
       },
       {
         id: 'img-hm-2',
-        url: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=800&q=80',
-        altText: 'Hydrating Moisturizer Texture',
+        url: '/images/care-hydrating-moisturizer.svg',
+        altText: 'CARe Hydrating Moisturizer Studio View',
         isPrimary: false,
       },
     ],
@@ -125,7 +125,7 @@ export const INITIAL_PRODUCTS: Product[] = [
       {
         id: 'var-sun-100ml',
         productId: 'prod-ray-barrier-sunscreen',
-        name: '100ml Tube',
+        name: '100ml Pump Bottle',
         sku: 'CBS-SUN-100ML',
         price: 649,
         compareAtPrice: 849,
@@ -144,14 +144,14 @@ export const INITIAL_PRODUCTS: Product[] = [
     images: [
       {
         id: 'img-sun-1',
-        url: 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=800&q=80',
-        altText: 'Care Beauty Ray Barrier Sunscreen 100ml Tube',
+        url: '/images/care-ray-barrier-sunscreen.svg',
+        altText: 'CARe Ray Barrier Sunscreen 100ml Bottle — Broad Spectrum SPF 50+',
         isPrimary: true,
       },
       {
         id: 'img-sun-2',
-        url: 'https://images.unsplash.com/photo-1576426863848-c21f53c60b19?auto=format&fit=crop&w=800&q=80',
-        altText: 'Sunscreen Invisible Fluid Gel',
+        url: '/images/care-ray-barrier-sunscreen.svg',
+        altText: 'CARe Ray Barrier Sunscreen Studio View',
         isPrimary: false,
       },
     ],
@@ -367,7 +367,7 @@ export const INITIAL_ORDERS: Order[] = [
         variantId: 'var-hm-50',
         productName: 'Hydrating Moisturizer',
         variantName: '50 ml Jar',
-        productImage: 'https://images.unsplash.com/photo-1608248597261-e4d354714552?auto=format&fit=crop&w=400&q=80',
+        productImage: '/images/care-hydrating-moisturizer.svg',
         price: 599,
         quantity: 1,
         subtotal: 599,
@@ -377,8 +377,8 @@ export const INITIAL_ORDERS: Order[] = [
         productId: 'prod-ray-barrier-sunscreen',
         variantId: 'var-sun-50',
         productName: 'Ray Barrier Sunscreen SPF 50+',
-        variantName: '50 ml Tube',
-        productImage: 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=400&q=80',
+        variantName: '100 ml Pump Bottle',
+        productImage: '/images/care-ray-barrier-sunscreen.svg',
         price: 649,
         quantity: 1,
         subtotal: 649,

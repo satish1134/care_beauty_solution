@@ -292,7 +292,7 @@ export class AdminService {
     const fileKey = `uploads/${Date.now()}-${crypto.randomBytes(4).toString('hex')}-${filename.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
     const bucket = 'carebeautysolution-media-cdn';
     const signedUrl = `https://${bucket}.s3.ap-south-1.amazonaws.com/${fileKey}?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIOSFODNN7EXAMPLE%2F20260805%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Date=20260805T100000Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c`;
-    const publicCdnUrl = `https://images.unsplash.com/photo-1608248597261-e4d354714552?auto=format&fit=crop&w=800&q=80`;
+    const publicCdnUrl = `/images/care-hydrating-moisturizer.svg`;
 
     return {
       success: true,

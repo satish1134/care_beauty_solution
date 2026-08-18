@@ -37,7 +37,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
 
   const productReviews = reviews.filter(r => r.productId === product.id);
-  const images = product.images.length > 0 ? product.images : [{ id: 'default', url: 'https://images.unsplash.com/photo-1608248597261-e4d354714552', altText: product.name, isPrimary: true }];
+  const images = product.images.length > 0 ? product.images : [{ id: 'default', url: '/images/care-refreshing-skin-cleanser.svg', altText: product.name, isPrimary: true }];
   const currentImage = images[selectedImageIndex] || images[0];
 
   const handlePrevImage = () => {

@@ -47,13 +47,15 @@ export const Banner: React.FC<BannerProps> = ({ products = [], onAddToCart, onSe
       title: '72-Hour Ceramide Moisture Lock',
       subtitle: 'Fast-absorbing barrier cream powered by Ceramides (NP/AP/EOP) + Niacinamide to repair compromised skin barriers and deeply nourish.',
       highlights: ['3x Ceramide Complex', '0% Artificial Fragrances', 'Non-Comedogenic'],
-      imageUrl: 'https://images.unsplash.com/photo-1608248597261-e4d354714552?auto=format&fit=crop&w=1000&q=80',
+      imageUrl: '/images/care-hydrating-moisturizer.svg',
       price: 599,
       originalPrice: 799,
       discount: '25% OFF',
       slug: 'hydrating-moisturizer',
       photoAngles: [
-        { title: 'Front Jar', url: 'https://images.unsplash.com/photo-1608248597261-e4d354714552?auto=format&fit=crop&w=1000&q=80' },
+        { title: 'Front Tube View', url: '/images/care-hydrating-moisturizer.svg' },
+        { title: 'Studio Lighting', url: '/images/care-hydrating-moisturizer.svg' },
+        { title: 'Dermatologist Pack', url: '/images/care-hydrating-moisturizer.svg' },
       ]
     },
     {
@@ -62,13 +64,15 @@ export const Banner: React.FC<BannerProps> = ({ products = [], onAddToCart, onSe
       title: 'Photostable Broad Spectrum SPF 50+ PA++++',
       subtitle: 'Ultra-lightweight invisible gel sunscreen engineered for humid tropical weather. Zero white cast, water-resistant for 80 mins.',
       highlights: ['PA++++ Highest Protection', 'Zero White Cast Gel', '80-Min Water Resistant'],
-      imageUrl: 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=1000&q=80',
+      imageUrl: '/images/care-ray-barrier-sunscreen.svg',
       price: 649,
       originalPrice: 849,
       discount: '23% OFF',
       slug: 'ray-barrier-sunscreen',
       photoAngles: [
-        { title: 'Front Bottle', url: 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=1000&q=80' },
+        { title: 'Front Pump View', url: '/images/care-ray-barrier-sunscreen.svg' },
+        { title: 'Studio Lighting', url: '/images/care-ray-barrier-sunscreen.svg' },
+        { title: 'UV Shield Edition', url: '/images/care-ray-barrier-sunscreen.svg' },
       ]
     },
   ];
