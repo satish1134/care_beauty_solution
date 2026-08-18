@@ -6,10 +6,11 @@ import { Product, ProductVariant } from '../types';
 interface BannerProps {
   products?: Product[];
   onAddToCart?: (product: Product, variant: ProductVariant, quantity: number) => void;
+  onBuyNow?: (product: Product, variant: ProductVariant, quantity: number) => void;
   onSelectProduct?: (product: Product) => void;
 }
 
-export const Banner: React.FC<BannerProps> = ({ products = [], onAddToCart, onSelectProduct }) => {
+export const Banner: React.FC<BannerProps> = ({ products = [], onAddToCart, onBuyNow, onSelectProduct }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -115,6 +116,17 @@ export const Banner: React.FC<BannerProps> = ({ products = [], onAddToCart, onSe
     }
   };
 
+  const handleBuyNowClick = () => {
+    if (activeProduct) {
+      const primaryVariant = activeProduct.variants[0];
+      if (onBuyNow) {
+        onBuyNow(activeProduct, primaryVariant, 1);
+      } else if (onAddToCart) {
+        onAddToCart(activeProduct, primaryVariant, 1);
+      }
+    }
+  };
+
   const handleExploreClick = () => {
     if (activeProduct && onSelectProduct) {
       onSelectProduct(activeProduct);
@@ -200,14 +212,14 @@ export const Banner: React.FC<BannerProps> = ({ products = [], onAddToCart, onSe
                   ))}
                 </motion.div>
 
-                {/* Pricing & Add to Bag CTA */}
+                {/* Pricing & Buy Now / Add to Bag CTA */}
                 <motion.div
                   initial={{ opacity: 0, y: 24 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.55, delay: 0.38, ease: [0.16, 1, 0.3, 1] }}
-                  className="pt-4 flex flex-wrap items-center gap-4"
+                  className="pt-4 flex flex-wrap items-center gap-3 sm:gap-4"
                 >
-                  <div className="flex items-baseline gap-2 bg-white border border-stone-200 px-4 py-2.5 rounded-2xl shadow-sm">
+                  <div className="flex items-baseline gap-2 bg-white border border-stone-200 px-4 py-3 rounded-2xl shadow-sm">
                     <span className="text-2xl font-bold text-amber-800">₹{activeSlideData.price}</span>
                     <span className="text-xs text-stone-400 line-through">₹{activeSlideData.originalPrice}</span>
                     <span className="text-[10px] font-bold text-white bg-amber-800 px-2 py-0.5 rounded-full uppercase ml-1">
@@ -215,30 +227,35 @@ export const Banner: React.FC<BannerProps> = ({ products = [], onAddToCart, onSe
                     </span>
                   </div>
 
+                  {/* BUY NOW Direct Action Button */}
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={handleBuyNowClick}
+                    className="group relative bg-gradient-to-r from-amber-600 via-amber-700 to-amber-800 hover:from-amber-700 hover:to-amber-900 text-white font-extrabold text-sm px-6 py-3.5 rounded-2xl transition-all duration-300 shadow-[0_4px_20px_rgba(217,119,6,0.35)] hover:shadow-[0_6px_28px_rgba(217,119,6,0.55)] flex items-center gap-2.5 cursor-pointer overflow-hidden border border-amber-400/30"
+                  >
+                    <ShoppingBag className="w-4 h-4 text-amber-100 transition-transform duration-300 group-hover:scale-110" />
+                    <span>BUY NOW — ₹{activeSlideData.price}</span>
+                  </motion.button>
+
+                  {/* ADD TO BAG Button */}
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.97 }}
                     onClick={handleAddToCartClick}
-                    className="group relative bg-stone-900 hover:bg-stone-950 text-amber-400 border border-amber-500/40 font-bold text-sm px-6 py-3.5 rounded-2xl transition-all duration-300 shadow-[0_0_16px_rgba(217,119,6,0.22)] hover:shadow-[0_0_32px_rgba(245,158,11,0.55)] hover:border-amber-400 flex items-center gap-2.5 cursor-pointer overflow-hidden"
+                    className="group relative bg-stone-900 hover:bg-stone-950 text-amber-300 border border-amber-500/40 font-bold text-sm px-5 py-3.5 rounded-2xl transition-all duration-300 shadow-sm flex items-center gap-2 cursor-pointer"
                   >
-                    <ShoppingBag className="w-4 h-4 text-amber-400 transition-transform duration-300 group-hover:scale-110" />
-                    <span className="relative inline-block">
-                      Add to Bag — ₹{activeSlideData.price}
-                      <span className="absolute bottom-[-2px] left-0 w-0 h-[2px] bg-amber-400 transition-all duration-300 group-hover:w-full"></span>
-                    </span>
+                    <span>+ Add to Bag</span>
                   </motion.button>
 
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.97 }}
                     onClick={handleExploreClick}
-                    className="group bg-stone-900/90 hover:bg-stone-900 text-amber-300 font-semibold text-sm px-5 py-3.5 rounded-2xl border border-stone-700/80 transition-all duration-300 shadow-[0_0_12px_rgba(217,119,6,0.18)] hover:shadow-[0_0_24px_rgba(245,158,11,0.45)] hover:border-amber-500/60 flex items-center gap-2 cursor-pointer"
+                    className="group bg-stone-100 hover:bg-stone-200 text-stone-800 font-semibold text-xs px-4 py-3.5 rounded-2xl border border-stone-300 transition-all duration-300 flex items-center gap-1.5 cursor-pointer"
                   >
-                    <span className="relative inline-block text-amber-300">
-                      View Full Details
-                      <span className="absolute bottom-[-2px] left-0 w-0 h-[2px] bg-amber-400 transition-all duration-300 group-hover:w-full"></span>
-                    </span>
-                    <ArrowRight className="w-4 h-4 text-amber-400 transition-transform duration-300 group-hover:translate-x-1" />
+                    <span>Details</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-stone-600 transition-transform duration-300 group-hover:translate-x-1" />
                   </motion.button>
                 </motion.div>
               </motion.div>

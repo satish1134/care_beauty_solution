@@ -8,6 +8,7 @@ interface ProductDetailPageProps {
   allProducts?: Product[];
   onBackToCatalog: () => void;
   onAddToCart: (product: Product, variant: ProductVariant, quantity: number) => void;
+  onBuyNow?: (product: Product, variant: ProductVariant, quantity: number) => void;
   onSelectProduct?: (product: Product) => void;
   reviews: Review[];
   onAddReview: (reviewData: { productId: string; userName: string; rating: number; comment: string }) => void;
@@ -18,6 +19,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   allProducts = [],
   onBackToCatalog,
   onAddToCart,
+  onBuyNow,
   onSelectProduct,
   reviews,
   onAddReview,
@@ -323,30 +325,50 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 </button>
               </div>
 
-              {/* Add to Cart Button */}
-              <button
-                onClick={handleAddToCart}
-                disabled={selectedVariant.stock <= 0}
-                className={`w-full py-3 px-6 rounded-xl font-bold text-sm transition flex items-center justify-center gap-2 shadow-lg ${
-                  addedAnimation
-                    ? 'bg-emerald-600 text-white'
-                    : selectedVariant.stock > 0
-                    ? 'bg-emerald-900 hover:bg-emerald-800 text-white active:scale-95'
-                    : 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                }`}
-              >
-                {addedAnimation ? (
-                  <>
-                    <Check className="w-5 h-5 text-amber-300" /> Added to Bag!
-                  </>
-                ) : selectedVariant.stock > 0 ? (
-                  <>
-                    <ShoppingBag className="w-5 h-5 text-amber-300" /> Add {quantity} to Bag • ₹{selectedVariant.price * quantity}
-                  </>
-                ) : (
-                  'Out of Stock'
-                )}
-              </button>
+              {/* Action Buttons: Buy Now & Add to Bag */}
+              <div className="flex flex-col sm:flex-row items-stretch gap-3 w-full">
+                {/* BUY NOW Button */}
+                <button
+                  onClick={() => {
+                    if (selectedVariant.stock <= 0) return;
+                    if (onBuyNow) {
+                      onBuyNow(product, selectedVariant, quantity);
+                    } else {
+                      onAddToCart(product, selectedVariant, quantity);
+                    }
+                  }}
+                  disabled={selectedVariant.stock <= 0}
+                  className="flex-1 py-3.5 px-6 rounded-xl font-extrabold text-sm transition flex items-center justify-center gap-2 shadow-lg bg-gradient-to-r from-amber-600 via-amber-700 to-amber-800 hover:from-amber-700 hover:to-amber-900 text-white active:scale-95 cursor-pointer border border-amber-400/30"
+                >
+                  <ShoppingBag className="w-5 h-5 text-amber-200" />
+                  <span>BUY NOW • ₹{selectedVariant.price * quantity}</span>
+                </button>
+
+                {/* Add to Cart Button */}
+                <button
+                  onClick={handleAddToCart}
+                  disabled={selectedVariant.stock <= 0}
+                  className={`flex-1 py-3.5 px-6 rounded-xl font-bold text-sm transition flex items-center justify-center gap-2 shadow-md ${
+                    addedAnimation
+                      ? 'bg-emerald-600 text-white'
+                      : selectedVariant.stock > 0
+                      ? 'bg-stone-900 hover:bg-stone-950 text-amber-300 border border-amber-500/30 active:scale-95'
+                      : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                  }`}
+                >
+                  {addedAnimation ? (
+                    <>
+                      <Check className="w-5 h-5 text-amber-300" /> Added to Bag!
+                    </>
+                  ) : selectedVariant.stock > 0 ? (
+                    <>
+                      <span>+ Add to Bag</span>
+                    </>
+                  ) : (
+                    'Out of Stock'
+                  )}
+                </button>
+              </div>
             </div>
           </div>
 

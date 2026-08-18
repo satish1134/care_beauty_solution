@@ -50,7 +50,19 @@ export default function App() {
   const [categories, setCategories] = useState<Category[]>(INITIAL_CATEGORIES);
   const [coupons, setCoupons] = useState<Coupon[]>(INITIAL_COUPONS);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>(INITIAL_AUDIT_LOGS);
-  const [orders, setOrders] = useState<Order[]>(INITIAL_ORDERS);
+  const [orders, setOrders] = useState<Order[]>(() => {
+    try {
+      const userOrdersStr = localStorage.getItem('care_user_orders');
+      const beautyOrdersStr = localStorage.getItem('care_beauty_orders');
+      const userOrders: Order[] = userOrdersStr ? JSON.parse(userOrdersStr) : [];
+      const beautyOrders: Order[] = beautyOrdersStr ? JSON.parse(beautyOrdersStr) : [];
+      const map = new Map<string, Order>();
+      [...userOrders, ...beautyOrders, ...INITIAL_ORDERS].forEach(o => map.set(o.id, o));
+      return Array.from(map.values());
+    } catch {
+      return INITIAL_ORDERS;
+    }
+  });
   const [reviews, setReviews] = useState<Review[]>([]);
 
   // Filter State
@@ -159,7 +171,13 @@ export default function App() {
       if (aRes.data && aRes.data.success) setAuditLogs(aRes.data.data);
 
       const oRes = await safeFetchApi('/api/orders?role=ADMIN');
-      if (oRes.data && oRes.data.success) setOrders(oRes.data.data);
+      if (oRes.data && oRes.data.success && Array.isArray(oRes.data.data)) {
+        setOrders(prev => {
+          const map = new Map<string, Order>();
+          [...oRes.data.data, ...prev].forEach((o: Order) => map.set(o.id, o));
+          return Array.from(map.values());
+        });
+      }
 
       const rRes = await safeFetchApi('/api/reviews');
       if (rRes.data && rRes.data.success) setReviews(rRes.data.data);
@@ -186,6 +204,12 @@ export default function App() {
     }
     return true;
   });
+
+  // Buy Now Action: adds item to cart and immediately triggers express checkout modal
+  const handleBuyNow = (product: Product, variant: ProductVariant, quantity: number) => {
+    handleAddToCart(product, variant, quantity);
+    setIsCheckoutOpen(true);
+  };
 
   // Cart Actions (Synced with Backend Persistent Cart Store)
   const handleAddToCart = async (product: Product, variant: ProductVariant, quantity: number) => {
@@ -410,6 +434,7 @@ export default function App() {
             allProducts={products}
             onBackToCatalog={() => navigateTo('/')}
             onAddToCart={handleAddToCart}
+            onBuyNow={handleBuyNow}
             onSelectProduct={p => navigateTo(`/product/${p.slug}`)}
             reviews={reviews}
             onAddReview={handleAddReview}
@@ -424,6 +449,7 @@ export default function App() {
             selectedSkinConcern={selectedSkinConcern}
             onSelectSkinConcern={concern => setSelectedSkinConcern(concern)}
             onAddToCart={handleAddToCart}
+            onBuyNow={handleBuyNow}
             onOpenQuickView={p => setQuickViewProduct(p)}
             onOpenProductDetail={p => navigateTo(`/product/${p.slug}`)}
           />
@@ -433,6 +459,7 @@ export default function App() {
             <Banner
               products={products}
               onAddToCart={handleAddToCart}
+              onBuyNow={handleBuyNow}
               onSelectProduct={p => navigateTo(`/product/${p.slug}`)}
             />
 
@@ -507,6 +534,7 @@ export default function App() {
                       key={product.id}
                       product={product}
                       onAddToCart={handleAddToCart}
+                      onBuyNow={handleBuyNow}
                       onOpenQuickView={p => navigateTo(`/product/${p.slug}`)}
                     />
                   ))}
@@ -557,19 +585,30 @@ export default function App() {
           setDiscountAmount(0);
         }}
         onOrderPlaced={order => {
+          setOrders(prev => {
+            const updated = [order, ...prev.filter(o => o.id !== order.id)];
+            try {
+              localStorage.setItem('care_user_orders', JSON.stringify(updated));
+              localStorage.setItem('care_beauty_orders', JSON.stringify(updated));
+            } catch (e) {}
+            return updated;
+          });
           fetchBackendData();
         }}
         userPhone={user?.phone || null}
       />
 
-      {/* User Orders Modal */}
+      {/* User Orders & Profile Modal */}
       <UserOrdersModal
         isOpen={isOrdersOpen}
         onClose={() => setIsOrdersOpen(false)}
         orders={orders.filter(o =>
           user?.phone ? o.customerPhone.includes(user.phone.slice(-6)) : true
         )}
-        phone={user?.phone || ''}
+        phone={user?.phone || '9876543210'}
+        email={user?.email || 'ananya.sharma@example.com'}
+        fullName={user?.fullName || 'Care Customer'}
+        onOpenAddresses={() => setIsAddressesOpen(true)}
       />
 
       {/* Customer Address Book Modal */}

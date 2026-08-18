@@ -11,6 +11,7 @@ interface ProductListingPageProps {
   selectedSkinConcern: SkinConcern | null;
   onSelectSkinConcern: (concern: SkinConcern | null) => void;
   onAddToCart: (product: Product, variant: ProductVariant, quantity: number) => void;
+  onBuyNow?: (product: Product, variant: ProductVariant, quantity: number) => void;
   onOpenQuickView: (product: Product) => void;
   onOpenProductDetail: (product: Product) => void;
 }
@@ -23,6 +24,7 @@ export const ProductListingPage: React.FC<ProductListingPageProps> = ({
   selectedSkinConcern,
   onSelectSkinConcern,
   onAddToCart,
+  onBuyNow,
   onOpenQuickView,
   onOpenProductDetail,
 }) => {
@@ -387,6 +389,7 @@ export const ProductListingPage: React.FC<ProductListingPageProps> = ({
                   key={product.id}
                   product={product}
                   onAddToCart={onAddToCart}
+                  onBuyNow={onBuyNow}
                   onOpenQuickView={p => onOpenProductDetail(p)}
                 />
               ))}

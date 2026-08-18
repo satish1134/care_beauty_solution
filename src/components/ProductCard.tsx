@@ -5,12 +5,14 @@ import { Product, ProductVariant } from '../types';
 interface ProductCardProps {
   product: Product;
   onAddToCart: (product: Product, variant: ProductVariant, quantity: number) => void;
+  onBuyNow?: (product: Product, variant: ProductVariant, quantity: number) => void;
   onOpenQuickView: (product: Product) => void;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({
   product,
   onAddToCart,
+  onBuyNow,
   onOpenQuickView,
 }) => {
   const [selectedVariantId, setSelectedVariantId] = useState<string>(product.variants[0]?.id || '');
@@ -165,30 +167,39 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             )}
           </div>
 
-          {/* Add to Cart CTA */}
-          <button
-            onClick={handleAddToCart}
-            disabled={!currentVariant || currentVariant.stock <= 0}
-            className={`w-full py-2.5 px-4 rounded-xl font-bold text-xs transition-all duration-300 flex items-center justify-center gap-2 shadow-sm ${
-              addedAnimation
-                ? 'bg-amber-800 text-white'
-                : currentVariant && currentVariant.stock > 0
-                ? 'bg-amber-800 hover:bg-amber-900 text-amber-50 active:scale-98 shadow-md'
-                : 'bg-stone-200 text-stone-400 cursor-not-allowed'
-            }`}
-          >
-            {addedAnimation ? (
-              <>
-                <Check className="w-4 h-4 text-amber-300 animate-bounce" /> Added to Bag
-              </>
-            ) : currentVariant && currentVariant.stock > 0 ? (
-              <>
-                <ShoppingBag className="w-4 h-4 text-amber-100" /> Add to Cart — ₹{currentVariant?.price}
-              </>
-            ) : (
-              'Out of Stock'
-            )}
-          </button>
+          {/* Action CTAs: Buy Now & Add to Cart */}
+          <div className="flex items-center gap-2 pt-1">
+            <button
+              onClick={e => {
+                e.stopPropagation();
+                if (!currentVariant || currentVariant.stock <= 0) return;
+                if (onBuyNow) {
+                  onBuyNow(product, currentVariant, 1);
+                } else {
+                  onAddToCart(product, currentVariant, 1);
+                }
+              }}
+              disabled={!currentVariant || currentVariant.stock <= 0}
+              className="flex-1 py-2.5 px-3 rounded-xl font-extrabold text-xs transition-all duration-300 flex items-center justify-center gap-1.5 shadow-md bg-gradient-to-r from-amber-600 to-amber-800 hover:from-amber-700 hover:to-amber-900 text-white active:scale-95 cursor-pointer border border-amber-400/30"
+            >
+              <ShoppingBag className="w-3.5 h-3.5 text-amber-200" />
+              <span>Buy Now</span>
+            </button>
+
+            <button
+              onClick={handleAddToCart}
+              disabled={!currentVariant || currentVariant.stock <= 0}
+              className={`py-2.5 px-3 rounded-xl font-bold text-xs transition-all duration-300 flex items-center justify-center gap-1 shadow-sm ${
+                addedAnimation
+                  ? 'bg-emerald-700 text-white'
+                  : currentVariant && currentVariant.stock > 0
+                  ? 'bg-stone-900 hover:bg-stone-950 text-amber-300 border border-stone-800 active:scale-95'
+                  : 'bg-stone-200 text-stone-400 cursor-not-allowed'
+              }`}
+            >
+              {addedAnimation ? <Check className="w-3.5 h-3.5 text-amber-300" /> : '+ Cart'}
+            </button>
+          </div>
         </div>
       </div>
     </div>

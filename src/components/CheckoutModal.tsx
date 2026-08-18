@@ -26,6 +26,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 }) => {
   if (!isOpen) return null;
 
+  // Checkout Mode: Guest vs Registered
+  const [checkoutMode, setCheckoutMode] = useState<'GUEST' | 'REGISTERED'>(userPhone ? 'REGISTERED' : 'GUEST');
+
   // Address Form State
   const [fullName, setFullName] = useState('Ananya Sharma');
   const [phone, setPhone] = useState(userPhone || '9876543210');
@@ -267,6 +270,42 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
           ) : (
             /* Checkout Form */
             <form onSubmit={handlePlaceOrder} className="space-y-6">
+              {/* Guest vs Registered Account Selector */}
+              <div className="bg-amber-50/80 p-3 rounded-2xl border border-amber-200/80 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-amber-700 shrink-0" />
+                  <div>
+                    <div className="text-xs font-bold text-amber-950">Choose Checkout Option</div>
+                    <div className="text-[11px] text-stone-600">Buy as guest or link to your registered Care account</div>
+                  </div>
+                </div>
+
+                <div className="flex items-center bg-white p-1 rounded-xl border border-amber-200 shadow-sm w-full sm:w-auto shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setCheckoutMode('GUEST')}
+                    className={`flex-1 sm:flex-initial px-4 py-1.5 text-xs font-bold rounded-lg transition ${
+                      checkoutMode === 'GUEST'
+                        ? 'bg-amber-800 text-white shadow-sm'
+                        : 'text-stone-600 hover:text-stone-900'
+                    }`}
+                  >
+                    Guest Checkout
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCheckoutMode('REGISTERED')}
+                    className={`flex-1 sm:flex-initial px-4 py-1.5 text-xs font-bold rounded-lg transition ${
+                      checkoutMode === 'REGISTERED'
+                        ? 'bg-amber-800 text-white shadow-sm'
+                        : 'text-stone-600 hover:text-stone-900'
+                    }`}
+                  >
+                    {userPhone ? 'Registered User' : 'Register / Log In'}
+                  </button>
+                </div>
+              </div>
+
               {/* Shipping Address Section */}
               <div className="space-y-3">
                 <h3 className="text-sm font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5 border-b border-slate-200 pb-2">
