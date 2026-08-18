@@ -11,6 +11,7 @@ import { CartDrawer } from './components/CartDrawer';
 import { CheckoutModal } from './components/CheckoutModal';
 import { UserOrdersModal } from './components/UserOrdersModal';
 import { AdminPortal } from './admin/AdminPortal';
+import { ProtectedAdminRoute } from './components/ProtectedRoute';
 import { AuthModal } from './components/AuthModal';
 import { AddressBookModal } from './components/AddressBookModal';
 import { Footer } from './components/Footer';
@@ -358,15 +359,17 @@ export default function App() {
   // SEPARATE STANDALONE ADMIN PORTAL ROUTE (/admin)
   if (isDirectAdminRoute) {
     return (
-      <AdminPortal
-        products={products}
-        categories={categories}
-        coupons={coupons}
-        auditLogs={auditLogs}
-        orders={orders}
-        onRefreshData={fetchBackendData}
-        onExitToStore={() => navigateTo('/')}
-      />
+      <ProtectedAdminRoute onRedirectToStore={() => navigateTo('/')}>
+        <AdminPortal
+          products={products}
+          categories={categories}
+          coupons={coupons}
+          auditLogs={auditLogs}
+          orders={orders}
+          onRefreshData={fetchBackendData}
+          onExitToStore={() => navigateTo('/')}
+        />
+      </ProtectedAdminRoute>
     );
   }
 

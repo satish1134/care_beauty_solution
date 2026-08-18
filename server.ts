@@ -447,6 +447,48 @@ app.put('/api/products/:id', (req: Request, res: Response) => {
   res.json({ success: true, data: updated });
 });
 
+app.post('/api/products/bulk-update', (req: Request, res: Response) => {
+  try {
+    const { updates } = req.body;
+    if (!Array.isArray(updates) || updates.length === 0) {
+      return res.status(400).json({ success: false, message: 'No updates provided' });
+    }
+
+    let updatedCount = 0;
+    updates.forEach((upd: { productId: string; variantId: string; price?: number; compareAtPrice?: number; stock?: number }) => {
+      const prod = products.find(p => p.id === upd.productId);
+      if (prod) {
+        const variant = prod.variants.find(v => v.id === upd.variantId);
+        if (variant) {
+          if (typeof upd.price === 'number' && !isNaN(upd.price)) {
+            variant.price = upd.price;
+          }
+          if (typeof upd.compareAtPrice === 'number' || upd.compareAtPrice === null) {
+            variant.compareAtPrice = upd.compareAtPrice ?? undefined;
+          }
+          if (typeof upd.stock === 'number' && !isNaN(upd.stock)) {
+            variant.stock = Math.max(0, upd.stock);
+          }
+          prod.updatedAt = new Date().toISOString();
+          updatedCount++;
+        }
+      }
+    });
+
+    recordAuditLog(
+      'admin@carebeautysolution.com',
+      'BULK_UPDATE_PRODUCTS',
+      'Product',
+      'batch-update',
+      `Bulk updated pricing & stock levels for ${updatedCount} variants`
+    );
+
+    res.json({ success: true, message: `Successfully updated ${updatedCount} variants`, updatedCount });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 app.delete('/api/products/:id', (req: Request, res: Response) => {
   const { id } = req.params;
   const target = products.find(p => p.id === id);

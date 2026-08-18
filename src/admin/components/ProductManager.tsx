@@ -10,8 +10,10 @@ import {
   AlertTriangle,
   X,
   Sparkles,
+  Layers,
 } from 'lucide-react';
 import { Product, Category } from '../../types';
+import { BulkProductEditor } from './BulkProductEditor';
 
 interface ProductManagerProps {
   products: Product[];
@@ -26,6 +28,7 @@ export const ProductManager: React.FC<ProductManagerProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>('ALL');
+  const [viewMode, setViewMode] = useState<'CATALOG' | 'BULK_EDIT'>('CATALOG');
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -149,6 +152,17 @@ export const ProductManager: React.FC<ProductManagerProps> = ({
     }
   };
 
+  if (viewMode === 'BULK_EDIT') {
+    return (
+      <BulkProductEditor
+        products={products}
+        categories={categories}
+        onRefreshData={onRefreshData}
+        onClose={() => setViewMode('CATALOG')}
+      />
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header Controls */}
@@ -157,13 +171,22 @@ export const ProductManager: React.FC<ProductManagerProps> = ({
           <h2 className="text-xl font-bold font-serif text-white">Formulations & SKU Catalog</h2>
           <p className="text-slate-400 text-xs mt-1">Manage active products, pricing tiers, and stock levels.</p>
         </div>
-        <button
-          onClick={handleOpenCreateModal}
-          className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition-colors shadow-lg shadow-amber-500/20"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Add New Formulation</span>
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setViewMode('BULK_EDIT')}
+            className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-amber-400 font-semibold text-xs border border-amber-500/30 transition-all shadow-md"
+          >
+            <Layers className="w-4 h-4 text-amber-400" />
+            <span>Bulk Price & Stock Editor</span>
+          </button>
+          <button
+            onClick={handleOpenCreateModal}
+            className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition-colors shadow-lg shadow-amber-500/20"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add New Formulation</span>
+          </button>
+        </div>
       </div>
 
       {/* Filter & Search Bar */}
