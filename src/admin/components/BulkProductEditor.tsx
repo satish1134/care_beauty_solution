@@ -26,6 +26,7 @@ interface BulkProductEditorProps {
   categories: Category[];
   onRefreshData: () => void;
   onClose?: () => void;
+  isDarkMode?: boolean;
 }
 
 interface EditableVariantRow {
@@ -51,6 +52,7 @@ export const BulkProductEditor: React.FC<BulkProductEditorProps> = ({
   categories,
   onRefreshData,
   onClose,
+  isDarkMode = false,
 }) => {
   const [rows, setRows] = useState<EditableVariantRow[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -58,6 +60,11 @@ export const BulkProductEditor: React.FC<BulkProductEditorProps> = ({
   const [stockFilter, setStockFilter] = useState<'ALL' | 'LOW_STOCK' | 'OUT_OF_STOCK'>('ALL');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  const cardBg = isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-sm';
+  const textPrimary = isDarkMode ? 'text-white' : 'text-slate-900';
+  const textSecondary = isDarkMode ? 'text-slate-300' : 'text-slate-700';
+  const textMuted = isDarkMode ? 'text-slate-400' : 'text-slate-600';
 
   // Batch Operation Tool State
   const [batchPriceMode, setBatchPriceMode] = useState<'SET' | 'PERCENT_DISCOUNT' | 'PERCENT_MARKUP'>('SET');

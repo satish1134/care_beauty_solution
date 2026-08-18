@@ -19,17 +19,24 @@ import { Order, OrderStatus } from '../../types';
 interface OrderFulfillmentProps {
   orders: Order[];
   onRefreshData: () => void;
+  isDarkMode?: boolean;
 }
 
 export const OrderFulfillment: React.FC<OrderFulfillmentProps> = ({
   orders,
   onRefreshData,
+  isDarkMode = false,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [invoiceModalOrder, setInvoiceModalOrder] = useState<Order | null>(null);
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
+
+  const cardBg = isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-sm';
+  const textPrimary = isDarkMode ? 'text-white' : 'text-slate-900';
+  const textSecondary = isDarkMode ? 'text-slate-300' : 'text-slate-700';
+  const textMuted = isDarkMode ? 'text-slate-400' : 'text-slate-600';
 
   const filteredOrders = orders.filter(o => {
     const matchesSearch =
@@ -99,36 +106,50 @@ export const OrderFulfillment: React.FC<OrderFulfillmentProps> = ({
   return (
     <div className="space-y-6">
       {/* Top Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900 p-6 rounded-3xl border border-slate-800 shadow-xl">
+      <div className={`flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-3xl border ${cardBg}`}>
         <div>
-          <h2 className="text-xl font-bold font-serif text-white">Order Pipeline & Fulfillment</h2>
-          <p className="text-slate-400 text-xs mt-1">Manage order statuses, shipping updates, customer invoices, and dispatch logistics.</p>
+          <h2 className={`text-2xl font-bold font-serif ${textPrimary}`}>Order Pipeline & Fulfillment</h2>
+          <p className={`${textSecondary} text-sm mt-1 font-medium`}>
+            Manage order statuses, shipping updates, customer invoices, and dispatch logistics.
+          </p>
         </div>
         <button
           onClick={onRefreshData}
-          className="flex items-center justify-center gap-2 px-4 py-2 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs border border-slate-700 transition-colors"
+          className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl font-bold text-xs border transition-colors ${
+            isDarkMode
+              ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'
+              : 'bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300'
+          }`}
         >
-          <RefreshCw className="w-3.5 h-3.5" />
+          <RefreshCw className="w-4 h-4" />
           <span>Refresh Pipeline</span>
         </button>
       </div>
 
       {/* Filter & Search */}
-      <div className="flex flex-col sm:flex-row gap-3 bg-slate-900 p-4 rounded-2xl border border-slate-800">
+      <div className={`flex flex-col sm:flex-row gap-3 p-4 rounded-2xl border ${cardBg}`}>
         <div className="relative flex-1">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+          <Search className={`w-4 h-4 ${textMuted} absolute left-3.5 top-3`} />
           <input
             type="text"
             placeholder="Search by Order ID, customer name or phone..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="w-full bg-slate-800 border border-slate-700/80 rounded-xl pl-10 pr-4 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+            className={`w-full rounded-xl pl-10 pr-4 py-2 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500 ${
+              isDarkMode
+                ? 'bg-slate-800 border border-slate-700 text-slate-100 placeholder-slate-400'
+                : 'bg-slate-50 border border-slate-300 text-slate-900 placeholder-slate-500'
+            }`}
           />
         </div>
         <select
           value={statusFilter}
           onChange={e => setStatusFilter(e.target.value)}
-          className="bg-slate-800 border border-slate-700/80 rounded-xl px-4 py-2 text-xs text-slate-200 font-medium focus:outline-none focus:border-emerald-500"
+          className={`rounded-xl px-4 py-2 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-amber-500 ${
+            isDarkMode
+              ? 'bg-slate-800 border border-slate-700 text-slate-100'
+              : 'bg-slate-50 border border-slate-300 text-slate-900'
+          }`}
         >
           <option value="ALL">All Order Statuses</option>
           <option value="PENDING">Pending</option>
@@ -140,36 +161,47 @@ export const OrderFulfillment: React.FC<OrderFulfillmentProps> = ({
       </div>
 
       {/* Orders Table */}
-      <div className="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-xl">
+      <div className={`rounded-3xl border overflow-hidden ${cardBg}`}>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-800/80 text-slate-400 font-mono text-[11px] uppercase tracking-wider border-b border-slate-800">
+            <thead
+              className={`font-mono text-xs font-bold uppercase tracking-wider border-b ${
+                isDarkMode
+                  ? 'bg-slate-800 text-slate-300 border-slate-800'
+                  : 'bg-slate-100 text-slate-700 border-slate-200'
+              }`}
+            >
               <tr>
-                <th className="py-3.5 px-6">Order ID & Date</th>
-                <th className="py-3.5 px-4">Customer Details</th>
-                <th className="py-3.5 px-4">Items & Total</th>
-                <th className="py-3.5 px-4">Fulfillment Status</th>
-                <th className="py-3.5 px-6 text-right">Actions & Status Switch</th>
+                <th className="py-4 px-6">Order ID & Date</th>
+                <th className="py-4 px-4">Customer Details</th>
+                <th className="py-4 px-4">Items & Total</th>
+                <th className="py-4 px-4">Fulfillment Status</th>
+                <th className="py-4 px-6 text-right">Actions & Status Switch</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/80 text-slate-300">
+            <tbody className={`divide-y ${isDarkMode ? 'divide-slate-800' : 'divide-slate-200'}`}>
               {filteredOrders.map(order => (
-                <tr key={order.id} className="hover:bg-slate-800/40 transition-colors">
+                <tr
+                  key={order.id}
+                  className={`transition-colors ${
+                    isDarkMode ? 'hover:bg-slate-800/50' : 'hover:bg-slate-50'
+                  }`}
+                >
                   <td className="py-4 px-6 font-mono">
-                    <div className="font-bold text-emerald-400">{order.id}</div>
-                    <div className="text-[11px] text-slate-500">
+                    <div className="font-bold text-emerald-600 dark:text-emerald-400 text-sm">{order.id}</div>
+                    <div className={`text-xs font-medium ${textMuted}`}>
                       {new Date(order.createdAt).toLocaleDateString()} {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </div>
                   </td>
                   <td className="py-4 px-4">
-                    <div className="font-bold text-white">{order.customerName}</div>
-                    <div className="text-[11px] text-slate-400 font-mono">{order.customerPhone}</div>
+                    <div className={`font-bold text-sm ${textPrimary}`}>{order.customerName}</div>
+                    <div className={`text-xs font-mono font-medium ${textMuted}`}>{order.customerPhone}</div>
                   </td>
                   <td className="py-4 px-4">
-                    <div className="font-bold text-amber-400 font-mono text-sm">
+                    <div className="font-bold text-amber-700 dark:text-amber-400 font-mono text-base">
                       ₹{order.totalAmount.toLocaleString('en-IN')}
                     </div>
-                    <div className="text-[11px] text-slate-400">
+                    <div className={`text-xs font-medium ${textMuted}`}>
                       {order.items.length} item{order.items.length > 1 ? 's' : ''}
                     </div>
                   </td>
@@ -179,7 +211,11 @@ export const OrderFulfillment: React.FC<OrderFulfillmentProps> = ({
                       disabled={updatingOrderId === order.id}
                       value={order.status}
                       onChange={e => handleUpdateOrderStatus(order.id, e.target.value as OrderStatus)}
-                      className="bg-slate-800 border border-slate-700 text-slate-200 text-xs font-mono rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-amber-500"
+                      className={`rounded-xl px-3 py-1.5 text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-amber-500 ${
+                        isDarkMode
+                          ? 'bg-slate-800 border border-slate-700 text-slate-100'
+                          : 'bg-slate-100 border border-slate-300 text-slate-900'
+                      }`}
                     >
                       <option value="PENDING">PENDING</option>
                       <option value="PROCESSING">PROCESSING</option>
@@ -190,10 +226,15 @@ export const OrderFulfillment: React.FC<OrderFulfillmentProps> = ({
 
                     <button
                       onClick={() => setInvoiceModalOrder(order)}
-                      className="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors inline-flex items-center gap-1 text-[11px] px-2.5 font-medium"
+                      className={`px-3 py-1.5 rounded-xl border font-bold text-xs inline-flex items-center gap-1.5 transition ${
+                        isDarkMode
+                          ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-200'
+                          : 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-800'
+                      }`}
                       title="Generate Printable Packing Slip"
                     >
-                      <Printer className="w-3.5 h-3.5 text-amber-400" /> Invoice
+                      <Printer className="w-4 h-4 text-amber-500" />
+                      <span>Invoice</span>
                     </button>
                   </td>
                 </tr>

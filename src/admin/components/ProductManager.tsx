@@ -19,16 +19,23 @@ interface ProductManagerProps {
   products: Product[];
   categories: Category[];
   onRefreshData: () => void;
+  isDarkMode?: boolean;
 }
 
 export const ProductManager: React.FC<ProductManagerProps> = ({
   products,
   categories,
   onRefreshData,
+  isDarkMode = false,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>('ALL');
   const [viewMode, setViewMode] = useState<'CATALOG' | 'BULK_EDIT'>('CATALOG');
+
+  const cardBg = isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-sm';
+  const textPrimary = isDarkMode ? 'text-white' : 'text-slate-900';
+  const textSecondary = isDarkMode ? 'text-slate-300' : 'text-slate-700';
+  const textMuted = isDarkMode ? 'text-slate-400' : 'text-slate-600';
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -159,6 +166,7 @@ export const ProductManager: React.FC<ProductManagerProps> = ({
         categories={categories}
         onRefreshData={onRefreshData}
         onClose={() => setViewMode('CATALOG')}
+        isDarkMode={isDarkMode}
       />
     );
   }
@@ -166,22 +174,26 @@ export const ProductManager: React.FC<ProductManagerProps> = ({
   return (
     <div className="space-y-6">
       {/* Header Controls */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900 p-6 rounded-3xl border border-slate-800 shadow-xl">
+      <div className={`flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-3xl border ${cardBg}`}>
         <div>
-          <h2 className="text-xl font-bold font-serif text-white">Formulations & SKU Catalog</h2>
-          <p className="text-slate-400 text-xs mt-1">Manage active products, pricing tiers, and stock levels.</p>
+          <h2 className={`text-2xl font-bold font-serif ${textPrimary}`}>Formulations & SKU Catalog</h2>
+          <p className={`${textSecondary} text-sm mt-1 font-medium`}>Manage active products, pricing tiers, and stock levels.</p>
         </div>
         <div className="flex items-center gap-3">
           <button
             onClick={() => setViewMode('BULK_EDIT')}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-amber-400 font-semibold text-xs border border-amber-500/30 transition-all shadow-md"
+            className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl font-bold text-xs border transition-all shadow-sm ${
+              isDarkMode
+                ? 'bg-slate-800 hover:bg-slate-700 text-amber-300 border-amber-500/40'
+                : 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-900 border-amber-500/30'
+            }`}
           >
-            <Layers className="w-4 h-4 text-amber-400" />
+            <Layers className="w-4 h-4 text-amber-500" />
             <span>Bulk Price & Stock Editor</span>
           </button>
           <button
             onClick={handleOpenCreateModal}
-            className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition-colors shadow-lg shadow-amber-500/20"
+            className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition-colors shadow-md shadow-amber-500/20"
           >
             <Plus className="w-4 h-4" />
             <span>Add New Formulation</span>
@@ -190,21 +202,29 @@ export const ProductManager: React.FC<ProductManagerProps> = ({
       </div>
 
       {/* Filter & Search Bar */}
-      <div className="flex flex-col sm:flex-row gap-3 bg-slate-900 p-4 rounded-2xl border border-slate-800">
+      <div className={`flex flex-col sm:flex-row gap-3 p-4 rounded-2xl border ${cardBg}`}>
         <div className="relative flex-1">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+          <Search className={`w-4 h-4 ${textMuted} absolute left-3.5 top-3`} />
           <input
             type="text"
             placeholder="Search products by name or slug..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="w-full bg-slate-800 border border-slate-700/80 rounded-xl pl-10 pr-4 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+            className={`w-full rounded-xl pl-10 pr-4 py-2 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500 ${
+              isDarkMode
+                ? 'bg-slate-800 border border-slate-700 text-slate-100 placeholder-slate-400'
+                : 'bg-slate-50 border border-slate-300 text-slate-900 placeholder-slate-500'
+            }`}
           />
         </div>
         <select
           value={selectedCategoryFilter}
           onChange={e => setSelectedCategoryFilter(e.target.value)}
-          className="bg-slate-800 border border-slate-700/80 rounded-xl px-4 py-2 text-xs text-slate-200 font-medium focus:outline-none focus:border-emerald-500"
+          className={`rounded-xl px-4 py-2 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-amber-500 ${
+            isDarkMode
+              ? 'bg-slate-800 border border-slate-700 text-slate-100'
+              : 'bg-slate-50 border border-slate-300 text-slate-900'
+          }`}
         >
           <option value="ALL">All Categories</option>
           {categories.map(c => (
@@ -216,49 +236,62 @@ export const ProductManager: React.FC<ProductManagerProps> = ({
       </div>
 
       {/* Products Table */}
-      <div className="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-xl">
+      <div className={`rounded-3xl border overflow-hidden ${cardBg}`}>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-800/80 text-slate-400 font-mono text-[11px] uppercase tracking-wider border-b border-slate-800">
+            <thead
+              className={`font-mono text-xs font-bold uppercase tracking-wider border-b ${
+                isDarkMode
+                  ? 'bg-slate-800 text-slate-300 border-slate-800'
+                  : 'bg-slate-100 text-slate-700 border-slate-200'
+              }`}
+            >
               <tr>
-                <th className="py-3.5 px-6">Product & Image</th>
-                <th className="py-3.5 px-4">Category</th>
-                <th className="py-3.5 px-4">SKUs & Pricing</th>
-                <th className="py-3.5 px-4">Stock Status</th>
-                <th className="py-3.5 px-6 text-right">Actions</th>
+                <th className="py-4 px-6">Product & Image</th>
+                <th className="py-4 px-4">Category</th>
+                <th className="py-4 px-4">SKUs & Pricing</th>
+                <th className="py-4 px-4">Stock Status</th>
+                <th className="py-4 px-6 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/80 text-slate-300">
+            <tbody className={`divide-y ${isDarkMode ? 'divide-slate-800' : 'divide-slate-200'}`}>
               {filteredProducts.map(product => {
                 const category = categories.find(c => c.id === product.categoryId);
                 const primaryImage = product.images[0]?.url || '/images/care-hydrating-moisturizer.svg';
 
                 return (
-                  <tr key={product.id} className="hover:bg-slate-800/40 transition-colors">
+                  <tr
+                    key={product.id}
+                    className={`transition-colors ${
+                      isDarkMode ? 'hover:bg-slate-800/50' : 'hover:bg-slate-50'
+                    }`}
+                  >
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-3">
                         <img
                           src={primaryImage}
                           alt={product.name}
-                          className="w-12 h-12 rounded-xl object-contain bg-slate-800 p-1 border border-slate-700/60"
+                          className={`w-12 h-12 rounded-xl object-contain p-1 border ${
+                            isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-100 border-slate-200'
+                          }`}
                         />
                         <div>
-                          <div className="font-bold text-white text-sm">{product.name}</div>
-                          <div className="text-[11px] text-slate-400 font-mono">/{product.slug}</div>
+                          <div className={`font-bold text-sm ${textPrimary}`}>{product.name}</div>
+                          <div className={`text-xs font-mono font-medium ${textMuted}`}>/{product.slug}</div>
                         </div>
                       </div>
                     </td>
-                    <td className="py-4 px-4 font-medium text-emerald-400">
+                    <td className="py-4 px-4 font-bold text-emerald-600 dark:text-emerald-400">
                       {category?.name || 'Skincare'}
                     </td>
                     <td className="py-4 px-4">
                       <div className="space-y-1">
                         {product.variants.map(v => (
-                          <div key={v.id} className="flex items-center gap-2 text-[11px] font-mono">
-                            <span className="text-slate-400">{v.name}:</span>
-                            <span className="font-bold text-amber-400">₹{v.price}</span>
+                          <div key={v.id} className="flex items-center gap-2 text-xs font-mono">
+                            <span className={textMuted}>{v.name}:</span>
+                            <span className="font-bold text-amber-700 dark:text-amber-400">₹{v.price}</span>
                             {v.compareAtPrice && (
-                              <span className="line-through text-slate-500 text-[10px]">₹{v.compareAtPrice}</span>
+                              <span className={`line-through text-xs font-semibold ${textMuted}`}>₹{v.compareAtPrice}</span>
                             )}
                           </div>
                         ))}
@@ -269,11 +302,11 @@ export const ProductManager: React.FC<ProductManagerProps> = ({
                         {product.variants.map(v => (
                           <div key={v.id} className="flex items-center gap-2">
                             <span
-                              className={`w-2 h-2 rounded-full ${
-                                v.stock < 15 ? 'bg-rose-500 animate-pulse' : 'bg-emerald-400'
+                              className={`w-2.5 h-2.5 rounded-full ${
+                                v.stock < 15 ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500'
                               }`}
                             ></span>
-                            <span className="font-mono text-xs font-semibold">
+                            <span className={`font-mono text-xs font-bold ${textPrimary}`}>
                               {v.stock} units
                             </span>
                           </div>
@@ -283,17 +316,21 @@ export const ProductManager: React.FC<ProductManagerProps> = ({
                     <td className="py-4 px-6 text-right space-x-2">
                       <button
                         onClick={() => handleOpenEditModal(product)}
-                        className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors"
+                        className={`p-2 rounded-xl border transition-colors ${
+                          isDarkMode
+                            ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-100'
+                            : 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-800'
+                        }`}
                         title="Edit Product"
                       >
-                        <Edit className="w-3.5 h-3.5" />
+                        <Edit className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDeleteProduct(product.id, product.name)}
-                        className="p-2 rounded-xl bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 transition-colors"
+                        className="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/20 transition-colors"
                         title="Delete Product"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </td>
                   </tr>
@@ -307,23 +344,29 @@ export const ProductManager: React.FC<ProductManagerProps> = ({
       {/* Product Form Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-slate-900 border border-slate-800 w-full max-w-xl rounded-3xl p-6 space-y-5 relative shadow-2xl">
+          <div
+            className={`border w-full max-w-xl rounded-3xl p-6 space-y-5 relative shadow-2xl ${
+              isDarkMode ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
+            }`}
+          >
             <button
               onClick={() => setIsModalOpen(false)}
-              className="absolute right-5 top-5 p-2 text-slate-400 hover:text-white rounded-xl bg-slate-800"
+              className={`absolute right-5 top-5 p-2 rounded-xl transition ${
+                isDarkMode ? 'text-slate-400 hover:text-white bg-slate-800' : 'text-slate-600 hover:text-slate-900 bg-slate-100'
+              }`}
             >
               <X className="w-4 h-4" />
             </button>
 
-            <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
-              <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-400">
+            <div className={`flex items-center gap-3 border-b pb-4 ${isDarkMode ? 'border-slate-800' : 'border-slate-200'}`}>
+              <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-500">
                 <Sparkles className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-lg font-bold font-serif text-white">
+                <h3 className={`text-xl font-bold font-serif ${textPrimary}`}>
                   {modalMode === 'CREATE' ? 'Add New Formulation' : 'Edit Product Formulation'}
                 </h3>
-                <p className="text-xs text-slate-400">Specify product name, category, pricing, and initial inventory.</p>
+                <p className={`text-xs font-medium ${textMuted}`}>Specify product name, category, pricing, and initial inventory.</p>
               </div>
             </div>
 

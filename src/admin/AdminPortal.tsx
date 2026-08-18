@@ -52,6 +52,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
   const [passcode, setPasscode] = useState('');
   const [authError, setAuthError] = useState<string | null>(null);
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
 
   // Inactivity Auto-Lock Security Timer (15 minutes)
   useEffect(() => {
@@ -214,7 +215,11 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
   // Render Full Admin Portal Dashboard Layout
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex overflow-hidden font-sans">
+    <div
+      className={`min-h-screen flex overflow-hidden font-sans transition-colors ${
+        isDarkMode ? 'bg-slate-950 text-slate-100' : 'bg-slate-100 text-slate-900'
+      }`}
+    >
       {/* Sidebar Navigation */}
       <AdminSidebar
         activeTab={activeTab}
@@ -223,22 +228,30 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
         onChangeRole={setCurrentRole}
         onExitToStore={onExitToStore}
         onLogout={handleLogout}
+        isDarkMode={isDarkMode}
+        onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
       />
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
         {/* Top Header */}
-        <header className="bg-slate-900 border-b border-slate-800 px-8 py-4 flex justify-between items-center shrink-0">
+        <header
+          className={`border-b px-8 py-4 flex justify-between items-center shrink-0 transition-colors ${
+            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+          }`}
+        >
           <div className="flex items-center gap-3">
-            <span className="text-xs text-slate-400 font-medium">Logged in as:</span>
-            <span className="text-xs font-bold font-mono text-amber-300 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/20">
+            <span className={`text-xs font-semibold ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+              Logged in as:
+            </span>
+            <span className="text-xs font-bold font-mono text-amber-700 dark:text-amber-300 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/20">
               Rajesh V. (Super Admin)
             </span>
           </div>
 
           <div className="flex items-center gap-3 text-xs font-mono">
-            <span className="flex items-center gap-1.5 text-emerald-400 font-bold bg-emerald-500/10 px-3 py-1.5 rounded-xl border border-emerald-500/20">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 font-bold bg-emerald-500/10 px-3 py-1.5 rounded-xl border border-emerald-500/20">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
               PROD SERVER ACTIVE
             </span>
           </div>
@@ -254,6 +267,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               liveVisitors={liveVisitors}
               pageBreakdown={pageBreakdown}
               onNavigateToTab={setActiveTab}
+              isDarkMode={isDarkMode}
             />
           )}
 
@@ -262,20 +276,21 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               products={products}
               categories={categories}
               onRefreshData={onRefreshData}
+              isDarkMode={isDarkMode}
             />
           )}
 
           {activeTab === 'orders' && (
-            <OrderFulfillment orders={orders} onRefreshData={onRefreshData} />
+            <OrderFulfillment orders={orders} onRefreshData={onRefreshData} isDarkMode={isDarkMode} />
           )}
 
-          {activeTab === 'reviews' && <ReviewModerator products={products} />}
+          {activeTab === 'reviews' && <ReviewModerator products={products} isDarkMode={isDarkMode} />}
 
           {activeTab === 'coupons' && (
-            <CouponManager coupons={coupons} onRefreshData={onRefreshData} />
+            <CouponManager coupons={coupons} onRefreshData={onRefreshData} isDarkMode={isDarkMode} />
           )}
 
-          {activeTab === 'audit' && <AuditLogViewer auditLogs={auditLogs} />}
+          {activeTab === 'audit' && <AuditLogViewer auditLogs={auditLogs} isDarkMode={isDarkMode} />}
 
           {(activeTab === 'seo' || activeTab === 'marketplaces' || activeTab === 'rbac') && (
             <div className="bg-slate-900 p-8 rounded-3xl border border-slate-800 text-center space-y-3">

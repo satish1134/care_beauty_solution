@@ -4,12 +4,18 @@ import { Review, Product } from '../../types';
 
 interface ReviewModeratorProps {
   products: Product[];
+  isDarkMode?: boolean;
 }
 
-export const ReviewModerator: React.FC<ReviewModeratorProps> = ({ products }) => {
+export const ReviewModerator: React.FC<ReviewModeratorProps> = ({ products, isDarkMode = false }) => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filterRating, setFilterRating] = useState<number | 'ALL'>('ALL');
+
+  const cardBg = isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-sm';
+  const textPrimary = isDarkMode ? 'text-white' : 'text-slate-900';
+  const textSecondary = isDarkMode ? 'text-slate-300' : 'text-slate-700';
+  const textMuted = isDarkMode ? 'text-slate-400' : 'text-slate-600';
 
   const fetchReviews = async () => {
     setIsLoading(true);
@@ -50,17 +56,21 @@ export const ReviewModerator: React.FC<ReviewModeratorProps> = ({ products }) =>
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900 p-6 rounded-3xl border border-slate-800 shadow-xl">
+      <div className={`flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-3xl border ${cardBg}`}>
         <div>
-          <h2 className="text-xl font-bold font-serif text-white">Customer Review Moderation</h2>
-          <p className="text-slate-400 text-xs mt-1">Audit customer feedback, star ratings, and verified buyer claims.</p>
+          <h2 className={`text-2xl font-bold font-serif ${textPrimary}`}>Customer Review Moderation</h2>
+          <p className={`${textSecondary} text-sm mt-1 font-medium`}>Audit customer feedback, star ratings, and verified buyer claims.</p>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-slate-400 font-medium">Filter Rating:</span>
+          <span className={`text-xs font-bold ${textSecondary}`}>Filter Rating:</span>
           <select
             value={filterRating}
             onChange={e => setFilterRating(e.target.value === 'ALL' ? 'ALL' : Number(e.target.value))}
-            className="bg-slate-800 border border-slate-700 text-slate-200 text-xs font-mono rounded-xl px-3 py-1.5 focus:outline-none focus:border-emerald-500"
+            className={`rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-amber-500 ${
+              isDarkMode
+                ? 'bg-slate-800 border border-slate-700 text-slate-100'
+                : 'bg-slate-50 border border-slate-300 text-slate-900'
+            }`}
           >
             <option value="ALL">All Ratings (1 - 5 Stars)</option>
             <option value={5}>5 Stars ★★★★★</option>
@@ -74,7 +84,7 @@ export const ReviewModerator: React.FC<ReviewModeratorProps> = ({ products }) =>
 
       <div className="space-y-3">
         {filteredReviews.length === 0 ? (
-          <div className="text-center py-12 bg-slate-900 rounded-3xl border border-slate-800 text-slate-400 text-xs">
+          <div className={`text-center py-12 rounded-3xl border text-xs font-semibold ${cardBg} ${textMuted}`}>
             No customer reviews match the selected filter.
           </div>
         ) : (
@@ -84,27 +94,27 @@ export const ReviewModerator: React.FC<ReviewModeratorProps> = ({ products }) =>
             return (
               <div
                 key={review.id}
-                className="bg-slate-900 p-5 rounded-2xl border border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-slate-700/80 transition-colors"
+                className={`p-5 rounded-2xl border flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition-colors ${cardBg}`}
               >
                 <div className="space-y-1.5 flex-1">
                   <div className="flex items-center gap-3">
-                    <div className="flex text-amber-400">
+                    <div className="flex text-amber-500">
                       {[...Array(5)].map((_, i) => (
                         <Star
                           key={i}
-                          className={`w-3.5 h-3.5 ${i < review.rating ? 'fill-amber-400' : 'text-slate-700'}`}
+                          className={`w-4 h-4 ${i < review.rating ? 'fill-amber-400 text-amber-500' : 'text-slate-300 dark:text-slate-700'}`}
                         />
                       ))}
                     </div>
-                    <span className="font-bold text-white text-xs">{review.userName}</span>
-                    <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                    <span className={`font-bold text-sm ${textPrimary}`}>{review.userName}</span>
+                    <span className="text-xs font-mono font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
                       Verified Purchase
                     </span>
                   </div>
 
-                  <p className="text-xs text-slate-300 italic">"{review.comment}"</p>
+                  <p className={`text-sm italic font-medium ${textSecondary}`}>"{review.comment}"</p>
 
-                  <div className="text-[11px] font-mono text-slate-500 flex items-center gap-2">
+                  <div className={`text-xs font-mono font-medium flex items-center gap-2 ${textMuted}`}>
                     <span>Product: {product?.name || review.productId}</span>
                     <span>•</span>
                     <span>{new Date(review.createdAt).toLocaleDateString()}</span>
@@ -113,9 +123,9 @@ export const ReviewModerator: React.FC<ReviewModeratorProps> = ({ products }) =>
 
                 <button
                   onClick={() => handleDeleteReview(review.id)}
-                  className="px-3 py-1.5 rounded-xl bg-rose-950/40 hover:bg-rose-900/60 border border-rose-800/60 text-rose-300 text-xs font-semibold flex items-center gap-1.5 transition-colors shrink-0"
+                  className="px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-bold flex items-center gap-1.5 transition-colors shrink-0"
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
+                  <Trash2 className="w-4 h-4" />
                   <span>Remove Review</span>
                 </button>
               </div>
