@@ -34,12 +34,52 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   // Security Role State
   const [currentRole, setCurrentRole] = useState<AdminRole>('SUPER_ADMIN');
 
-  // Authentication State
+  // Authentication State - Locked by default unless valid short-lived session exists in sessionStorage
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    return localStorage.getItem('care_admin_auth') === 'true';
+    // Clear legacy permanent localStorage flag to eliminate insecure persistent bypass
+    localStorage.removeItem('care_admin_auth');
+    try {
+      const sessionToken = sessionStorage.getItem('care_admin_session_active');
+      const sessionExpiry = sessionStorage.getItem('care_admin_session_expiry');
+      if (sessionToken === 'valid' && sessionExpiry && Date.now() < Number(sessionExpiry)) {
+        return true;
+      }
+    } catch {
+      // Fallback lock
+    }
+    return false;
   });
+
   const [passcode, setPasscode] = useState('');
   const [authError, setAuthError] = useState<string | null>(null);
+
+  // Inactivity Auto-Lock Security Timer (15 minutes)
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    let timeoutId: NodeJS.Timeout;
+    const resetTimer = () => {
+      clearTimeout(timeoutId);
+      // Set session expiry 15 minutes from now
+      sessionStorage.setItem('care_admin_session_expiry', (Date.now() + 15 * 60 * 1000).toString());
+      timeoutId = setTimeout(() => {
+        handleLogout();
+        setAuthError('Session timed out due to 15 minutes of inactivity. Please re-authenticate.');
+      }, 15 * 60 * 1000);
+    };
+
+    resetTimer();
+    window.addEventListener('mousemove', resetTimer);
+    window.addEventListener('keydown', resetTimer);
+    window.addEventListener('click', resetTimer);
+
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('mousemove', resetTimer);
+      window.removeEventListener('keydown', resetTimer);
+      window.removeEventListener('click', resetTimer);
+    };
+  }, [isAuthenticated]);
 
   // Live Visitor Counter State
   const [liveVisitors, setLiveVisitors] = useState<number>(18);
@@ -77,7 +117,11 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
     e.preventDefault();
     if (passcode === 'admin123' || passcode === 'careadmin') {
       setIsAuthenticated(true);
-      localStorage.setItem('care_admin_auth', 'true');
+      // Store short-lived session in sessionStorage (expires when tab/window closes)
+      sessionStorage.setItem('care_admin_session_active', 'valid');
+      sessionStorage.setItem('care_admin_session_expiry', (Date.now() + 15 * 60 * 1000).toString());
+      localStorage.removeItem('care_admin_auth'); // Ensure no persistent storage
+      setPasscode('');
       setAuthError(null);
     } else {
       setAuthError('Invalid Security Passcode. Access denied.');
@@ -86,6 +130,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
   const handleLogout = () => {
     setIsAuthenticated(false);
+    sessionStorage.removeItem('care_admin_session_active');
+    sessionStorage.removeItem('care_admin_session_expiry');
     localStorage.removeItem('care_admin_auth');
   };
 

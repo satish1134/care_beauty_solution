@@ -106,13 +106,6 @@ export default function App() {
     }
   });
 
-  // Admin Portal Access State
-  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => {
-    return localStorage.getItem('care_admin_auth') === 'true';
-  });
-  const [adminPasscode, setAdminPasscode] = useState('');
-  const [adminAuthError, setAdminAuthError] = useState<string | null>(null);
-
   // Modals Toggle State
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -348,18 +341,6 @@ export default function App() {
       }
     } catch (err) {
       console.error(err);
-    }
-  };
-
-  // Handle Admin Authorization
-  const handleAdminLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (adminPasscode === 'admin123' || adminPasscode === 'careadmin') {
-      setIsAdminAuthenticated(true);
-      localStorage.setItem('care_admin_auth', 'true');
-      setAdminAuthError(null);
-    } else {
-      setAdminAuthError('Invalid Admin passcode. Access denied.');
     }
   };
 
