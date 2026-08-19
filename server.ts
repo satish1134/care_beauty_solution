@@ -833,7 +833,7 @@ app.post('/api/auth/send-otp', async (req: Request, res: Response) => {
   }
 });
 
-app.post('/api/auth/verify-otp', (req: Request, res: Response) => {
+app.post('/api/auth/verify-otp', async (req: Request, res: Response) => {
   try {
     const { phone, otp, name } = req.body;
     if (!phone || !otp) {
@@ -850,12 +850,28 @@ app.post('/api/auth/verify-otp', (req: Request, res: Response) => {
     // Find or create user
     let user = Array.from(usersStore.values()).find(u => u.phone === cleanPhone);
     const role = cleanPhone === '9999999999' ? 'ADMIN' : 'CUSTOMER';
+    const userId = user?.id || `usr-${cleanPhone.slice(-6)}`;
+    const userFullName = name || user?.fullName || 'Care Customer';
+
+    // Insert or update user in Neon PostgreSQL
+    try {
+      await queryDb(
+        `INSERT INTO users (id, phone, full_name, role)
+         VALUES ($1, $2, $3, $4)
+         ON CONFLICT (id) DO UPDATE SET
+           full_name = EXCLUDED.full_name,
+           phone = EXCLUDED.phone`,
+        [userId, cleanPhone, userFullName, role]
+      );
+    } catch (dbErr: any) {
+      console.error('[NEON OTP USER INSERT ERROR]', dbErr);
+    }
 
     if (!user) {
       user = {
-        id: `usr-${cleanPhone.slice(-6)}`,
+        id: userId,
         phone: cleanPhone,
-        fullName: name || 'Care Customer',
+        fullName: userFullName,
         role,
         createdAt: new Date().toISOString(),
       };
@@ -868,7 +884,7 @@ app.post('/api/auth/verify-otp', (req: Request, res: Response) => {
     const accessToken = authService.generateAccessToken(user.id, user.role, user.email, user.phone);
     const refreshToken = authService.generateRefreshToken(user.id, user.role, user.email, user.phone);
 
-    recordAuditLog(user.email || user.phone || 'customer', 'OTP_LOGIN', 'User', user.id, `User signed in via Mobile OTP`);
+    recordAuditLog(user.email || user.phone || 'customer', 'OTP_LOGIN', 'User', user.id, `User signed in via Mobile OTP in Neon PostgreSQL`);
 
     res.json({
       success: true,

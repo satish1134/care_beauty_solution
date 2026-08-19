@@ -10,8 +10,8 @@ export async function initializeDatabaseSchema() {
     -- Users Table
     CREATE TABLE IF NOT EXISTS users (
       id VARCHAR(36) PRIMARY KEY,
-      email VARCHAR(255) UNIQUE NOT NULL,
-      password_hash VARCHAR(255) NOT NULL,
+      email VARCHAR(255),
+      password_hash VARCHAR(255),
       full_name VARCHAR(100) NOT NULL,
       phone VARCHAR(20),
       role VARCHAR(20) DEFAULT 'CUSTOMER' CHECK (role IN ('CUSTOMER', 'ADMIN')),
@@ -50,8 +50,11 @@ export async function initializeDatabaseSchema() {
     CREATE TABLE IF NOT EXISTS orders (
       id VARCHAR(36) PRIMARY KEY,
       user_id VARCHAR(36) REFERENCES users(id) ON DELETE SET NULL,
-      cashfree_order_id VARCHAR(100) UNIQUE,
+      cashfree_order_id VARCHAR(100),
       cashfree_session_id TEXT,
+      customer_name VARCHAR(100),
+      customer_email VARCHAR(255),
+      customer_phone VARCHAR(20),
       total_amount NUMERIC(10, 2) NOT NULL,
       payment_status VARCHAR(50) DEFAULT 'PENDING' CHECK (payment_status IN ('PENDING', 'PAID', 'FAILED', 'CANCELLED')),
       order_status VARCHAR(50) DEFAULT 'PROCESSING' CHECK (order_status IN ('PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED')),
@@ -69,6 +72,13 @@ export async function initializeDatabaseSchema() {
       price NUMERIC(10, 2) NOT NULL,
       created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
     );
+
+    -- Safe Column Additions for Existing Tables
+    ALTER TABLE users ALTER COLUMN email DROP NOT NULL;
+    ALTER TABLE users ALTER COLUMN password_hash DROP NOT NULL;
+    ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_name VARCHAR(100);
+    ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_email VARCHAR(255);
+    ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_phone VARCHAR(20);
   `;
 
   try {
