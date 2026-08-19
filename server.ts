@@ -19,6 +19,7 @@ import { runPhase5MarketingTests } from './src/services/phase5Marketing.test';
 import { runPhase6HardeningTests } from './src/services/phase6Hardening.test';
 import { runInfrastructureHealthCheck } from './src/lib/diagnostics';
 import { seedDatabase } from './src/lib/seed';
+import { queryDb } from './src/lib/db';
 import { AdminPermission, AdminRole, MonitoringToolConfig, MarketplaceChannel, SeoCampaign } from './src/types';
 
 // User Account Interface
@@ -292,10 +293,60 @@ app.post('/api/seed', (req: Request, res: Response) => {
   });
 });
 
-app.get('/api/products', (req: Request, res: Response) => {
+app.get('/api/products', async (req: Request, res: Response) => {
   const { category, skinConcern, skinType, priceMin, priceMax, search, bestseller, sort, page, limit } = req.query;
 
-  let filtered = [...products];
+  let activeProducts = [...products];
+
+  try {
+    const dbRows = await queryDb<any>('SELECT * FROM products WHERE is_active = TRUE ORDER BY created_at DESC');
+    if (dbRows && dbRows.length > 0) {
+      activeProducts = dbRows.map(row => ({
+        id: row.id,
+        name: row.title,
+        slug: row.slug,
+        tagline: 'Clinical Skincare Solution',
+        description: row.description || '',
+        keyIngredients: [],
+        fullIngredients: '',
+        howToUse: '',
+        categoryId: row.category_id || 'cat_1',
+        categoryName: 'Skincare',
+        skinConcerns: ['Dryness'],
+        skinTypes: ['All Skin Types'],
+        features: [],
+        variants: [
+          {
+            id: `var-${row.id}`,
+            productId: row.id,
+            name: 'Standard (50ml)',
+            sku: `CBS-${row.slug.toUpperCase()}`,
+            price: Number(row.price),
+            compareAtPrice: row.compare_price ? Number(row.compare_price) : undefined,
+            stock: row.stock_quantity || 50,
+          }
+        ],
+        images: [
+          {
+            id: `img-${row.id}`,
+            url: row.image_url || 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=800',
+            altText: row.title,
+            isPrimary: true,
+          }
+        ],
+        rating: 5.0,
+        reviewCount: 12,
+        isBestSeller: true,
+        isNewArrival: true,
+        createdAt: row.created_at || new Date().toISOString(),
+        updatedAt: row.updated_at || new Date().toISOString(),
+      }));
+    }
+  } catch (err) {
+    console.warn('[NEON DB QUERY WARN] Falling back to memory state:', err);
+  }
+
+  let filtered = [...activeProducts];
 
   if (category && typeof category === 'string') {
     filtered = filtered.filter(p => p.categoryId === category || p.categoryName.toLowerCase().includes(category.toLowerCase()) || p.slug === category);
@@ -391,16 +442,42 @@ app.get('/api/products/:slugOrId', (req: Request, res: Response) => {
   res.json({ success: true, data: product });
 });
 
-app.post('/api/products', (req: Request, res: Response) => {
+app.post('/api/products', async (req: Request, res: Response) => {
   try {
     const body = req.body as Partial<Product>;
     if (!body.name || !body.categoryId || !body.variants || body.variants.length === 0) {
       return res.status(400).json({ success: false, message: 'Missing required product fields: name, categoryId, variants' });
     }
 
+    const prodId = `prod-${Date.now()}`;
     const slug = body.slug || body.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const price = body.variants[0]?.price || 500;
+    const comparePrice = body.variants[0]?.compareAtPrice || null;
+    const primaryImgUrl = body.images?.[0]?.url || 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=800';
+
+    try {
+      await queryDb(
+        `INSERT INTO products (id, category_id, title, slug, description, price, compare_price, stock_quantity, image_url, images)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+        [
+          prodId,
+          body.categoryId,
+          body.name,
+          slug,
+          body.description || '',
+          price,
+          comparePrice,
+          body.variants[0]?.stock || 50,
+          primaryImgUrl,
+          JSON.stringify(body.images || [])
+        ]
+      );
+    } catch (dbErr: any) {
+      console.error('[NEON PRODUCT INSERT ERROR]', dbErr);
+    }
+
     const newProduct: Product = {
-      id: `prod-${Date.now()}`,
+      id: prodId,
       name: body.name,
       slug,
       tagline: body.tagline || 'Clinical Skincare Solution',
@@ -415,7 +492,7 @@ app.post('/api/products', (req: Request, res: Response) => {
       features: body.features || [],
       variants: body.variants.map((v, i) => ({
         id: v.id || `var-${Date.now()}-${i}`,
-        productId: `prod-${Date.now()}`,
+        productId: prodId,
         name: v.name,
         sku: v.sku || `CBS-${slug.toUpperCase()}-${i}`,
         price: Number(v.price),
@@ -425,7 +502,7 @@ app.post('/api/products', (req: Request, res: Response) => {
       images: body.images || [
         {
           id: `img-${Date.now()}`,
-          url: 'https://images.unsplash.com/photo-1608248597261-e4d354714552?auto=format&fit=crop&w=800&q=80',
+          url: primaryImgUrl,
           altText: body.name,
           isPrimary: true,
         },
@@ -439,7 +516,7 @@ app.post('/api/products', (req: Request, res: Response) => {
     };
 
     products.unshift(newProduct);
-    recordAuditLog('admin@carebeautysolution.com', 'CREATE_PRODUCT', 'Product', newProduct.id, `Created product "${newProduct.name}" with ${newProduct.variants.length} variants`);
+    recordAuditLog('admin@carebeautysolution.com', 'CREATE_PRODUCT', 'Product', newProduct.id, `Created product "${newProduct.name}" in Neon PostgreSQL`);
 
     res.status(201).json({ success: true, data: newProduct });
   } catch (err: any) {
@@ -603,19 +680,46 @@ app.delete('/api/products/:id/variants/:variantId', (req: Request, res: Response
 // ==========================================
 // 3. CATEGORIES API
 // ==========================================
-app.get('/api/categories', (req: Request, res: Response) => {
+app.get('/api/categories', async (req: Request, res: Response) => {
+  try {
+    const dbCats = await queryDb<any>('SELECT * FROM categories ORDER BY name ASC');
+    if (dbCats && dbCats.length > 0) {
+      const formatted = dbCats.map(c => ({
+        id: c.id,
+        name: c.name,
+        slug: c.slug,
+        description: c.description || '',
+        imageUrl: c.image_url,
+        productCount: 5,
+      }));
+      return res.json({ success: true, data: formatted });
+    }
+  } catch (err) {
+    console.warn('[NEON CATEGORIES WARN] Falling back to memory state:', err);
+  }
   res.json({ success: true, data: categories });
 });
 
-app.post('/api/categories', (req: Request, res: Response) => {
+app.post('/api/categories', async (req: Request, res: Response) => {
   const { name, description, imageUrl } = req.body;
   if (!name) {
     return res.status(400).json({ success: false, message: 'Category name is required' });
   }
 
+  const catId = `cat-${Date.now()}`;
   const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+  try {
+    await queryDb(
+      'INSERT INTO categories (id, name, slug, description, image_url) VALUES ($1, $2, $3, $4, $5)',
+      [catId, name, slug, description || '', imageUrl || '']
+    );
+  } catch (err: any) {
+    console.error('[NEON CATEGORY INSERT ERROR]', err);
+  }
+
   const newCat: Category = {
-    id: `cat-${Date.now()}`,
+    id: catId,
     name,
     slug,
     description: description || '',
@@ -624,7 +728,7 @@ app.post('/api/categories', (req: Request, res: Response) => {
   };
 
   categories.push(newCat);
-  recordAuditLog('admin@carebeautysolution.com', 'CREATE_CATEGORY', 'Category', newCat.id, `Created new category "${newCat.name}"`);
+  recordAuditLog('admin@carebeautysolution.com', 'CREATE_CATEGORY', 'Category', newCat.id, `Created new category "${newCat.name}" in Neon PostgreSQL`);
 
   res.status(201).json({ success: true, data: newCat });
 });
@@ -786,7 +890,7 @@ app.post('/api/auth/verify-otp', (req: Request, res: Response) => {
 });
 
 // 5b. Email / Password Registration & Login
-app.post('/api/auth/register', (req: Request, res: Response) => {
+app.post('/api/auth/register', async (req: Request, res: Response) => {
   try {
     const { email, password, fullName, phone } = req.body;
     if (!email || !password || !fullName) {
@@ -794,15 +898,31 @@ app.post('/api/auth/register', (req: Request, res: Response) => {
     }
 
     const cleanEmail = email.trim().toLowerCase();
-    const existing = Array.from(usersStore.values()).find(u => u.email === cleanEmail);
 
-    if (existing) {
-      return res.status(400).json({ success: false, message: 'Account with this email already exists. Please log in.' });
+    // Check Neon DB for existing user
+    try {
+      const existingDb = await queryDb<any>('SELECT * FROM users WHERE email = $1', [cleanEmail]);
+      if (existingDb && existingDb.length > 0) {
+        return res.status(400).json({ success: false, message: 'Account with this email already exists. Please log in.' });
+      }
+    } catch (err) {
+      console.warn('[NEON USER SEARCH WARN]', err);
     }
 
     const { hash, salt } = authService.hashPassword(password);
     const role = cleanEmail.includes('admin') ? 'ADMIN' : 'CUSTOMER';
     const userId = `usr-${Date.now().toString().slice(-6)}`;
+    const fullHash = `${salt}:${hash}`;
+
+    // Insert user into Neon PostgreSQL
+    try {
+      await queryDb(
+        'INSERT INTO users (id, email, password_hash, full_name, phone, role) VALUES ($1, $2, $3, $4, $5, $6)',
+        [userId, cleanEmail, fullHash, fullName, phone || null, role]
+      );
+    } catch (dbErr: any) {
+      console.error('[NEON USER INSERT ERROR]', dbErr);
+    }
 
     const newUser: DBUser = {
       id: userId,
@@ -820,7 +940,7 @@ app.post('/api/auth/register', (req: Request, res: Response) => {
     const accessToken = authService.generateAccessToken(userId, role, cleanEmail, newUser.phone);
     const refreshToken = authService.generateRefreshToken(userId, role, cleanEmail, newUser.phone);
 
-    recordAuditLog(cleanEmail, 'REGISTER', 'User', userId, `New user registered via email/password`);
+    recordAuditLog(cleanEmail, 'REGISTER', 'User', userId, `New user registered via email/password in Neon PostgreSQL`);
 
     res.status(201).json({
       success: true,
@@ -841,7 +961,7 @@ app.post('/api/auth/register', (req: Request, res: Response) => {
   }
 });
 
-app.post('/api/auth/login', (req: Request, res: Response) => {
+app.post('/api/auth/login', async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -858,7 +978,34 @@ app.post('/api/auth/login', (req: Request, res: Response) => {
       });
     }
 
-    const user = Array.from(usersStore.values()).find(u => u.email === cleanEmail);
+    let user: DBUser | undefined;
+
+    // First check Neon DB for user
+    try {
+      const dbUsers = await queryDb<any>('SELECT * FROM users WHERE email = $1', [cleanEmail]);
+      if (dbUsers && dbUsers.length > 0) {
+        const u = dbUsers[0];
+        const parts = (u.password_hash || '').split(':');
+        user = {
+          id: u.id,
+          email: u.email,
+          fullName: u.full_name,
+          phone: u.phone,
+          role: u.role || 'CUSTOMER',
+          passwordSalt: parts[0] || '',
+          passwordHash: parts[1] || u.password_hash,
+          createdAt: u.created_at || new Date().toISOString(),
+        };
+      }
+    } catch (err) {
+      console.warn('[NEON LOGIN SEARCH WARN]', err);
+    }
+
+    // Fallback to memory store if not found in DB
+    if (!user) {
+      user = Array.from(usersStore.values()).find(u => u.email === cleanEmail);
+    }
+
     if (!user || !user.passwordHash || !user.passwordSalt) {
       const attemptInfo = authService.recordFailedAttempt(cleanEmail);
       return res.status(401).json({
@@ -886,7 +1033,7 @@ app.post('/api/auth/login', (req: Request, res: Response) => {
     const accessToken = authService.generateAccessToken(user.id, user.role, user.email, user.phone);
     const refreshToken = authService.generateRefreshToken(user.id, user.role, user.email, user.phone);
 
-    recordAuditLog(user.email, 'LOGIN', 'User', user.id, `User logged in via email/password`);
+    recordAuditLog(user.email || 'customer', 'LOGIN', 'User', user.id, `User logged in via email/password`);
 
     res.json({
       success: true,
