@@ -17,6 +17,8 @@ import { runPhase4AdminTests } from './src/services/phase4Admin.test';
 import { marketingService } from './src/services/marketingService';
 import { runPhase5MarketingTests } from './src/services/phase5Marketing.test';
 import { runPhase6HardeningTests } from './src/services/phase6Hardening.test';
+import { runInfrastructureHealthCheck } from './src/lib/diagnostics';
+import { seedDatabase } from './src/lib/seed';
 import { AdminPermission, AdminRole, MonitoringToolConfig, MarketplaceChannel, SeoCampaign } from './src/types';
 
 // User Account Interface
@@ -254,6 +256,24 @@ app.get('/api/health', (req: Request, res: Response) => {
     brand: 'Care Beauty Solution',
     timestamp: new Date().toISOString(),
   });
+});
+
+app.get('/api/diagnostics', async (req: Request, res: Response) => {
+  try {
+    const health = await runInfrastructureHealthCheck();
+    res.json({ success: true, diagnostics: health });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message || err });
+  }
+});
+
+app.post('/api/admin/init-db', async (req: Request, res: Response) => {
+  try {
+    const result = await seedDatabase();
+    res.json({ success: true, result });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message || err });
+  }
 });
 
 // ==========================================
