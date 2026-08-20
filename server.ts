@@ -3,7 +3,7 @@ import path from 'path';
 import crypto from 'crypto';
 import fs from 'fs';
 
-// Process-level crash logging for Render / Cloud deployments
+// Process-level crash logging for Vercel / Cloud deployments
 process.on('uncaughtException', (err) => {
   console.error('[CRITICAL UNCAUGHT EXCEPTION]', err);
 });
@@ -212,7 +212,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 
-// Health Check Endpoint for Render & Monitoring
+// Health Check Endpoint for Vercel & Monitoring
 app.get(['/health', '/api/health'], (req: Request, res: Response) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
@@ -2535,7 +2535,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 async function startServer() {
   const distPath = path.join(process.cwd(), 'dist');
   const distExists = fs.existsSync(distPath);
-  const isProduction = process.env.NODE_ENV === 'production' || process.env.RENDER === 'true' || distExists;
+  const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1' || distExists;
 
   if (isProduction && distExists) {
     console.log(`[SERVER] Production mode detected. Serving static files from ${distPath}`);

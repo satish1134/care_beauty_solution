@@ -8,8 +8,7 @@ CARe Beauty Solution is an enterprise-grade D2C clinical skincare e-commerce pla
 
 | Component | Target Platform | Free Tier | Infrastructure Role |
 | :--- | :--- | :--- | :--- |
-| **Storefront & Admin UI** | **Vercel** | Yes (Hobby Tier) | High-speed Global Edge CDN, SPA Routing |
-| **Backend API Service** | **Render / Railway** | Yes | Always-on Express Node.js application server |
+| **Full-Stack Application** | **Vercel** | Yes (Hobby Tier) | Frontend Edge CDN & Serverless Express API backend |
 | **Database** | **Neon** | Yes | Managed serverless PostgreSQL database |
 | **Redis & Queue** | **Upstash** | Yes | Serverless Redis store for BullMQ job queue |
 | **Payments** | **Razorpay** | Pay-per-use | India payment gateway (UPI, Netbanking, Cards) |
@@ -21,34 +20,25 @@ CARe Beauty Solution is an enterprise-grade D2C clinical skincare e-commerce pla
 ### 1. Database Setup (Neon PostgreSQL)
 1. Sign up at [Neon.tech](https://neon.tech).
 2. Create a new PostgreSQL database project named `care-beauty-db`.
-3. Copy the Connection String URI and set it as `DATABASE_URL` in your backend environment variables.
+3. Copy the Connection String URI and set it as `DATABASE_URL` in your environment variables.
 
 ### 2. Redis & Job Queue Setup (Upstash Redis)
 1. Sign up at [Upstash.com](https://upstash.com).
 2. Create a Redis database instance.
 3. Copy the Redis Connection URL (`redis://...`) and set it as `REDIS_URL`.
 
-### 3. Deploy Backend API Server (Render or Railway)
+### 3. Deploy Full-Stack App (Vercel)
 1. Push your repository to GitHub.
-2. Connect your repository to **Render** (New Web Service) or **Railway**.
-3. Set the build and start commands:
-   - **Build Command**: `npm run build`
-   - **Start Command**: `npm start`
-4. Configure environment variables in the Render/Railway dashboard:
-   - `NODE_ENV=production`
+2. Connect your repository to **Vercel** (Add New Project).
+3. Vercel automatically detects `vercel.json` and builds both frontend and `/api` serverless backend functions.
+4. Configure environment variables in the Vercel dashboard:
+   - `NODE_ENV` = `production`
    - `DATABASE_URL` (From Neon)
    - `REDIS_URL` (From Upstash)
    - `JWT_SECRET`
    - `RAZORPAY_KEY_ID` & `RAZORPAY_SECRET`
    - `GEMINI_API_KEY`
-5. Note your deployed Backend API URL (e.g., `https://care-beauty-api.onrender.com`).
-
-### 4. Deploy Storefront & Admin UI (Vercel)
-1. Connect your repository to **Vercel**.
-2. Select **Vite** as the Framework Preset.
-3. Set the Environment Variables:
-   - `VITE_API_BASE_URL` = `https://care-beauty-api.onrender.com`
-4. Click **Deploy**. Vercel will build and distribute your frontend across global edge nodes.
+5. Click **Deploy**. Your frontend and backend will both run under your custom Vercel domain!
 
 ---
 
