@@ -1,9 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   X, Smartphone, Mail, Lock, ArrowRight, CheckCircle2, Eye, EyeOff, 
-  ShieldCheck, Sparkles, RefreshCw, UserCheck, ShieldAlert, Award
+  ShieldCheck, Sparkles, RefreshCw, ShieldAlert, UserPlus, LogIn
 } from 'lucide-react';
 import { safeFetchApi } from '../utils/apiHelper';
+import { RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from 'firebase/auth';
+import { getFirebaseAuth, isFirebaseConfigured } from '../lib/firebase';
+
+declare global {
+  interface Window {
+    recaptchaVerifier?: RecaptchaVerifier;
+  }
+}
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -21,34 +29,34 @@ const COUNTRY_CODES = [
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSuccess }) => {
   if (!isOpen) return null;
 
-  const [authMethod, setAuthMethod] = useState<'OTP' | 'EMAIL'>('OTP');
-  const [emailMode, setEmailMode] = useState<'LOGIN' | 'REGISTER'>('LOGIN');
+  const [authTab, setAuthTab] = useState<'OTP' | 'EMAIL'>('OTP');
+  const [emailSubTab, setEmailSubTab] = useState<'LOGIN' | 'REGISTER'>('LOGIN');
 
-  // Country Code
+  // Country Code & Mobile Phone State
   const [selectedCountry, setSelectedCountry] = useState('+91');
-
-  // OTP State
-  const [otpStep, setOtpStep] = useState<'PHONE' | 'OTP'>('PHONE');
   const [phone, setPhone] = useState('');
+
+  // OTP Step State: 'PHONE' -> 'OTP' -> 'COMPLETE_PROFILE' (if new user)
+  const [otpStep, setOtpStep] = useState<'PHONE' | 'OTP' | 'COMPLETE_PROFILE'>('PHONE');
   const [otpDigits, setOtpDigits] = useState(['', '', '', '', '', '']);
-  const [otpName, setOtpName] = useState('');
   const [resendTimer, setResendTimer] = useState(30);
   const [canResend, setCanResend] = useState(false);
+  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
 
-  // Email State
+  // User Profile State (Required when onboarding new mobile user or email user)
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [fullName, setFullName] = useState('');
 
-  // UI state
+  // Status & Feedback
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  // Timer logic for Resend OTP
+  // Resend Timer Countdown
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (otpStep === 'OTP' && resendTimer > 0) {
@@ -61,14 +69,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
     return () => clearInterval(interval);
   }, [otpStep, resendTimer]);
 
-  // Handle OTP digit input changes
+  // Handle OTP Digit Inputs
   const handleOtpDigitChange = (index: number, value: string) => {
     if (!/^\d*$/.test(value)) return;
     const newDigits = [...otpDigits];
     newDigits[index] = value.slice(-1);
     setOtpDigits(newDigits);
 
-    // Auto-advance to next input
     if (value && index < 5) {
       otpInputRefs.current[index + 1]?.focus();
     }
@@ -80,7 +87,28 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
     }
   };
 
-  // Send OTP
+  // Setup Firebase Recaptcha
+  const initRecaptcha = () => {
+    const auth = getFirebaseAuth();
+    if (typeof window !== 'undefined' && auth) {
+      if (window.recaptchaVerifier) {
+        try { window.recaptchaVerifier.clear(); } catch(e){}
+        window.recaptchaVerifier = undefined;
+      }
+      try {
+        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+          size: 'invisible',
+          callback: () => {
+            console.log('[FIREBASE RECAPTCHA] Solved');
+          },
+        });
+      } catch (err) {
+        console.warn('[FIREBASE RECAPTCHA INIT WARN]', err);
+      }
+    }
+  };
+
+  // Step 1: Request Mobile OTP
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     const cleanNumber = phone.replace(/\D/g, '');
@@ -89,32 +117,131 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
       return;
     }
 
+    const fullPhoneNumber = `${selectedCountry}${cleanNumber}`;
     setIsLoading(true);
     setError(null);
 
-    const apiRes = await safeFetchApi('/api/auth/send-otp', {
-      method: 'POST',
-      body: JSON.stringify({ phone: cleanNumber }),
-    });
+    let firebaseSuccess = false;
+    const firebaseAuthInstance = getFirebaseAuth();
+
+    // 1. Try Firebase Phone Auth if configured
+    if (isFirebaseConfigured() && firebaseAuthInstance) {
+      try {
+        initRecaptcha();
+        if (window.recaptchaVerifier) {
+          const confirmation = await signInWithPhoneNumber(firebaseAuthInstance, fullPhoneNumber, window.recaptchaVerifier);
+          setConfirmationResult(confirmation);
+          firebaseSuccess = true;
+          setSuccessMsg(`Verification code sent via Firebase SMS to ${fullPhoneNumber}`);
+        }
+      } catch (firebaseErr: any) {
+        console.error('[FIREBASE PHONE AUTH ERROR]', firebaseErr);
+        const errMsg = firebaseErr?.message || String(firebaseErr);
+        if (errMsg.includes('auth/unauthorized-domain')) {
+          setError(`Firebase Error: Authorized Domain missing in Firebase Console. Please add ${window.location.hostname} to Authorized Domains.`);
+          setIsLoading(false);
+          return;
+        } else if (errMsg.includes('auth/invalid-phone-number')) {
+          setError('Invalid mobile number format for Firebase SMS.');
+          setIsLoading(false);
+          return;
+        }
+        // Reset recaptcha instance on error
+        if (window.recaptchaVerifier) {
+          try { window.recaptchaVerifier.clear(); } catch(e){}
+          window.recaptchaVerifier = undefined;
+        }
+      }
+    }
+
+    // 2. Fallback to Server Fast2SMS / Gateway Handler
+    if (!firebaseSuccess) {
+      const apiRes = await safeFetchApi('/api/auth/send-otp', {
+        method: 'POST',
+        body: JSON.stringify({ phone: cleanNumber }),
+      });
+
+      if (apiRes.data && apiRes.data.success) {
+        setSuccessMsg(`Verification code sent via SMS to ${selectedCountry} ${cleanNumber}`);
+      } else {
+        setError(apiRes.data?.message || 'Failed to dispatch OTP. Please verify phone number.');
+        setIsLoading(false);
+        return;
+      }
+    }
 
     setIsLoading(false);
     setOtpStep('OTP');
     setResendTimer(30);
     setCanResend(false);
-    setSuccessMsg('SMS OTP code dispatched successfully! Default demo code: 123456');
 
-    // Focus first digit box
     setTimeout(() => {
       otpInputRefs.current[0]?.focus();
-    }, 100);
+    }, 150);
   };
 
-  // Verify OTP
+  // Step 2: Verify Mobile OTP
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     const fullOtp = otpDigits.join('');
     if (fullOtp.length < 6) {
-      setError('Please enter all 6 digits of the OTP code');
+      setError('Please enter all 6 digits of the OTP verification code');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    let verifiedByFirebase = false;
+
+    // 1. Try Firebase confirmation first
+    if (confirmationResult) {
+      try {
+        const credential = await confirmationResult.confirm(fullOtp);
+        if (credential.user) {
+          verifiedByFirebase = true;
+        }
+      } catch (fbVerifyErr: any) {
+        console.warn('[FIREBASE VERIFY WARN]', fbVerifyErr);
+      }
+    }
+
+    // 2. Send verification request to Server
+    const apiRes = await safeFetchApi('/api/auth/verify-otp', {
+      method: 'POST',
+      body: JSON.stringify({ 
+        phone: phone.replace(/\D/g, ''), 
+        otp: fullOtp, 
+        name: fullName,
+        email: email 
+      }),
+    });
+
+    setIsLoading(false);
+
+    if (apiRes.data && apiRes.data.success) {
+      // If server requests profile completion for NEW mobile user
+      if (apiRes.data.requiresProfileCompletion) {
+        setOtpStep('COMPLETE_PROFILE');
+        setSuccessMsg('Mobile number verified! Please enter your name and email to complete registration.');
+        return;
+      }
+
+      saveSessionAndClose(apiRes.data);
+    } else if (verifiedByFirebase) {
+      // If Firebase verified but backend asks for profile
+      setOtpStep('COMPLETE_PROFILE');
+      setSuccessMsg('Phone verified! Please enter your details to complete setup.');
+    } else {
+      setError(apiRes.data?.message || 'Invalid verification code. Please check the 6 digits and try again.');
+    }
+  };
+
+  // Step 3: Complete Registration Profile for New Mobile User
+  const handleCompleteMobileProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!fullName.trim() || !email.trim()) {
+      setError('Full Name and Email address are required to create your account');
       return;
     }
 
@@ -123,33 +250,30 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
 
     const apiRes = await safeFetchApi('/api/auth/verify-otp', {
       method: 'POST',
-      body: JSON.stringify({ phone, otp: fullOtp, name: otpName }),
+      body: JSON.stringify({
+        phone: phone.replace(/\D/g, ''),
+        otp: otpDigits.join('') || '123456',
+        name: fullName,
+        email: email,
+      }),
     });
 
     setIsLoading(false);
 
-    if (apiRes.data && apiRes.data.success) {
+    if (apiRes.data && apiRes.data.success && apiRes.data.user) {
       saveSessionAndClose(apiRes.data);
     } else {
-      // Fallback fallback
-      const mockUser = {
-        id: `usr_${Date.now()}`,
-        phone,
-        fullName: otpName || 'Care Beauty Member',
-        accessToken: `token_mock_${Date.now()}`,
-        refreshToken: `ref_mock_${Date.now()}`,
-      };
-      saveSessionAndClose({ user: mockUser, accessToken: mockUser.accessToken, refreshToken: mockUser.refreshToken });
+      setError(apiRes.data?.message || 'Failed to complete registration profile. Please try again.');
     }
   };
 
-  // Resend OTP
+  // Resend OTP Code
   const handleResendOtp = () => {
     if (!canResend) return;
     setOtpDigits(['', '', '', '', '', '']);
     setResendTimer(30);
     setCanResend(false);
-    setSuccessMsg('New OTP code resent! Default demo code: 123456');
+    setSuccessMsg(`New verification code resent to ${selectedCountry} ${phone}`);
     otpInputRefs.current[0]?.focus();
   };
 
@@ -182,7 +306,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
   const handleEmailRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!fullName || !email || !password) {
-      setError('Please fill in all required fields');
+      setError('Full Name, Email Address, and Password are required');
       return;
     }
 
@@ -204,11 +328,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
     if (apiRes.data && apiRes.data.success) {
       saveSessionAndClose(apiRes.data);
     } else {
-      setError(apiRes.data?.message || 'Registration failed. Email may already be in use.');
+      setError(apiRes.data?.message || 'Registration failed. Email may already be registered.');
     }
   };
 
-  // Helper to save session locally
+  // Helper to store tokens and close modal
   const saveSessionAndClose = (data: any) => {
     const { accessToken, refreshToken, user } = data;
     localStorage.setItem('care_access_token', accessToken);
@@ -230,35 +354,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
     onClose();
   };
 
-  // Quick One-Click Admin & Customer demo login helper
-  const handleQuickDemoLogin = (role: 'ADMIN' | 'CUSTOMER') => {
-    setIsLoading(true);
-    setTimeout(() => {
-      const demoUser = role === 'ADMIN' ? {
-        id: 'usr_admin_1',
-        email: 'admin@carebeautysolution.com',
-        phone: '9999999999',
-        fullName: 'Care Beauty Admin',
-        role: 'ADMIN',
-        accessToken: `demo_admin_token_${Date.now()}`,
-        refreshToken: `demo_admin_ref_${Date.now()}`
-      } : {
-        id: 'usr_cust_1',
-        email: 'customer@carebeautysolution.com',
-        phone: '9876543210',
-        fullName: 'Priya Sharma',
-        role: 'CUSTOMER',
-        accessToken: `demo_cust_token_${Date.now()}`,
-        refreshToken: `demo_cust_ref_${Date.now()}`
-      };
-      saveSessionAndClose({ user: demoUser, accessToken: demoUser.accessToken, refreshToken: demoUser.refreshToken });
-    }, 400);
-  };
-
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-fadeIn">
+      {/* Invisible Firebase reCAPTCHA Container */}
+      <div id="recaptcha-container"></div>
+
       <div className="bg-white rounded-3xl max-w-4xl w-full shadow-2xl overflow-hidden border border-amber-100 flex flex-col md:flex-row relative">
-        {/* Close Button */}
+        {/* Close Modal Button */}
         <button 
           onClick={onClose} 
           className="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 flex items-center justify-center transition shadow-sm"
@@ -267,9 +369,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
           <X className="w-5 h-5" />
         </button>
 
-        {/* LEFT PANE: Editorial Visual Banner (Desktop) */}
+        {/* LEFT PANE: Luxury Brand Editorial (Desktop) */}
         <div className="hidden md:flex md:w-5/12 bg-emerald-950 text-white p-8 flex-col justify-between relative overflow-hidden">
-          {/* Subtle Background Pattern */}
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-emerald-800/40 via-emerald-950 to-slate-950"></div>
           <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -284,7 +385,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
                 Pure Radiance.<br />Science & Botanicals.
               </h2>
               <p className="text-xs text-emerald-200/80 leading-relaxed">
-                Join our botanical beauty community to unlock member-only privileges, bespoke recommendations & fast checkout.
+                Join our botanical beauty community to unlock member privileges, order tracking & fast checkout.
               </p>
             </div>
 
@@ -305,7 +406,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
                 <div className="w-6 h-6 rounded-full bg-emerald-900 flex items-center justify-center text-amber-300 shrink-0">
                   <CheckCircle2 className="w-4 h-4" />
                 </div>
-                <span>Personalized Skincare Consultation</span>
+                <span>Personalized Skincare Consultations</span>
               </div>
             </div>
           </div>
@@ -323,16 +424,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
           <div className="space-y-5">
             {/* Header */}
             <div>
-              <div className="flex items-center justify-between">
-                <h3 className="font-serif text-xl sm:text-2xl font-bold text-slate-900">
-                  {authMethod === 'OTP' ? 'Mobile Verification' : emailMode === 'LOGIN' ? 'Welcome Back' : 'Create Account'}
-                </h3>
-              </div>
+              <h3 className="font-serif text-xl sm:text-2xl font-bold text-slate-900">
+                {authTab === 'OTP' 
+                  ? (otpStep === 'COMPLETE_PROFILE' ? 'Complete Profile' : 'Mobile Verification') 
+                  : (emailSubTab === 'LOGIN' ? 'Welcome Back' : 'Create Account')}
+              </h3>
               <p className="text-xs text-slate-500 mt-1">
-                {authMethod === 'OTP' 
-                  ? 'Sign in instantly using 1-click Mobile OTP SMS code' 
-                  : emailMode === 'LOGIN'
-                  ? 'Access your saved addresses, track orders & wishlist'
+                {authTab === 'OTP' 
+                  ? 'Sign in or register seamlessly using 1-click Mobile OTP' 
+                  : emailSubTab === 'LOGIN'
+                  ? 'Access your saved addresses, order history & rewards'
                   : 'Register a new account in under 30 seconds'}
               </p>
             </div>
@@ -341,9 +442,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
             <div className="grid grid-cols-2 bg-slate-100 p-1.5 rounded-2xl text-xs font-semibold text-slate-600">
               <button
                 type="button"
-                onClick={() => { setAuthMethod('OTP'); setError(null); setSuccessMsg(null); }}
+                onClick={() => { setAuthTab('OTP'); setError(null); setSuccessMsg(null); setOtpStep('PHONE'); }}
                 className={`py-2.5 rounded-xl transition flex items-center justify-center gap-2 ${
-                  authMethod === 'OTP' 
+                  authTab === 'OTP' 
                     ? 'bg-emerald-950 text-white shadow-md font-bold' 
                     : 'hover:text-slate-900 hover:bg-slate-200/60'
                 }`}
@@ -353,9 +454,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
               </button>
               <button
                 type="button"
-                onClick={() => { setAuthMethod('EMAIL'); setError(null); setSuccessMsg(null); }}
+                onClick={() => { setAuthTab('EMAIL'); setError(null); setSuccessMsg(null); }}
                 className={`py-2.5 rounded-xl transition flex items-center justify-center gap-2 ${
-                  authMethod === 'EMAIL' 
+                  authTab === 'EMAIL' 
                     ? 'bg-emerald-950 text-white shadow-md font-bold' 
                     : 'hover:text-slate-900 hover:bg-slate-200/60'
                 }`}
@@ -365,7 +466,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
               </button>
             </div>
 
-            {/* Error Banner */}
+            {/* Error Message */}
             {error && (
               <div className="bg-rose-50 border border-rose-200 text-rose-700 text-xs p-3 rounded-2xl flex items-start gap-2.5 animate-fadeIn">
                 <ShieldAlert className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
@@ -373,7 +474,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
               </div>
             )}
 
-            {/* Success Banner */}
+            {/* Success Message */}
             {successMsg && (
               <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs p-3 rounded-2xl flex items-start gap-2.5 animate-fadeIn">
                 <Sparkles className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
@@ -382,23 +483,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
             )}
 
             {/* FORM AREA */}
-            {authMethod === 'OTP' ? (
+            {authTab === 'OTP' ? (
               /* ================= MOBILE OTP FLOW ================= */
               otpStep === 'PHONE' ? (
                 <form onSubmit={handleSendOtp} className="space-y-4">
                   <div>
-                    <label className="text-xs font-semibold text-slate-700">Full Name (Optional)</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Radhika Sharma"
-                      value={otpName}
-                      onChange={(e) => setOtpName(e.target.value)}
-                      className="w-full text-xs border border-slate-200 rounded-xl px-3.5 py-3 mt-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-900/30 focus:border-emerald-900 transition bg-slate-50/50"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-semibold text-slate-700">Mobile Number <span className="text-rose-500">*</span></label>
+                    <label className="text-xs font-semibold text-slate-700">
+                      Enter Mobile Number <span className="text-rose-500">*</span>
+                    </label>
                     <div className="flex gap-2 mt-1.5">
                       <select
                         value={selectedCountry}
@@ -414,7 +506,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
                       <input
                         type="tel"
                         required
-                        placeholder="9876543210"
+                        placeholder="e.g. 9166053810"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         maxLength={10}
@@ -438,13 +530,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
                     )}
                   </button>
                 </form>
-              ) : (
+              ) : otpStep === 'OTP' ? (
                 /* STEP 2: Enter 6-Digit OTP */
                 <form onSubmit={handleVerifyOtp} className="space-y-4">
                   <div className="text-center space-y-1">
                     <label className="text-xs font-bold text-slate-800">Enter 6-Digit OTP Code</label>
                     <p className="text-[11px] text-slate-500">
-                      Sent to <span className="font-mono font-bold text-slate-800">{selectedCountry} {phone}</span>
+                      Code sent to <span className="font-mono font-bold text-slate-800">{selectedCountry} {phone}</span>
                     </p>
                   </div>
 
@@ -473,7 +565,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
                     {isLoading ? (
                       <RefreshCw className="w-4 h-4 animate-spin text-amber-300" />
                     ) : (
-                      <span>Verify & Access Account</span>
+                      <span>Verify & Continue</span>
                     )}
                   </button>
 
@@ -483,7 +575,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
                       onClick={() => setOtpStep('PHONE')}
                       className="text-slate-500 hover:text-slate-900 underline font-medium"
                     >
-                      Change Number
+                      Change Phone Number
                     </button>
 
                     <button
@@ -498,37 +590,81 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
                     </button>
                   </div>
                 </form>
+              ) : (
+                /* STEP 3: Complete Profile for New Mobile User */
+                <form onSubmit={handleCompleteMobileProfile} className="space-y-3.5">
+                  <div>
+                    <label className="text-xs font-semibold text-slate-700">
+                      Full Name <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Radhika Sharma"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      className="w-full text-xs border border-slate-200 rounded-xl px-3.5 py-3 mt-1 focus:outline-none focus:ring-2 focus:ring-emerald-900/30 focus:border-emerald-900 transition bg-slate-50/50"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold text-slate-700">
+                      Email Address <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="e.g. radhika@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full text-xs border border-slate-200 rounded-xl px-3.5 py-3 mt-1 focus:outline-none focus:ring-2 focus:ring-emerald-900/30 focus:border-emerald-900 transition bg-slate-50/50"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full bg-emerald-950 hover:bg-emerald-900 active:scale-[0.99] text-white font-bold text-xs py-3.5 rounded-xl shadow-lg shadow-emerald-950/20 transition flex items-center justify-center gap-2"
+                  >
+                    {isLoading ? (
+                      <RefreshCw className="w-4 h-4 animate-spin text-amber-300" />
+                    ) : (
+                      <span>Create Account & Continue</span>
+                    )}
+                  </button>
+                </form>
               )
             ) : (
               /* ================= EMAIL & PASSWORD FLOW ================= */
               <div className="space-y-4">
-                {/* Sub-mode toggle */}
                 <div className="flex border-b border-slate-200 text-xs font-bold">
                   <button
                     type="button"
-                    onClick={() => { setEmailMode('LOGIN'); setError(null); }}
-                    className={`flex-1 text-center pb-2.5 transition ${
-                      emailMode === 'LOGIN' 
+                    onClick={() => { setEmailSubTab('LOGIN'); setError(null); }}
+                    className={`flex-1 text-center pb-2.5 transition flex items-center justify-center gap-1.5 ${
+                      emailSubTab === 'LOGIN' 
                         ? 'text-emerald-950 border-b-2 border-emerald-950 font-bold' 
                         : 'text-slate-400 hover:text-slate-700'
                     }`}
                   >
-                    Sign In
+                    <LogIn className="w-3.5 h-3.5" />
+                    <span>Sign In</span>
                   </button>
                   <button
                     type="button"
-                    onClick={() => { setEmailMode('REGISTER'); setError(null); }}
-                    className={`flex-1 text-center pb-2.5 transition ${
-                      emailMode === 'REGISTER' 
+                    onClick={() => { setEmailSubTab('REGISTER'); setError(null); }}
+                    className={`flex-1 text-center pb-2.5 transition flex items-center justify-center gap-1.5 ${
+                      emailSubTab === 'REGISTER' 
                         ? 'text-emerald-950 border-b-2 border-emerald-950 font-bold' 
                         : 'text-slate-400 hover:text-slate-700'
                     }`}
                   >
-                    Create Account
+                    <UserPlus className="w-3.5 h-3.5" />
+                    <span>Create Account</span>
                   </button>
                 </div>
 
-                {emailMode === 'LOGIN' ? (
+                {emailSubTab === 'LOGIN' ? (
                   <form onSubmit={handleEmailLogin} className="space-y-3.5">
                     <div>
                       <label className="text-xs font-semibold text-slate-700">Email Address <span className="text-rose-500">*</span></label>
@@ -575,7 +711,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
                       {isLoading ? (
                         <RefreshCw className="w-4 h-4 animate-spin text-amber-300" />
                       ) : (
-                        <span>Sign In to Account</span>
+                        <span>Sign In</span>
                       )}
                     </button>
                   </form>
@@ -606,9 +742,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
                     </div>
 
                     <div>
-                      <label className="text-xs font-semibold text-slate-700">Mobile Number (Optional)</label>
+                      <label className="text-xs font-semibold text-slate-700">Mobile Number <span className="text-rose-500">*</span></label>
                       <input
                         type="tel"
+                        required
                         placeholder="9876543210"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
@@ -622,7 +759,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
                         <input
                           type={showPassword ? 'text' : 'password'}
                           required
-                          placeholder="Min 6 characters"
+                          placeholder="Minimum 6 characters"
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           className="w-full text-xs border border-slate-200 rounded-xl pl-3.5 pr-10 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-900/30 focus:border-emerald-900 transition bg-slate-50/50"
@@ -645,41 +782,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
                       {isLoading ? (
                         <RefreshCw className="w-4 h-4 animate-spin text-amber-300" />
                       ) : (
-                        <span>Create Member Account</span>
+                        <span>Create Account</span>
                       )}
                     </button>
                   </form>
                 )}
               </div>
             )}
-          </div>
-
-          {/* Quick Demo Login Helpers */}
-          <div className="pt-4 border-t border-slate-100 mt-4 space-y-2">
-            <div className="flex items-center justify-between text-[11px] text-slate-400">
-              <span>Instant Testing Credentials</span>
-              <span className="flex items-center gap-1 text-emerald-800 font-semibold"><Award className="w-3.5 h-3.5" /> Demo Shortcuts</span>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => handleQuickDemoLogin('CUSTOMER')}
-                className="bg-amber-50 hover:bg-amber-100/80 text-amber-900 border border-amber-200 rounded-xl py-2 px-3 text-[11px] font-semibold flex items-center justify-center gap-1.5 transition"
-              >
-                <UserCheck className="w-3.5 h-3.5 text-amber-700" />
-                <span>Demo Customer</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickDemoLogin('ADMIN')}
-                className="bg-emerald-50 hover:bg-emerald-100/80 text-emerald-950 border border-emerald-200 rounded-xl py-2 px-3 text-[11px] font-semibold flex items-center justify-center gap-1.5 transition"
-              >
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
-                <span>Super Admin</span>
-              </button>
-            </div>
           </div>
         </div>
       </div>

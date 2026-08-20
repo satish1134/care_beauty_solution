@@ -816,16 +816,32 @@ app.post('/api/auth/send-otp', async (req: Request, res: Response) => {
 
     const cleanPhone = phone.replace(/\D/g, '').slice(-10);
     const { code, expiresAt } = mockSmsProvider.generateAndStoreOtp(cleanPhone);
-    const smsResult = await mockSmsProvider.sendSms(cleanPhone, `Your Care Beauty Solution OTP is ${code}. Valid for 5 minutes.`);
+    const smsResult = await mockSmsProvider.sendSms(
+      cleanPhone, 
+      `Your Care Beauty Solution OTP is ${code}. Valid for 5 minutes.`, 
+      code
+    );
 
     if (!smsResult.success) {
       return res.status(429).json({ success: false, message: smsResult.error });
     }
 
+    // Check if user already exists in DB
+    let userExists = false;
+    try {
+      const dbSearch = await queryDb<any>('SELECT id, full_name, email FROM users WHERE phone = $1', [cleanPhone]);
+      if (dbSearch && dbSearch.length > 0) {
+        userExists = true;
+      }
+    } catch (e) {
+      userExists = Array.from(usersStore.values()).some(u => u.phone === cleanPhone);
+    }
+
     res.json({
       success: true,
-      message: `OTP sent to +91 ${cleanPhone}.`,
-      otpHint: code, // Convenient hint for dev/testing
+      message: `Verification code sent to +91 ${cleanPhone}`,
+      isRealSmsSent: smsResult.isRealSmsSent || false,
+      userExists,
       expiresAt: new Date(expiresAt).toISOString(),
     });
   } catch (err: any) {
@@ -835,7 +851,7 @@ app.post('/api/auth/send-otp', async (req: Request, res: Response) => {
 
 app.post('/api/auth/verify-otp', async (req: Request, res: Response) => {
   try {
-    const { phone, otp, name } = req.body;
+    const { phone, otp, name, email } = req.body;
     if (!phone || !otp) {
       return res.status(400).json({ success: false, message: 'Mobile number and OTP code are required' });
     }
@@ -847,58 +863,75 @@ app.post('/api/auth/verify-otp', async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, message: verification.message });
     }
 
-    // Find or create user
-    let user = Array.from(usersStore.values()).find(u => u.phone === cleanPhone);
-    const role = cleanPhone === '9999999999' ? 'ADMIN' : 'CUSTOMER';
-    const userId = user?.id || `usr-${cleanPhone.slice(-6)}`;
-    const userFullName = name || user?.fullName || 'Care Customer';
+    // Check if user exists in Neon PostgreSQL
+    let existingUser: any = null;
+    try {
+      const dbRows = await queryDb<any>('SELECT * FROM users WHERE phone = $1 OR (email IS NOT NULL AND email = $2)', [cleanPhone, email || '']);
+      if (dbRows && dbRows.length > 0) {
+        existingUser = dbRows[0];
+      }
+    } catch (err) {
+      console.warn('[NEON CHECK USER WARN]', err);
+    }
+
+    if (!existingUser) {
+      existingUser = Array.from(usersStore.values()).find(u => u.phone === cleanPhone);
+    }
+
+    const isNewUser = !existingUser;
+
+    // If new user and name/email not provided yet, request profile completion
+    if (isNewUser && (!name || name.trim() === '')) {
+      return res.json({
+        success: true,
+        requiresProfileCompletion: true,
+        phone: cleanPhone,
+        message: 'OTP verified! Please complete your name & email to create your account.',
+      });
+    }
+
+    const role = cleanPhone === '9999999999' ? 'ADMIN' : (existingUser?.role || 'CUSTOMER');
+    const userId = existingUser?.id || `usr-${cleanPhone.slice(-6)}`;
+    const userFullName = name || existingUser?.full_name || existingUser?.fullName || 'Care Member';
+    const userEmail = email || existingUser?.email || null;
 
     // Insert or update user in Neon PostgreSQL
     try {
       await queryDb(
-        `INSERT INTO users (id, phone, full_name, role)
-         VALUES ($1, $2, $3, $4)
+        `INSERT INTO users (id, phone, email, full_name, role)
+         VALUES ($1, $2, $3, $4, $5)
          ON CONFLICT (id) DO UPDATE SET
            full_name = EXCLUDED.full_name,
-           phone = EXCLUDED.phone`,
-        [userId, cleanPhone, userFullName, role]
+           phone = EXCLUDED.phone,
+           email = COALESCE(EXCLUDED.email, users.email)`,
+        [userId, cleanPhone, userEmail, userFullName, role]
       );
     } catch (dbErr: any) {
       console.error('[NEON OTP USER INSERT ERROR]', dbErr);
     }
 
-    if (!user) {
-      user = {
-        id: userId,
-        phone: cleanPhone,
-        fullName: userFullName,
-        role,
-        createdAt: new Date().toISOString(),
-      };
-      usersStore.set(user.id, user);
-    } else if (name && user.fullName === 'Care Customer') {
-      user.fullName = name;
-    }
+    const userObj = {
+      id: userId,
+      phone: cleanPhone,
+      email: userEmail,
+      fullName: userFullName,
+      role,
+      createdAt: existingUser?.created_at || new Date().toISOString(),
+    };
+    usersStore.set(userId, userObj as DBUser);
 
     // Generate Access & Refresh Tokens
-    const accessToken = authService.generateAccessToken(user.id, user.role, user.email, user.phone);
-    const refreshToken = authService.generateRefreshToken(user.id, user.role, user.email, user.phone);
+    const accessToken = authService.generateAccessToken(userId, role, userEmail, cleanPhone);
+    const refreshToken = authService.generateRefreshToken(userId, role, userEmail, cleanPhone);
 
-    recordAuditLog(user.email || user.phone || 'customer', 'OTP_LOGIN', 'User', user.id, `User signed in via Mobile OTP in Neon PostgreSQL`);
+    recordAuditLog(userEmail || cleanPhone, 'OTP_LOGIN', 'User', userId, `User authenticated via Mobile OTP in Neon PostgreSQL`);
 
     res.json({
       success: true,
-      message: 'Mobile OTP authentication successful',
+      message: 'Authentication successful',
       accessToken,
       refreshToken,
-      user: {
-        id: user.id,
-        fullName: user.fullName,
-        phone: user.phone,
-        email: user.email,
-        role: user.role,
-        createdAt: user.createdAt,
-      },
+      user: userObj,
     });
   } catch (err: any) {
     res.status(500).json({ success: false, message: err.message });
