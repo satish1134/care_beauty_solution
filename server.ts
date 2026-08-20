@@ -2,6 +2,15 @@ import express, { Request, Response, NextFunction } from 'express';
 import path from 'path';
 import crypto from 'crypto';
 import fs from 'fs';
+
+// Process-level crash logging for Render / Cloud deployments
+process.on('uncaughtException', (err) => {
+  console.error('[CRITICAL UNCAUGHT EXCEPTION]', err);
+});
+
+process.on('unhandledRejection', (reason) => {
+  console.error('[CRITICAL UNHANDLED REJECTION]', reason);
+});
 import { INITIAL_PRODUCTS, INITIAL_CATEGORIES, INITIAL_COUPONS, INITIAL_AUDIT_LOGS, INITIAL_ORDERS } from './src/data/initialData';
 import { Product, Category, Coupon, AuditLog, Order, Review } from './src/types';
 import { authService, TokenPayload } from './src/services/authService';
