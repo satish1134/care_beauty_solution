@@ -82,7 +82,7 @@ function authenticateToken(req: AuthenticatedRequest, res: Response, next: NextF
 }
 
 const app = express();
-const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+const PORT = (process.env.PORT && !isNaN(parseInt(process.env.PORT, 10))) ? parseInt(process.env.PORT, 10) : 3000;
 
 app.use(express.json({ limit: '10mb' }));
 
@@ -2521,23 +2521,46 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 // 10. VITE DEV SERVER / STATIC SERVING
 // ==========================================
 async function startServer() {
-  if (process.env.NODE_ENV !== 'production') {
-    const { createServer: createViteServer } = await import('vite');
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: 'spa',
-    });
-    app.use(vite.middlewares);
-  } else {
-    const distPath = path.join(process.cwd(), 'dist');
+  const distPath = path.join(process.cwd(), 'dist');
+  const distExists = fs.existsSync(distPath);
+  const isProduction = process.env.NODE_ENV === 'production' || process.env.RENDER === 'true' || distExists;
+
+  if (isProduction && distExists) {
+    console.log(`[SERVER] Production mode detected. Serving static files from ${distPath}`);
     app.use(express.static(distPath));
     app.get('*', (req: Request, res: Response) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+      const indexPath = path.join(distPath, 'index.html');
+      if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+      } else {
+        res.status(404).send('Application build index.html not found.');
+      }
     });
+  } else {
+    try {
+      console.log('[SERVER] Dev mode detected. Starting Vite middleware...');
+      const { createServer: createViteServer } = await import('vite');
+      const vite = await createViteServer({
+        server: { middlewareMode: true },
+        appType: 'spa',
+      });
+      app.use(vite.middlewares);
+    } catch (err) {
+      console.error('[SERVER WARN] Could not start Vite dev server, serving static dist:', err);
+      app.use(express.static(distPath));
+      app.get('*', (req: Request, res: Response) => {
+        const indexPath = path.join(distPath, 'index.html');
+        if (fs.existsSync(indexPath)) {
+          res.sendFile(indexPath);
+        } else {
+          res.status(404).send('Application build not found.');
+        }
+      });
+    }
   }
 
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Care Beauty Solution E-Commerce API running on http://localhost:${PORT}`);
+    console.log(`Care Beauty Solution E-Commerce server running on port ${PORT}`);
   });
 }
 

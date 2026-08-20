@@ -1,7 +1,9 @@
 import { Pool, neonConfig } from '@neondatabase/serverless';
 
 // Enable WebSocket connection pooling for serverless and edge environments
-neonConfig.webSocketConstructor = globalThis.WebSocket;
+if (typeof globalThis.WebSocket !== 'undefined') {
+  neonConfig.webSocketConstructor = globalThis.WebSocket;
+}
 
 let pool: Pool | null = null;
 
