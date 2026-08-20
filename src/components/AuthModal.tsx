@@ -137,20 +137,23 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
       } catch (firebaseErr: any) {
         console.error('[FIREBASE PHONE AUTH ERROR]', firebaseErr);
         const errMsg = firebaseErr?.message || String(firebaseErr);
-        if (errMsg.includes('auth/unauthorized-domain')) {
-          setError(`Firebase Error: Authorized Domain missing in Firebase Console. Please add ${window.location.hostname} to Authorized Domains.`);
-          setIsLoading(false);
-          return;
-        } else if (errMsg.includes('auth/invalid-phone-number')) {
-          setError('Invalid mobile number format for Firebase SMS.');
-          setIsLoading(false);
-          return;
-        }
         // Reset recaptcha instance on error
         if (window.recaptchaVerifier) {
           try { window.recaptchaVerifier.clear(); } catch(e){}
           window.recaptchaVerifier = undefined;
         }
+
+        if (errMsg.includes('auth/unauthorized-domain')) {
+          setError(`Firebase Error: Domain (${window.location.hostname}) is not added to Authorized Domains in Firebase Console.`);
+        } else if (errMsg.includes('auth/invalid-phone-number')) {
+          setError('Invalid mobile number format for Firebase SMS.');
+        } else if (errMsg.includes('auth/operation-not-allowed')) {
+          setError('Firebase Error: Phone Auth provider is disabled in Firebase Console. Enable it in Authentication -> Sign-in method.');
+        } else {
+          setError(`Firebase SMS Error: ${errMsg}`);
+        }
+        setIsLoading(false);
+        return;
       }
     }
 
