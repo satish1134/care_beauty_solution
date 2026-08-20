@@ -143,7 +143,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     (req.path === '/api/checkout' && req.method === 'POST');
 
   if (isAuthOrSensitive) {
-    const authLimit = 10; // Max 10 attempts per minute
+    const authLimit = 30; // Max 30 attempts per minute
     let record = authRateLimitMap.get(clientIp);
     if (!record || record.resetTime < now) {
       record = { count: 1, resetTime: now + windowMs };

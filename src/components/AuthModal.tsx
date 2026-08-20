@@ -268,7 +268,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
     if (apiRes.data && apiRes.data.success && apiRes.data.user) {
       saveSessionAndClose(apiRes.data);
     } else {
-      setError(apiRes.data?.message || 'Failed to complete registration profile. Please try again.');
+      const serverMessage = apiRes.data?.message || apiRes.data?.error || apiRes.error;
+      setError(serverMessage || `Error (${apiRes.status || 'Network'}): Failed to complete registration profile. Please try again.`);
     }
   };
 
