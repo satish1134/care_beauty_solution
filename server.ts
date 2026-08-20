@@ -137,7 +137,7 @@ const globalRateLimitMap = new Map<string, RateLimitRecord>();
 const authRateLimitMap = new Map<string, RateLimitRecord>();
 
 // Helper to clear stale rate limit entries
-setInterval(() => {
+const rateLimitCleanupTimer = setInterval(() => {
   const now = Date.now();
   globalRateLimitMap.forEach((val, key) => {
     if (val.resetTime < now) globalRateLimitMap.delete(key);
@@ -146,6 +146,9 @@ setInterval(() => {
     if (val.resetTime < now) authRateLimitMap.delete(key);
   });
 }, 60000);
+if (rateLimitCleanupTimer && typeof rateLimitCleanupTimer.unref === 'function') {
+  rateLimitCleanupTimer.unref();
+}
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   // Skip rate limiting for automated internal test suites when header 'x-skip-rate-limit' is present
