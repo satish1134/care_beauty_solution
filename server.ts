@@ -213,7 +213,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 
 // Health Check Endpoint for Vercel & Monitoring
-app.get(['/health', '/api/health'], (req: Request, res: Response) => {
+app.get(['/health', '/api/health', '/api'], (req: Request, res: Response) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
@@ -2514,6 +2514,15 @@ function renderSSRPageHtml(reqPath: string): { html: string; title: string; meta
   }
 }
 
+// API 404 handler - prevents API requests from hanging or falling through to HTML handlers
+app.all('/api/*', (req: Request, res: Response) => {
+  res.status(404).json({
+    success: false,
+    error: 'Not Found',
+    message: `API endpoint ${req.method} ${req.originalUrl || req.url} not found`,
+  });
+});
+
 // Intercept page requests for pre-rendering (SEO & Crawlers only)
 app.use((req: Request, res: Response, next: NextFunction) => {
   if (req.method !== 'GET' || req.path.startsWith('/api') || req.path.includes('.')) {
@@ -2581,7 +2590,15 @@ async function startServer() {
   });
 }
 
-if (!process.env.VERCEL) {
+const isServerlessRuntime = Boolean(
+  process.env.VERCEL ||
+  process.env.VERCEL_ENV ||
+  process.env.AWS_LAMBDA_FUNCTION_NAME ||
+  process.env.LAMBDA_TASK_ROOT ||
+  process.env.NETLIFY
+);
+
+if (!isServerlessRuntime) {
   startServer();
 }
 
