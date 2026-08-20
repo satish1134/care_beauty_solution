@@ -2,7 +2,6 @@ import express, { Request, Response, NextFunction } from 'express';
 import path from 'path';
 import crypto from 'crypto';
 import fs from 'fs';
-import { createServer as createViteServer } from 'vite';
 import { INITIAL_PRODUCTS, INITIAL_CATEGORIES, INITIAL_COUPONS, INITIAL_AUDIT_LOGS, INITIAL_ORDERS } from './src/data/initialData';
 import { Product, Category, Coupon, AuditLog, Order, Review } from './src/types';
 import { authService, TokenPayload } from './src/services/authService';
@@ -86,6 +85,19 @@ const app = express();
 const PORT = 3000;
 
 app.use(express.json({ limit: '10mb' }));
+
+// ==========================================
+// CORS MIDDLEWARE
+// ==========================================
+app.use((req: Request, res: Response, next: NextFunction) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-skip-rate-limit');
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  next();
+});
 
 // ==========================================
 // SECURITY HEADERS MIDDLEWARE
@@ -2504,6 +2516,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 // ==========================================
 async function startServer() {
   if (process.env.NODE_ENV !== 'production') {
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
@@ -2522,6 +2535,8 @@ async function startServer() {
   });
 }
 
-startServer();
+if (!process.env.VERCEL) {
+  startServer();
+}
 
 export default app;
