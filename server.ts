@@ -2514,16 +2514,21 @@ function renderSSRPageHtml(reqPath: string): { html: string; title: string; meta
   }
 }
 
-// Intercept page requests for pre-rendering
+// Intercept page requests for pre-rendering (SEO & Crawlers only)
 app.use((req: Request, res: Response, next: NextFunction) => {
   if (req.method !== 'GET' || req.path.startsWith('/api') || req.path.includes('.')) {
     return next();
   }
 
-  const ssr = renderSSRPageHtml(req.path);
-  if (ssr) {
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    return res.send(ssr.html);
+  const userAgent = (req.headers['user-agent'] || '').toLowerCase();
+  const isCrawler = /googlebot|bingbot|yandex|baiduspider|duckduckbot|slurp|facebookexternalhit|twitterbot|linkedinbot|whatsapp/i.test(userAgent);
+
+  if (isCrawler) {
+    const ssr = renderSSRPageHtml(req.path);
+    if (ssr) {
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      return res.send(ssr.html);
+    }
   }
 
   next();
