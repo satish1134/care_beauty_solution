@@ -851,16 +851,22 @@ app.post('/api/auth/send-otp', async (req: Request, res: Response) => {
 
 app.post('/api/auth/verify-otp', async (req: Request, res: Response) => {
   try {
-    const { phone, otp, name, email } = req.body;
-    if (!phone || !otp) {
-      return res.status(400).json({ success: false, message: 'Mobile number and OTP code are required' });
+    const { phone, otp, name, email, firebaseVerified } = req.body;
+    if (!phone) {
+      return res.status(400).json({ success: false, message: 'Mobile number is required' });
     }
 
     const cleanPhone = phone.replace(/\D/g, '').slice(-10);
-    const verification = mockSmsProvider.verifyOtp(cleanPhone, otp);
 
-    if (!verification.success) {
-      return res.status(400).json({ success: false, message: verification.message });
+    // Verify OTP using server store if not already verified by Firebase client-side
+    if (!firebaseVerified) {
+      if (!otp) {
+        return res.status(400).json({ success: false, message: 'OTP code is required' });
+      }
+      const verification = mockSmsProvider.verifyOtp(cleanPhone, otp);
+      if (!verification.success) {
+        return res.status(400).json({ success: false, message: verification.message });
+      }
     }
 
     // Check if user exists in Neon PostgreSQL

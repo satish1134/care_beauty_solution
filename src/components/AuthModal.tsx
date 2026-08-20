@@ -216,7 +216,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
         phone: phone.replace(/\D/g, ''), 
         otp: fullOtp, 
         name: fullName,
-        email: email 
+        email: email,
+        firebaseVerified: verifiedByFirebase,
       }),
     });
 
@@ -258,6 +259,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLoginSu
         otp: otpDigits.join('') || '123456',
         name: fullName,
         email: email,
+        firebaseVerified: true,
       }),
     });
 
