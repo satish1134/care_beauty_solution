@@ -82,7 +82,7 @@ function authenticateToken(req: AuthenticatedRequest, res: Response, next: NextF
 }
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
 app.use(express.json({ limit: '10mb' }));
 
@@ -197,6 +197,12 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   }
 
   next();
+});
+
+
+// Health Check Endpoint for Render & Monitoring
+app.get(['/health', '/api/health'], (req: Request, res: Response) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // In-Memory Data Storage (Initialized from baseline data)
