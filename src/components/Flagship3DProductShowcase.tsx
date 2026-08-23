@@ -80,45 +80,45 @@ const STAGES: FlagshipProductStage[] = [
     gallery: [
       {
         id: 'cl-1',
-        url: 'https://res.cloudinary.com/m9tniguf/image/upload/v1787467940/10-studio-floating.png.png',
+        url: '/images/care-cleanser-1-hero-marble.svg',
         label: 'Studio Front',
         tag: 'Hero Bottle',
       },
       {
         id: 'cl-2',
-        url: 'https://res.cloudinary.com/m9tniguf/image/upload/v1787467940/01-hero-front.png.png',
-        label: 'Sunlit Marble',
-        tag: 'Lifestyle',
+        url: '/images/care-cleanser-2-studio-isolated.svg',
+        label: 'Studio Cutout',
+        tag: 'Packaging',
       },
       {
         id: 'cl-3',
-        url: 'https://res.cloudinary.com/m9tniguf/image/upload/v1787467940/03-gel-texture-swatch.png.png',
+        url: '/images/care-cleanser-3-lifestyle-vanity.svg',
+        label: 'Vanity Setup',
+        tag: 'Lifestyle',
+      },
+      {
+        id: 'cl-4',
+        url: '/images/care-cleanser-texture.svg',
         label: 'Gel Swatch',
         tag: 'Texture',
       },
       {
-        id: 'cl-4',
-        url: 'https://res.cloudinary.com/m9tniguf/image/upload/v1787467940/04-ingredients-label.png.png',
-        label: 'Formula Macro',
-        tag: 'Ingredients',
-      },
-      {
         id: 'cl-5',
-        url: 'https://res.cloudinary.com/m9tniguf/image/upload/v1787467940/05-pump-nozzle-macro.png.png',
+        url: '/images/care-cleanser-5-pump-closeup.svg',
         label: 'Pump Detail',
         tag: 'Packaging',
       },
       {
         id: 'cl-6',
-        url: 'https://res.cloudinary.com/m9tniguf/image/upload/v1787467940/06-lifestyle-mirror-angle.png.png',
-        label: 'Vanity Mirror',
-        tag: 'Context',
+        url: '/images/care-cleanser-6-label-detail.svg',
+        label: 'Formula Macro',
+        tag: 'Ingredients',
       },
       {
         id: 'cl-7',
-        url: 'https://res.cloudinary.com/m9tniguf/image/upload/v1787467940/08-lifestyle-plant-shelf.png.png',
-        label: 'Botanical Shelf',
-        tag: 'Atmosphere',
+        url: '/images/care-cleanser-8-quarter-left.svg',
+        label: 'Quarter View',
+        tag: 'Product Angle',
       },
     ],
     fluidType: 'serum-ribbon',
@@ -155,14 +155,14 @@ const STAGES: FlagshipProductStage[] = [
       },
       {
         id: 'mo-2',
-        url: '/images/care-cleanser-texture.svg',
-        label: 'Cashmere Cream',
+        url: '/images/care-hydrating-moisturizer.svg',
+        label: 'Studio Detail',
         tag: 'Texture',
       },
       {
         id: 'mo-3',
-        url: '/images/care-cleanser-3-lifestyle-vanity.svg',
-        label: 'Vanity Setup',
+        url: '/images/care-hydrating-moisturizer.svg',
+        label: 'Brand Closeup',
         tag: 'Lifestyle',
       },
     ],
@@ -200,13 +200,13 @@ const STAGES: FlagshipProductStage[] = [
       },
       {
         id: 'sun-2',
-        url: '/images/care-cleanser-texture.svg',
+        url: '/images/care-ray-barrier-sunscreen.svg',
         label: 'Water-Gel Burst',
         tag: 'Texture',
       },
       {
         id: 'sun-3',
-        url: '/images/care-cleanser-1-hero-marble.svg',
+        url: '/images/care-ray-barrier-sunscreen.svg',
         label: 'Outdoor Ready',
         tag: 'Lifestyle',
       },
@@ -711,22 +711,22 @@ export const Flagship3DProductShowcase: React.FC<Flagship3DProductShowcaseProps>
           </div>
 
           {/* =====================================================================
-              SIGNATURE ROUTINE FEATURE BLOCK (USING LOCAL BRAND ASSETS)
+              BRAND-FIRST MINIMAL ROUTINE STRIP
               ===================================================================== */}
           <div className="mb-6 pointer-events-auto">
-            <div className="rounded-[28px] border border-black/5 bg-white/70 backdrop-blur-md shadow-[0_18px_40px_rgba(13,38,27,0.06)] p-4 sm:p-5">
+            <div className="rounded-[30px] border border-[#0D261B]/5 bg-[#f8f5f1] shadow-[0_10px_28px_rgba(13,38,27,0.04)] p-4 sm:p-5">
               <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
-                <div className="flex items-center gap-4 sm:gap-5">
+                <div className="flex items-center gap-4 sm:gap-5 min-w-0">
                   <img
                     src="/images/care-header-no-tagline.svg"
-                    alt="CARe Logo"
-                    className="w-36 sm:w-44 xl:w-52 h-auto object-contain"
+                    alt="CARe Brand Emblem"
+                    className="w-24 sm:w-32 xl:w-40 h-auto object-contain shrink-0"
                   />
-                  <div>
-                    <p className="text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.26em] text-[#0D261B]/55">
+                  <div className="min-w-0 border-l border-[#0D261B]/10 pl-4 sm:pl-5">
+                    <p className="text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.28em] text-[#0D261B]/55">
                       Signature routine
                     </p>
-                    <h2 className="font-syne text-xl sm:text-2xl xl:text-3xl font-black uppercase tracking-tight text-[#0D261B]">
+                    <h2 className="font-syne text-xl sm:text-2xl xl:text-[2.4rem] font-black uppercase tracking-[-0.06em] text-[#0D261B] leading-[0.95] mt-1">
                       Cleanse • Hydrate • Defend
                     </h2>
                   </div>
@@ -734,26 +734,28 @@ export const Flagship3DProductShowcase: React.FC<Flagship3DProductShowcaseProps>
 
                 <div className="flex flex-wrap items-center justify-center xl:justify-end gap-2.5 sm:gap-3">
                   {[
-                    { index: 0, name: 'Cleanser', image: '/images/care-cleanser-1-hero-marble.svg', accent: 'bg-[#EAF9C4]' },
-                    { index: 1, name: 'Moisturizer', image: '/images/care-hydrating-moisturizer.svg', accent: 'bg-[#DFF6FF]' },
-                    { index: 2, name: 'Sunscreen', image: '/images/care-ray-barrier-sunscreen.svg', accent: 'bg-[#F8E7F7]' },
+                    { index: 0, name: 'Cleanser', image: '/images/care-cleanser-1-hero-marble.svg' },
+                    { index: 1, name: 'Moisturizer', image: '/images/care-hydrating-moisturizer.svg' },
+                    { index: 2, name: 'Sunscreen', image: '/images/care-ray-barrier-sunscreen.svg' },
                   ].map((tile) => (
                     <button
                       key={tile.index}
                       type="button"
                       onClick={() => switchProductStage(tile.index)}
-                      className={`group flex items-center gap-2.5 rounded-2xl border border-black/5 ${tile.accent} px-2.5 py-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_24px_rgba(13,38,27,0.08)] cursor-pointer`}
+                      className="group flex items-center gap-2.5 rounded-2xl border border-[#0D261B]/8 bg-white px-2.5 py-2 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#0D261B]/15 hover:shadow-[0_12px_24px_rgba(13,38,27,0.05)] cursor-pointer"
                     >
-                      <img
-                        src={tile.image}
-                        alt={tile.name}
-                        className="h-12 w-12 sm:h-14 sm:w-14 object-contain rounded-xl bg-white/70 p-1.5 shadow-sm"
-                      />
+                      <div className="flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-[#f7f5f1] border border-[#0D261B]/5 overflow-hidden">
+                        <img
+                          src={tile.image}
+                          alt={tile.name}
+                          className="h-full w-full object-contain p-1"
+                        />
+                      </div>
                       <div className="text-left leading-none">
-                        <div className="text-[9px] sm:text-[10px] font-mono uppercase tracking-[0.18em] text-[#0D261B]/55">
+                        <div className="text-[8px] sm:text-[9px] font-mono uppercase tracking-[0.18em] text-[#0D261B]/55">
                           0{tile.index + 1}
                         </div>
-                        <div className="mt-1 text-[11px] sm:text-xs font-syne font-bold uppercase tracking-wide text-[#0D261B]">
+                        <div className="mt-1 text-[10px] sm:text-[11px] font-syne font-bold uppercase tracking-[0.12em] text-[#0D261B]">
                           {tile.name}
                         </div>
                       </div>
@@ -838,7 +840,7 @@ export const Flagship3DProductShowcase: React.FC<Flagship3DProductShowcaseProps>
               
               {/* Main Image Stage Box */}
               <div
-                className="relative w-full max-w-[500px] aspect-4/3 sm:aspect-square bg-white rounded-3xl p-6 sm:p-8 flex items-center justify-center border border-black/5 shadow-[0_16px_40px_rgba(13,38,27,0.06)] group transition-all duration-300 hover:shadow-[0_20px_50px_rgba(13,38,27,0.09)]"
+                className="relative w-full max-w-[500px] aspect-4/3 sm:aspect-square bg-[#f9f5f1] rounded-[28px] p-6 sm:p-8 flex items-center justify-center border border-[#0D261B]/5 shadow-[0_10px_30px_rgba(13,38,27,0.04)] group transition-all duration-300 hover:shadow-[0_14px_36px_rgba(13,38,27,0.06)]"
                 onClick={() => {
                   if (onSelectProduct && matchedProduct) {
                     onSelectProduct(matchedProduct);
