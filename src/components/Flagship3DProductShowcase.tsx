@@ -639,95 +639,90 @@ export const Flagship3DProductShowcase: React.FC<Flagship3DProductShowcaseProps>
           ======================================================================= */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 flex flex-col justify-between min-h-[720px] lg:min-h-[760px] h-full pt-8 sm:pt-10 pb-6 sm:pb-8 pointer-events-none">
           
-          {/* Top Bar: In-Showcase Stage Switcher & Audio Control */}
+          {/* Top header bar matching the luxury editorial mockup */}
           <div className="flex items-center justify-between pointer-events-auto gap-3">
-            
-            {/* Quick Product Stage Switcher Pills */}
-            <div className="flex items-center gap-1.5 sm:gap-2 p-1 rounded-full bg-white/70 backdrop-blur-md border border-black/5 shadow-xs">
+            <div className="flex items-center gap-3 min-w-0">
+              <img
+                src={headerLogo}
+                alt="CARe Brand Logo"
+                className="h-12 sm:h-14 w-auto object-contain drop-shadow-[0_8px_18px_rgba(140,106,18,0.15)]"
+              />
+            </div>
+
+            <div className="flex items-center justify-center gap-2 sm:gap-3 p-1.5 rounded-full bg-white/70 backdrop-blur-md border border-[#0D261B]/5 shadow-[0_2px_10px_rgba(13,38,27,0.03)]">
               {STAGES.map((stg) => {
                 const isCurrent = stg.stageIndex === activeStageIndex;
                 return (
                   <button
                     key={stg.id}
                     onClick={() => switchProductStage(stg.stageIndex)}
-                    className={`px-3 py-1 sm:px-4 sm:py-1.5 rounded-full text-xs font-mono font-bold tracking-wider transition-all duration-200 cursor-pointer ${
+                    className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-[10px] sm:text-[11px] font-syne font-bold tracking-[0.18em] uppercase transition-all duration-200 cursor-pointer ${
                       isCurrent
-                        ? 'bg-[#0D261B] text-white shadow-xs'
+                        ? 'bg-[#0D261B] text-white shadow-[0_6px_20px_rgba(13,38,27,0.12)]'
                         : 'text-[#0D261B]/60 hover:text-[#0D261B] hover:bg-black/5'
                     }`}
                   >
-                    {stg.navLabel}
+                    {stg.navLabel.replace(' ', ' ')}
                   </button>
                 );
               })}
             </div>
 
-            {/* Right: Stage Navigation Chevrons + Audio Toggle */}
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 bg-white/70 backdrop-blur-md p-1 rounded-full border border-black/5 shadow-xs">
-                <button
-                  onClick={handlePrevStage}
-                  className="p-1.5 hover:bg-black/5 rounded-full text-[#0D261B] transition cursor-pointer"
-                  title="Previous Product"
-                  aria-label="Previous Product"
-                >
-                  <ChevronLeft className="w-3.5 h-3.5" />
-                </button>
-                <span className="text-[11px] font-mono font-bold px-1 text-[#0D261B]/80">
-                  {activeStageIndex + 1}/3
-                </span>
-                <button
-                  onClick={handleNextStage}
-                  className="p-1.5 hover:bg-black/5 rounded-full text-[#0D261B] transition cursor-pointer"
-                  title="Next Product"
-                  aria-label="Next Product"
-                >
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-
               <button
                 onClick={() => {
                   const nextMuted = !isAudioMuted;
                   setIsAudioMuted(nextMuted);
                   asmrSynth.setMuted(nextMuted);
                 }}
-                className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-white/70 hover:bg-white text-[#0D261B] backdrop-blur-md rounded-full border border-black/5 transition shadow-xs cursor-pointer text-xs font-mono"
+                className="hidden sm:flex items-center gap-2 px-3 py-2 bg-white/70 hover:bg-white text-[#0D261B] backdrop-blur-md rounded-full border border-[#0D261B]/5 transition shadow-[0_2px_10px_rgba(13,38,27,0.02)] cursor-pointer text-[10px] sm:text-[11px] font-syne tracking-[0.18em] uppercase"
                 title={isAudioMuted ? 'Unmute Sound' : 'Mute Sound'}
                 aria-label="Toggle Sound"
               >
                 {isAudioMuted ? (
                   <>
-                    <VolumeX className="w-3.5 h-3.5 text-rose-500" />
-                    <span className="text-[11px] text-rose-500 font-medium">MUTED</span>
+                    <VolumeX className="w-3.5 h-3.5 text-[#C86D51]" />
+                    <span className="text-[#C86D51]">Muted</span>
                   </>
                 ) : (
                   <>
                     <Volume2 className="w-3.5 h-3.5 text-[#0D261B]" />
-                    <span className="text-[11px] text-[#0D261B]/70 font-medium">AUDIO ON</span>
+                    <span className="text-[#0D261B]/75">Audio On</span>
                   </>
                 )}
+              </button>
+
+              <button
+                onClick={onOpenCart}
+                className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/70 hover:bg-white border border-[#0D261B]/5 text-[#0D261B] font-syne text-[10px] sm:text-[11px] tracking-[0.18em] uppercase shadow-[0_2px_10px_rgba(13,38,27,0.02)] cursor-pointer"
+                aria-label="Open cart"
+              >
+                <ShoppingBag className="w-3.5 h-3.5" />
+                <span>Cart ({cartCount})</span>
               </button>
             </div>
           </div>
 
           {/* =====================================================================
-              BRAND-FIRST MINIMAL ROUTINE STRIP
+              PREMIUM CLINICAL ROUTINE STRIP (MATCHING REFERENCE)
               ===================================================================== */}
-          <div className="mb-6 pointer-events-auto">
-            <div className="rounded-[30px] border border-[#0D261B]/5 bg-[#f8f5f1] shadow-[0_10px_28px_rgba(13,38,27,0.04)] p-4 sm:p-5">
+          <div className="mb-6 mt-5 pointer-events-auto">
+            <div className="rounded-[30px] border border-[#0D261B]/5 bg-[#F2EEE8] shadow-[0_12px_28px_rgba(13,38,27,0.04)] px-5 py-4 sm:px-6 sm:py-5">
               <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
                 <div className="flex items-center gap-4 sm:gap-5 min-w-0">
-                  <img
-                    src={headerLogo}
-                    alt="CARe Brand Emblem"
-                    className="w-24 sm:w-32 xl:w-40 h-auto object-contain shrink-0"
-                  />
-                  <div className="min-w-0 border-l border-[#0D261B]/10 pl-4 sm:pl-5">
-                    <p className="text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.28em] text-[#0D261B]/55">
+                  <div className="flex items-center justify-center rounded-full bg-[#F7F3EE] p-3 border border-[#0D261B]/5 shadow-[inset_0_0_20px_rgba(255,255,255,0.7)]">
+                    <img
+                      src={headerLogo}
+                      alt="CARe Emblem"
+                      className="h-16 sm:h-20 xl:h-24 w-auto object-contain"
+                    />
+                  </div>
+
+                  <div className="min-w-0">
+                    <p className="text-[10px] sm:text-[11px] font-syne uppercase tracking-[0.34em] text-[#0D261B]/60">
                       Signature routine
                     </p>
-                    <h2 className="font-syne text-xl sm:text-2xl xl:text-[2.4rem] font-black uppercase tracking-[-0.06em] text-[#0D261B] leading-[0.95] mt-1">
+                    <h2 className="font-syne text-3xl sm:text-5xl xl:text-[5rem] font-black uppercase tracking-[-0.08em] text-[#0D261B] leading-[0.92] mt-2">
                       Cleanse • Hydrate • Defend
                     </h2>
                   </div>
@@ -743,17 +738,21 @@ export const Flagship3DProductShowcase: React.FC<Flagship3DProductShowcaseProps>
                       key={tile.index}
                       type="button"
                       onClick={() => switchProductStage(tile.index)}
-                      className="group flex items-center gap-2.5 rounded-2xl border border-[#0D261B]/8 bg-white px-2.5 py-2 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#0D261B]/15 hover:shadow-[0_12px_24px_rgba(13,38,27,0.05)] cursor-pointer"
+                      className={`group flex items-center gap-2.5 rounded-[20px] border px-2.5 py-2 transition-all duration-200 cursor-pointer ${
+                        activeStageIndex === tile.index
+                          ? 'border-[#0D261B]/10 bg-white shadow-[0_8px_20px_rgba(13,38,27,0.05)]'
+                          : 'border-[#0D261B]/10 bg-white/60 hover:bg-white hover:shadow-[0_8px_20px_rgba(13,38,27,0.04)]'
+                      }`}
                     >
                       <div className="flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-[#f7f5f1] border border-[#0D261B]/5 overflow-hidden">
                         <img
                           src={tile.image}
                           alt={tile.name}
-                          className="h-full w-full object-contain p-1"
+                          className="h-full w-full object-contain p-1.5"
                         />
                       </div>
                       <div className="text-left leading-none">
-                        <div className="text-[8px] sm:text-[9px] font-mono uppercase tracking-[0.18em] text-[#0D261B]/55">
+                        <div className="text-[8px] sm:text-[9px] font-syne uppercase tracking-[0.24em] text-[#0D261B]/55">
                           0{tile.index + 1}
                         </div>
                         <div className="mt-1 text-[10px] sm:text-[11px] font-syne font-bold uppercase tracking-[0.12em] text-[#0D261B]">
