@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
+import { LuxuryClinicalHero } from './components/LuxuryClinicalHero';
+import { HeroFormulationsGrid } from './components/HeroFormulationsGrid';
+import { SensoryBioLabHub } from './components/SensoryBioLabHub';
+import { ClinicalEvidenceSection } from './components/ClinicalEvidenceSection';
 import { Flagship3DProductShowcase } from './components/Flagship3DProductShowcase';
 import { CyberBentoHero } from './components/CyberBentoHero';
 import { ProductCard } from './components/ProductCard';
@@ -446,17 +450,51 @@ export default function App() {
             onOpenProductDetail={p => navigateTo(`/product/${p.slug}`)}
           />
         ) : (
-          /* Home View: High-Energy, Premium Light-Mode 3D Interactive Showcase Built Exclusively for Flagship Products */
-          <Flagship3DProductShowcase
-            products={products}
-            activeStageIndexProp={activeStageIndex}
-            onStageChange={setActiveStageIndex}
-            onAddToCart={handleAddToCart}
-            onBuyNow={handleBuyNow}
-            onSelectProduct={p => navigateTo(`/product/${p.slug}`)}
-            onOpenCart={() => setIsCartOpen(true)}
-            cartCount={totalCartItems}
-          />
+          /* Home View: Ultra-Modern Luxury Clinical Skincare Experience */
+          <div className="space-y-0">
+            {/* 1. Hero Section: Luxury Water Curves, Gold Cap Moisturizer, Serif Typography */}
+            <LuxuryClinicalHero
+              moisturizerProduct={
+                products.find(p => p.slug.includes('moisturizer') || p.id.includes('moisturizer')) || products[0]
+              }
+              onAddToCart={handleAddToCart}
+              onBuyNow={handleBuyNow}
+              onExploreLabClick={() => {
+                const el = document.getElementById('interactive-biolab-hub');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              onViewProductDetail={p => navigateTo(`/product/${p.slug}`)}
+            />
+
+            {/* 2. Product Grid: 3-Column Hero Formulations (Cleanser, Moisturizer, Sunscreen) */}
+            <HeroFormulationsGrid
+              products={products}
+              onAddToCart={handleAddToCart}
+              onBuyNow={handleBuyNow}
+              onOpenQuickView={p => setQuickViewProduct(p)}
+              onOpenProductDetail={p => navigateTo(`/product/${p.slug}`)}
+            />
+
+            {/* 3. Interactive Lab Component: 3D Sensory Bio-Lab & Texture Simulation Hub */}
+            <SensoryBioLabHub
+              products={products}
+              onAddToCart={handleAddToCart}
+              onOpenProductDetail={p => navigateTo(`/product/${p.slug}`)}
+            />
+
+            {/* 4. Clinical Evidence & Dermatological Proof Section */}
+            <ClinicalEvidenceSection />
+
+            {/* 5. Customer Engagement & Verified Reviews */}
+            <CustomerEngagementHub
+              products={products}
+              onAddToCart={handleAddToCart}
+              onOpenQuickView={p => setQuickViewProduct(p)}
+              onOpenProductDetail={p => navigateTo(`/product/${p.slug}`)}
+              onAddReview={handleAddReview}
+              reviews={reviews}
+            />
+          </div>
         )}
       </main>
 
