@@ -1,4 +1,6 @@
 import React from 'react';
+import headerLogo from '../../images/Header logo.png';
+import fullLogo from '../../images/Full_LOGO.png';
 
 export interface CareBrandLogoProps {
   className?: string;
@@ -36,7 +38,7 @@ export const CareBrandLogo: React.FC<CareBrandLogoProps> = ({
     return (
       <div className={`flex flex-col items-center justify-center text-center select-none ${className}`}>
         <img
-          src="/images/care-header-no-tagline.svg"
+          src={headerLogo}
           alt="CARe Brand Logo (Header Version No Tagline)"
           className={`${widthClass} h-auto select-none pointer-events-none drop-shadow-[0_6px_20px_rgba(140,106,18,0.16)]`}
         />
@@ -60,7 +62,7 @@ export const CareBrandLogo: React.FC<CareBrandLogoProps> = ({
         className={`flex flex-col items-center justify-center text-center select-none p-4 sm:p-6 transition-all duration-300 ${className}`}
       >
         <img
-          src="/images/care-official-gold-logo.svg"
+          src={fullLogo}
           alt="CARe A Beauty Solution Master Official Logo"
           className={`${widthClass} h-auto select-none pointer-events-none filter drop-shadow-[0_8px_24px_rgba(140,106,18,0.18)] transition-transform duration-300 hover:scale-[1.01]`}
         />

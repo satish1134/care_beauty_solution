@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState, useMemo, useCallback } from 'react';
 import * as THREE from 'three';
+import headerLogo from '../../images/Header logo.png';
 import {
   ShoppingBag,
   Sparkles,
@@ -718,7 +719,7 @@ export const Flagship3DProductShowcase: React.FC<Flagship3DProductShowcaseProps>
               <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
                 <div className="flex items-center gap-4 sm:gap-5 min-w-0">
                   <img
-                    src="/images/care-header-no-tagline.svg"
+                    src={headerLogo}
                     alt="CARe Brand Emblem"
                     className="w-24 sm:w-32 xl:w-40 h-auto object-contain shrink-0"
                   />
