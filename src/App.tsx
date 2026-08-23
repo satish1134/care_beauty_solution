@@ -595,19 +595,30 @@ export default function App() {
           });
           fetchBackendData();
         }}
-        userPhone={user?.phone || null}
+        userPhone={user?.phone || localStorage.getItem('care_user_phone') || null}
+        userEmail={user?.email || localStorage.getItem('care_user_email') || null}
+        userName={user?.fullName || localStorage.getItem('care_user_name') || null}
       />
 
       {/* User Orders & Profile Modal */}
       <UserOrdersModal
         isOpen={isOrdersOpen}
         onClose={() => setIsOrdersOpen(false)}
-        orders={orders.filter(o =>
-          user?.phone ? o.customerPhone.includes(user.phone.slice(-6)) : true
-        )}
-        phone={user?.phone || '9876543210'}
-        email={user?.email || 'ananya.sharma@example.com'}
-        fullName={user?.fullName || 'Care Customer'}
+        orders={orders.filter(o => {
+          const effectivePhone = user?.phone || localStorage.getItem('care_user_phone');
+          return effectivePhone ? o.customerPhone.includes(effectivePhone.slice(-6)) : true;
+        })}
+        phone={user?.phone || localStorage.getItem('care_user_phone') || ''}
+        email={user?.email || localStorage.getItem('care_user_email') || ''}
+        fullName={user?.fullName || localStorage.getItem('care_user_name') || ''}
+        onUpdateProfile={data => {
+          setUser(prev => ({
+            ...prev,
+            fullName: data.fullName,
+            email: data.email,
+            phone: data.phone,
+          }));
+        }}
         onOpenAddresses={() => setIsAddressesOpen(true)}
       />
 

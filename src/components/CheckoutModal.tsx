@@ -11,7 +11,9 @@ interface CheckoutModalProps {
   appliedCoupon: string | null;
   onClearCart: () => void;
   onOrderPlaced: (order: Order) => void;
-  userPhone: string | null;
+  userPhone?: string | null;
+  userEmail?: string | null;
+  userName?: string | null;
 }
 
 export const CheckoutModal: React.FC<CheckoutModalProps> = ({
@@ -23,22 +25,43 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   onClearCart,
   onOrderPlaced,
   userPhone,
+  userEmail,
+  userName,
 }) => {
   if (!isOpen) return null;
 
+  const getInitialName = () => userName || localStorage.getItem('care_user_name') || '';
+  const getInitialPhone = () => userPhone || localStorage.getItem('care_user_phone') || '';
+  const getInitialEmail = () => userEmail || localStorage.getItem('care_user_email') || '';
+
   // Checkout Mode: Guest vs Registered
-  const [checkoutMode, setCheckoutMode] = useState<'GUEST' | 'REGISTERED'>(userPhone ? 'REGISTERED' : 'GUEST');
+  const [checkoutMode, setCheckoutMode] = useState<'GUEST' | 'REGISTERED'>(() => {
+    return (userPhone || localStorage.getItem('care_user_phone') || localStorage.getItem('care_access_token')) ? 'REGISTERED' : 'GUEST';
+  });
 
   // Address Form State
-  const [fullName, setFullName] = useState('Ananya Sharma');
-  const [phone, setPhone] = useState(userPhone || '9876543210');
-  const [email, setEmail] = useState('ananya.sharma@example.com');
-  const [addressLine1, setAddressLine1] = useState('Flat 402, Sunshine Heights');
-  const [addressLine2, setAddressLine2] = useState('100 Feet Road, Indiranagar');
-  const [landmark, setLandmark] = useState('Near Metro Pillar 84');
-  const [pincode, setPincode] = useState('560038');
-  const [city, setCity] = useState('Bengaluru');
-  const [state, setState] = useState('Karnataka');
+  const [fullName, setFullName] = useState(getInitialName);
+  const [phone, setPhone] = useState(getInitialPhone);
+  const [email, setEmail] = useState(getInitialEmail);
+  const [addressLine1, setAddressLine1] = useState('');
+  const [addressLine2, setAddressLine2] = useState('');
+  const [landmark, setLandmark] = useState('');
+  const [pincode, setPincode] = useState('');
+  const [city, setCity] = useState('');
+  const [state, setState] = useState('');
+
+  // Sync on modal open
+  React.useEffect(() => {
+    if (isOpen) {
+      const activeName = getInitialName();
+      const activePhone = getInitialPhone();
+      const activeEmail = getInitialEmail();
+      if (activeName) setFullName(activeName);
+      if (activePhone) setPhone(activePhone);
+      if (activeEmail) setEmail(activeEmail);
+      if (activePhone || activeEmail) setCheckoutMode('REGISTERED');
+    }
+  }, [isOpen, userName, userPhone, userEmail]);
 
   // Payment State
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('RAZORPAY');

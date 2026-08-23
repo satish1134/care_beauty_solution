@@ -6,9 +6,10 @@ interface UserOrdersModalProps {
   isOpen: boolean;
   onClose: () => void;
   orders: Order[];
-  phone: string;
+  phone?: string;
   email?: string;
   fullName?: string;
+  onUpdateProfile?: (data: { fullName: string; email: string; phone: string }) => void;
   onOpenAddresses?: () => void;
 }
 
@@ -26,20 +27,61 @@ export const UserOrdersModal: React.FC<UserOrdersModalProps> = ({
   onClose,
   orders,
   phone,
-  email = 'ananya.sharma@example.com',
-  fullName = 'Care Customer',
+  email,
+  fullName,
+  onUpdateProfile,
   onOpenAddresses,
 }) => {
   const [activeTab, setActiveTab] = useState<'PROFILE' | 'ORDERS' | 'BENEFITS'>('PROFILE');
   const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [userName, setUserName] = useState(fullName);
-  const [userEmail, setUserEmail] = useState(email);
-  const [userPhone, setUserPhone] = useState(phone || '9876543210');
+
+  const getEffectiveName = () => fullName || localStorage.getItem('care_user_name') || 'Care Customer';
+  const getEffectiveEmail = () => email || localStorage.getItem('care_user_email') || 'customer@carebeautysolution.com';
+  const getEffectivePhone = () => phone || localStorage.getItem('care_user_phone') || '';
+
+  const [userName, setUserName] = useState<string>(getEffectiveName);
+  const [userEmail, setUserEmail] = useState<string>(getEffectiveEmail);
+  const [userPhone, setUserPhone] = useState<string>(getEffectivePhone);
+
+  // Sync state whenever modal opens or props change
+  React.useEffect(() => {
+    if (isOpen) {
+      setUserName(getEffectiveName());
+      setUserEmail(getEffectiveEmail());
+      setUserPhone(getEffectivePhone());
+      setIsEditingProfile(false);
+    }
+  }, [isOpen, fullName, email, phone]);
+
+  const handleSaveProfile = () => {
+    if (isEditingProfile) {
+      const cleanName = userName.trim() || 'Care Customer';
+      const cleanEmail = userEmail.trim().toLowerCase();
+      const cleanPhone = userPhone.replace(/\D/g, '').slice(-10);
+
+      localStorage.setItem('care_user_name', cleanName);
+      if (cleanEmail) localStorage.setItem('care_user_email', cleanEmail);
+      if (cleanPhone) localStorage.setItem('care_user_phone', cleanPhone);
+
+      setUserName(cleanName);
+      setUserEmail(cleanEmail);
+      setUserPhone(cleanPhone);
+
+      if (onUpdateProfile) {
+        onUpdateProfile({ fullName: cleanName, email: cleanEmail, phone: cleanPhone });
+      }
+      setIsEditingProfile(false);
+    } else {
+      setIsEditingProfile(true);
+    }
+  };
 
   if (!isOpen) return null;
 
   const totalSpent = orders.reduce((acc, o) => acc + (o.totalAmount || 0), 0);
   const loyaltyPoints = Math.floor(totalSpent * 0.1);
+
+  const displayInitials = (userName || 'Care Customer').trim().charAt(0).toUpperCase() || 'C';
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-stone-950/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-6">
@@ -52,7 +94,7 @@ export const UserOrdersModal: React.FC<UserOrdersModalProps> = ({
           <div className="flex items-center justify-between relative z-10">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 rounded-2xl bg-amber-500/20 border-2 border-amber-400/50 flex items-center justify-center text-amber-300 font-serif font-bold text-2xl shadow-inner">
-                {userName.charAt(0).toUpperCase()}
+                {displayInitials}
               </div>
               <div>
                 <div className="flex items-center gap-2">
@@ -136,8 +178,8 @@ export const UserOrdersModal: React.FC<UserOrdersModalProps> = ({
                     <User className="w-4 h-4 text-amber-700" /> Personal Profile
                   </h3>
                   <button
-                    onClick={() => setIsEditingProfile(!isEditingProfile)}
-                    className="text-xs font-bold text-amber-800 hover:text-amber-950 flex items-center gap-1 bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-200 transition"
+                    onClick={handleSaveProfile}
+                    className="text-xs font-bold text-amber-800 hover:text-amber-950 flex items-center gap-1 bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-200 transition cursor-pointer"
                   >
                     {isEditingProfile ? <Save className="w-3.5 h-3.5" /> : <Edit3 className="w-3.5 h-3.5" />}
                     <span>{isEditingProfile ? 'Save Changes' : 'Edit Profile'}</span>
