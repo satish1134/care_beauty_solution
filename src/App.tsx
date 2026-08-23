@@ -14,6 +14,7 @@ import { AdminPortal } from './admin/AdminPortal';
 import { ProtectedAdminRoute } from './components/ProtectedRoute';
 import { AuthModal } from './components/AuthModal';
 import { AddressBookModal } from './components/AddressBookModal';
+import { CookieConsent } from './components/CookieConsent';
 import { Footer } from './components/Footer';
 
 import { Product, ProductVariant, Category, CartItem, Coupon, AuditLog, Order, Review, SkinConcern } from './types';
@@ -472,12 +473,12 @@ export default function App() {
 
             {/* Core Featured Formulations Section */}
             <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
-              <div className="flex flex-wrap items-end justify-between gap-4 border-b border-emerald-100 pb-4">
+              <div className="flex flex-wrap items-end justify-between gap-4 border-b border-amber-200/60 pb-4">
                 <div>
-                  <span className="text-xs font-bold uppercase tracking-widest text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full">
-                    Clinical Skincare Line
+                  <span className="text-xs font-black uppercase tracking-widest text-amber-900 bg-amber-100/70 px-3.5 py-1 rounded-full border border-amber-300">
+                    ✨ Clinical Formulations
                   </span>
-                  <h2 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900 mt-2">
+                  <h2 className="text-2xl sm:text-3xl font-serif font-black text-slate-900 mt-2">
                     {selectedCategory
                       ? categories.find(c => c.id === selectedCategory)?.name
                       : selectedSkinConcern
@@ -485,7 +486,7 @@ export default function App() {
                       : 'Featured Formulations'}
                   </h2>
                   <p className="text-xs text-slate-500 mt-1">
-                    Dermatologically tested, 100% fragrance-free, non-comedogenic formulations for Indian skin
+                    Dermatologically tested, 100% fragrance-free, soap-free pH 5.5 formulations for Indian skin
                   </p>
                 </div>
 
@@ -497,7 +498,7 @@ export default function App() {
                         setSelectedSkinConcern(null);
                         setSearchQuery('');
                       }}
-                      className="text-xs text-emerald-800 font-bold bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-full transition"
+                      className="text-xs text-amber-900 font-bold bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3.5 py-1.5 rounded-full transition cursor-pointer"
                     >
                       Reset Filters ✕
                     </button>
@@ -505,16 +506,17 @@ export default function App() {
 
                   <button
                     onClick={() => navigateTo('/catalog')}
-                    className="bg-emerald-950 text-white font-bold text-xs px-4 py-2 rounded-xl flex items-center gap-1.5 shadow-md hover:bg-emerald-900 transition"
+                    className="bg-gradient-to-r from-amber-700 via-amber-600 to-yellow-600 text-white font-extrabold text-xs px-5 py-2.5 rounded-2xl flex items-center gap-1.5 shadow-[0_3px_12px_rgba(180,83,9,0.3)] hover:opacity-95 transition cursor-pointer active:scale-95 border border-amber-400/40"
                   >
-                    View All Catalog <ArrowRight className="w-3.5 h-3.5 text-amber-300" />
+                    <span>View Full Catalog</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-yellow-200" />
                   </button>
                 </div>
               </div>
 
               {/* Product Grid */}
               {filteredProducts.length === 0 ? (
-                <div className="text-center py-16 bg-white rounded-3xl border border-slate-200 space-y-3">
+                <div className="text-center py-16 bg-white rounded-3xl border border-amber-100 space-y-3 shadow-xs">
                   <p className="text-slate-500 text-sm">No formulations matching your search criteria.</p>
                   <button
                     onClick={() => {
@@ -522,7 +524,7 @@ export default function App() {
                       setSelectedSkinConcern(null);
                       setSearchQuery('');
                     }}
-                    className="bg-emerald-950 text-white font-semibold text-xs px-4 py-2 rounded-xl"
+                    className="bg-gradient-to-r from-amber-700 to-amber-600 text-white font-bold text-xs px-4 py-2 rounded-xl cursor-pointer"
                   >
                     View All Products
                   </button>
@@ -640,6 +642,9 @@ export default function App() {
           if (userData.fullName) localStorage.setItem('care_user_name', userData.fullName);
         }}
       />
+
+      {/* GDPR & DPDP Cookie Consent & Privacy Policy Notice */}
+      <CookieConsent />
     </div>
   );
 }

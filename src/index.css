@@ -3,8 +3,8 @@
 @layer base {
   body {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-    background-color: #FFFFFF;
-    color: #1C1917;
+    background-color: #F8FAFC;
+    color: #0F172A;
     overflow-x: hidden;
   }
 
@@ -13,25 +13,61 @@
   }
 }
 
-/* Luxury White Packaging & Gold Accent Custom Utilities */
-.bg-porcelain {
-  background-color: #FFFFFF;
+/* Biotech & Clinical Luxury Glow Accents (100% Non-Pink) */
+.text-gradient-emerald {
+  background: linear-gradient(135deg, #059669 0%, #10B981 40%, #06B6D4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.bg-offwhite {
-  background-color: #FAF8F5;
+.text-gradient-cobalt {
+  background: linear-gradient(135deg, #1E40AF 0%, #2563EB 40%, #06B6D4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.text-gold-accent {
-  color: #B45309;
+.text-gradient-teal {
+  background: linear-gradient(135deg, #0F766E 0%, #14B8A6 40%, #38BDF8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.bg-gold-accent {
-  background-color: #B45309;
+.text-gradient-obsidian {
+  background: linear-gradient(135deg, #0F172A 0%, #047857 60%, #06B6D4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.border-gold-accent {
-  border-color: #D97706;
+.bg-gradient-biotech {
+  background: linear-gradient(135deg, #059669 0%, #10B981 50%, #06B6D4 100%);
+}
+
+.bg-gradient-cobalt-cyan {
+  background: linear-gradient(135deg, #1E40AF 0%, #2563EB 50%, #06B6D4 100%);
+}
+
+.bg-gradient-teal-amber {
+  background: linear-gradient(135deg, #0F766E 0%, #14B8A6 50%, #F59E0B 100%);
+}
+
+.bg-gradient-obsidian-emerald {
+  background: linear-gradient(135deg, #0F172A 0%, #065F46 50%, #0D9488 100%);
+}
+
+.shadow-glow-emerald {
+  box-shadow: 0 10px 30px -5px rgba(16, 185, 129, 0.38);
+}
+
+.shadow-glow-cobalt {
+  box-shadow: 0 10px 30px -5px rgba(37, 99, 235, 0.38);
+}
+
+.shadow-glow-cyan {
+  box-shadow: 0 10px 30px -5px rgba(6, 182, 212, 0.38);
+}
+
+.shadow-glow-teal {
+  box-shadow: 0 10px 30px -5px rgba(20, 184, 166, 0.38);
 }
 
 /* Slow spin animation for brand emblem ring */
@@ -60,6 +96,34 @@
   animation-play-state: paused;
 }
 
+/* Shimmer Light Sweep Effect */
+@keyframes shimmerSweep {
+  0% { transform: translateX(-100%) rotate(25deg); }
+  100% { transform: translateX(250%) rotate(25deg); }
+}
+
+.animate-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.animate-shimmer::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.25),
+    transparent
+  );
+  animation: shimmerSweep 4s infinite ease-in-out;
+  pointer-events: none;
+}
+
 /* Custom Scrollbars */
 .scrollbar-none::-webkit-scrollbar {
   display: none;
@@ -67,71 +131,5 @@
 .scrollbar-none {
   -ms-overflow-style: none;
   scrollbar-width: none;
-}
-
-/* Gold Glow, Entrance Animation & Scale Transform Effects for Banner CTA Buttons */
-@keyframes bannerButtonEntrance {
-  0% {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes goldRingPulse {
-  0%, 100% {
-    box-shadow: 0 0 14px rgba(217, 119, 6, 0.22), 0 0 4px rgba(245, 158, 11, 0.15), 0 0 0 0px rgba(217, 119, 6, 0);
-  }
-  15% {
-    box-shadow: 0 0 20px rgba(217, 119, 6, 0.4), 0 0 6px rgba(245, 158, 11, 0.25), 0 0 0 10px rgba(217, 119, 6, 0.35);
-  }
-  30% {
-    box-shadow: 0 0 14px rgba(217, 119, 6, 0.22), 0 0 4px rgba(245, 158, 11, 0.15), 0 0 0 16px rgba(217, 119, 6, 0);
-  }
-}
-
-@keyframes goldTextFlicker {
-  0%, 100% {
-    text-shadow: 0 0 4px rgba(245, 158, 11, 0.4), 0 0 10px rgba(217, 119, 6, 0.2);
-  }
-  25% {
-    text-shadow: 0 0 9px rgba(251, 191, 36, 0.75), 0 0 18px rgba(217, 119, 6, 0.5);
-  }
-  50% {
-    text-shadow: 0 0 2px rgba(245, 158, 11, 0.3), 0 0 6px rgba(217, 119, 6, 0.15);
-  }
-  75% {
-    text-shadow: 0 0 11px rgba(251, 191, 36, 0.85), 0 0 22px rgba(217, 119, 6, 0.6);
-  }
-}
-
-.Banner button {
-  opacity: 0;
-  animation: bannerButtonEntrance 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s ease-out forwards, goldRingPulse 3s ease-in-out 0.2s infinite;
-  background-color: #1C1917;
-  color: #B45309;
-  border-bottom: 2px solid transparent;
-  box-shadow: 0 0 14px rgba(217, 119, 6, 0.22), 0 0 4px rgba(245, 158, 11, 0.15);
-  letter-spacing: normal;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.Banner button:hover {
-  transform: scale(1.05);
-  letter-spacing: 0.05em;
-  border-bottom-color: #B45309;
-  box-shadow: 0 0 28px rgba(217, 119, 6, 0.55), 0 0 12px rgba(245, 158, 11, 0.38);
-  animation: goldTextFlicker 1.2s ease-in-out infinite, goldRingPulse 3s ease-in-out infinite;
-}
-
-.Banner button svg {
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.Banner button:hover svg {
-  transform: translateX(3px) rotate(-8deg);
 }
 
