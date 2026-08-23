@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Star, ShoppingBag, ShieldCheck, CheckCircle2, MessageSquare, Send, ChevronRight, ChevronLeft, Share2, ArrowLeft, Check, Sparkles, Maximize2, Eye } from 'lucide-react';
 import { Product, ProductVariant, Review } from '../types';
 import { ProductSlider } from './ProductSlider';
+import { getOptimizedCloudinaryUrl } from '../lib/cloudinaryClient';
 
 interface ProductDetailPageProps {
   product: Product;
@@ -144,7 +145,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
         <div className="lg:col-span-6 space-y-4">
           <div className="aspect-square bg-emerald-50/50 rounded-3xl overflow-hidden border border-emerald-100 relative group shadow-sm">
             <img
-              src={currentImage.url}
+              src={getOptimizedCloudinaryUrl(currentImage.url, { width: 1000, height: 1000, quality: 'auto', crop: 'limit' })}
               alt={currentImage.altText || product.name}
               className="w-full h-full object-cover object-center transition-all duration-500 group-hover:scale-105"
               referrerPolicy="no-referrer"
@@ -206,7 +207,12 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                   selectedImageIndex === idx ? 'border-emerald-800 shadow-md scale-105 ring-2 ring-emerald-300/50' : 'border-slate-200 opacity-70 hover:opacity-100'
                 }`}
               >
-                <img src={img.url} alt={img.altText} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                <img
+                  src={getOptimizedCloudinaryUrl(img.url, { width: 160, height: 160, quality: 'auto', crop: 'fill' })}
+                  alt={img.altText}
+                  className="w-full h-full object-cover"
+                  referrerPolicy="no-referrer"
+                />
               </button>
             ))}
           </div>

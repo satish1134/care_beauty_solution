@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Trash2, Tag, ArrowRight, ShieldCheck, ShoppingBag, Sparkles } from 'lucide-react';
 import { CartItem } from '../types';
+import { getOptimizedCloudinaryUrl } from '../lib/cloudinaryClient';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -106,8 +107,9 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 className="flex items-center gap-3 bg-slate-50/80 p-3 rounded-2xl border border-slate-200/80"
               >
                 <img
-                  src={item.productImage}
+                  src={getOptimizedCloudinaryUrl(item.productImage, { width: 160, height: 160, quality: 'auto', crop: 'fill' })}
                   alt={item.productName}
+                  referrerPolicy="no-referrer"
                   className="w-16 h-16 rounded-xl object-cover bg-white border border-slate-200"
                 />
 

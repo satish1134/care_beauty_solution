@@ -1,0 +1,174 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 160" width="100%" height="100%">
+  <defs>
+    
+    <linearGradient id="goldMaster3D" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5E3D07" />
+      <stop offset="14%" stop-color="#8C6A12" />
+      <stop offset="28%" stop-color="#C9A227" />
+      <stop offset="44%" stop-color="#FFF9DB" />
+      <stop offset="58%" stop-color="#E8C76A" />
+      <stop offset="74%" stop-color="#8C6A12" />
+      <stop offset="88%" stop-color="#FDF3BA" />
+      <stop offset="100%" stop-color="#4F2D02" />
+    </linearGradient>
+
+    <linearGradient id="goldWireGrad" x1="12%" y1="0%" x2="88%" y2="100%">
+      <stop offset="0%" stop-color="#6B4509" />
+      <stop offset="22%" stop-color="#C9A227" />
+      <stop offset="48%" stop-color="#FFF8D6" />
+      <stop offset="76%" stop-color="#8C6A12" />
+      <stop offset="100%" stop-color="#4E2901" />
+    </linearGradient>
+
+    <linearGradient id="goldSpecGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3B2001" stop-opacity="0.05" />
+      <stop offset="35%" stop-color="#FFFFFF" stop-opacity="0.95" />
+      <stop offset="70%" stop-color="#E8C76A" stop-opacity="0.4" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.95" />
+    </linearGradient>
+
+    <linearGradient id="goldRodGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4E2A01" />
+      <stop offset="20%" stop-color="#C9A227" />
+      <stop offset="46%" stop-color="#FFFFFF" />
+      <stop offset="72%" stop-color="#E8C76A" />
+      <stop offset="90%" stop-color="#8C6A12" />
+      <stop offset="100%" stop-color="#3D1D00" />
+    </linearGradient>
+
+    <filter id="softBevel" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="1.8" dy="3.2" stdDeviation="2.5" flood-color="#241200" flood-opacity="0.45" />
+      <feDropShadow dx="-0.8" dy="-0.8" stdDeviation="1" flood-color="#FFFCE6" flood-opacity="0.8" />
+    </filter>
+
+    <filter id="masterDropShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="4" stdDeviation="3.5" flood-color="#221100" flood-opacity="0.38" />
+      <feDropShadow dx="-1" dy="-1" stdDeviation="1.5" flood-color="#FFFFFF" flood-opacity="0.75" />
+    </filter>
+    
+  </defs>
+
+  <rect width="100%" height="100%" rx="16" fill="#0D261B" />
+
+  <g id="care-dark-horizontal-brand" transform="translate(18, 16)">
+    
+    <!-- Emblem -->
+    <g id="dark-emblem" transform="translate(56, 64)">
+      <g transform="scale(0.32) translate(-400, -310)">
+        <ellipse cx="401.5" cy="313" rx="175" ry="58" transform="rotate(0.00 400 310)" fill="none" stroke="#221100" stroke-width="4.5" opacity="0.32" />
+    <ellipse cx="401.5" cy="313" rx="175" ry="58" transform="rotate(18.00 400 310)" fill="none" stroke="#221100" stroke-width="4.5" opacity="0.32" />
+    <ellipse cx="401.5" cy="313" rx="175" ry="58" transform="rotate(36.00 400 310)" fill="none" stroke="#221100" stroke-width="4.5" opacity="0.32" />
+    <ellipse cx="401.5" cy="313" rx="175" ry="58" transform="rotate(54.00 400 310)" fill="none" stroke="#221100" stroke-width="4.5" opacity="0.32" />
+    <ellipse cx="401.5" cy="313" rx="175" ry="58" transform="rotate(72.00 400 310)" fill="none" stroke="#221100" stroke-width="4.5" opacity="0.32" />
+    <ellipse cx="401.5" cy="313" rx="175" ry="58" transform="rotate(90.00 400 310)" fill="none" stroke="#221100" stroke-width="4.5" opacity="0.32" />
+    <ellipse cx="401.5" cy="313" rx="175" ry="58" transform="rotate(108.00 400 310)" fill="none" stroke="#221100" stroke-width="4.5" opacity="0.32" />
+    <ellipse cx="401.5" cy="313" rx="175" ry="58" transform="rotate(126.00 400 310)" fill="none" stroke="#221100" stroke-width="4.5" opacity="0.32" />
+    <ellipse cx="401.5" cy="313" rx="175" ry="58" transform="rotate(144.00 400 310)" fill="none" stroke="#221100" stroke-width="4.5" opacity="0.32" />
+    <ellipse cx="401.5" cy="313" rx="175" ry="58" transform="rotate(162.00 400 310)" fill="none" stroke="#221100" stroke-width="4.5" opacity="0.32" />
+    <ellipse cx="401.5" cy="313" rx="175" ry="58" transform="rotate(180.00 400 310)" fill="none" stroke="#221100" stroke-width="4.5" opacity="0.32" />
+    <ellipse cx="401.5" cy="313" rx="175" ry="58" transform="rotate(198.00 400 310)" fill="none" stroke="#221100" stroke-width="4.5" opacity="0.32" />
+    <ellipse cx="401.5" cy="313" rx="175" ry="58" transform="rotate(216.00 400 310)" fill="none" stroke="#221100" stroke-width="4.5" opacity="0.32" />
+    <ellipse cx="401.5" cy="313" rx="175" ry="58" transform="rotate(234.00 400 310)" fill="none" stroke="#221100" stroke-width="4.5" opacity="0.32" />
+    <ellipse cx="401.5" cy="313" rx="175" ry="58" transform="rotate(252.00 400 310)" fill="none" stroke="#221100" stroke-width="4.5" opacity="0.32" />
+    <ellipse cx="401.5" cy="313" rx="175" ry="58" transform="rotate(270.00 400 310)" fill="none" stroke="#221100" stroke-width="4.5" opacity="0.32" />
+    <ellipse cx="401.5" cy="313" rx="175" ry="58" transform="rotate(288.00 400 310)" fill="none" stroke="#221100" stroke-width="4.5" opacity="0.32" />
+    <ellipse cx="401.5" cy="313" rx="175" ry="58" transform="rotate(306.00 400 310)" fill="none" stroke="#221100" stroke-width="4.5" opacity="0.32" />
+    <ellipse cx="401.5" cy="313" rx="175" ry="58" transform="rotate(324.00 400 310)" fill="none" stroke="#221100" stroke-width="4.5" opacity="0.32" />
+    <ellipse cx="401.5" cy="313" rx="175" ry="58" transform="rotate(342.00 400 310)" fill="none" stroke="#221100" stroke-width="4.5" opacity="0.32" />
+    <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(0.00 400 310)" fill="none" stroke="url(#goldWireGrad)" stroke-width="4.8" />
+    <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(18.00 400 310)" fill="none" stroke="url(#goldWireGrad)" stroke-width="4.8" />
+    <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(36.00 400 310)" fill="none" stroke="url(#goldWireGrad)" stroke-width="4.8" />
+    <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(54.00 400 310)" fill="none" stroke="url(#goldWireGrad)" stroke-width="4.8" />
+    <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(72.00 400 310)" fill="none" stroke="url(#goldWireGrad)" stroke-width="4.8" />
+    <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(90.00 400 310)" fill="none" stroke="url(#goldWireGrad)" stroke-width="4.8" />
+    <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(108.00 400 310)" fill="none" stroke="url(#goldWireGrad)" stroke-width="4.8" />
+    <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(126.00 400 310)" fill="none" stroke="url(#goldWireGrad)" stroke-width="4.8" />
+    <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(144.00 400 310)" fill="none" stroke="url(#goldWireGrad)" stroke-width="4.8" />
+    <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(162.00 400 310)" fill="none" stroke="url(#goldWireGrad)" stroke-width="4.8" />
+    <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(180.00 400 310)" fill="none" stroke="url(#goldWireGrad)" stroke-width="4.8" />
+    <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(198.00 400 310)" fill="none" stroke="url(#goldWireGrad)" stroke-width="4.8" />
+    <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(216.00 400 310)" fill="none" stroke="url(#goldWireGrad)" stroke-width="4.8" />
+    <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(234.00 400 310)" fill="none" stroke="url(#goldWireGrad)" stroke-width="4.8" />
+    <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(252.00 400 310)" fill="none" stroke="url(#goldWireGrad)" stroke-width="4.8" />
+    <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(270.00 400 310)" fill="none" stroke="url(#goldWireGrad)" stroke-width="4.8" />
+    <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(288.00 400 310)" fill="none" stroke="url(#goldWireGrad)" stroke-width="4.8" />
+    <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(306.00 400 310)" fill="none" stroke="url(#goldWireGrad)" stroke-width="4.8" />
+    <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(324.00 400 310)" fill="none" stroke="url(#goldWireGrad)" stroke-width="4.8" />
+    <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(342.00 400 310)" fill="none" stroke="url(#goldWireGrad)" stroke-width="4.8" />
+    <ellipse cx="399.2" cy="309.2" rx="175" ry="58" transform="rotate(0.00 400 310)" fill="none" stroke="url(#goldSpecGrad)" stroke-width="1.4" opacity="0.9" />
+    <ellipse cx="399.2" cy="309.2" rx="175" ry="58" transform="rotate(18.00 400 310)" fill="none" stroke="url(#goldSpecGrad)" stroke-width="1.4" opacity="0.9" />
+    <ellipse cx="399.2" cy="309.2" rx="175" ry="58" transform="rotate(36.00 400 310)" fill="none" stroke="url(#goldSpecGrad)" stroke-width="1.4" opacity="0.9" />
+    <ellipse cx="399.2" cy="309.2" rx="175" ry="58" transform="rotate(54.00 400 310)" fill="none" stroke="url(#goldSpecGrad)" stroke-width="1.4" opacity="0.9" />
+    <ellipse cx="399.2" cy="309.2" rx="175" ry="58" transform="rotate(72.00 400 310)" fill="none" stroke="url(#goldSpecGrad)" stroke-width="1.4" opacity="0.9" />
+    <ellipse cx="399.2" cy="309.2" rx="175" ry="58" transform="rotate(90.00 400 310)" fill="none" stroke="url(#goldSpecGrad)" stroke-width="1.4" opacity="0.9" />
+    <ellipse cx="399.2" cy="309.2" rx="175" ry="58" transform="rotate(108.00 400 310)" fill="none" stroke="url(#goldSpecGrad)" stroke-width="1.4" opacity="0.9" />
+    <ellipse cx="399.2" cy="309.2" rx="175" ry="58" transform="rotate(126.00 400 310)" fill="none" stroke="url(#goldSpecGrad)" stroke-width="1.4" opacity="0.9" />
+    <ellipse cx="399.2" cy="309.2" rx="175" ry="58" transform="rotate(144.00 400 310)" fill="none" stroke="url(#goldSpecGrad)" stroke-width="1.4" opacity="0.9" />
+    <ellipse cx="399.2" cy="309.2" rx="175" ry="58" transform="rotate(162.00 400 310)" fill="none" stroke="url(#goldSpecGrad)" stroke-width="1.4" opacity="0.9" />
+    <ellipse cx="399.2" cy="309.2" rx="175" ry="58" transform="rotate(180.00 400 310)" fill="none" stroke="url(#goldSpecGrad)" stroke-width="1.4" opacity="0.9" />
+    <ellipse cx="399.2" cy="309.2" rx="175" ry="58" transform="rotate(198.00 400 310)" fill="none" stroke="url(#goldSpecGrad)" stroke-width="1.4" opacity="0.9" />
+    <ellipse cx="399.2" cy="309.2" rx="175" ry="58" transform="rotate(216.00 400 310)" fill="none" stroke="url(#goldSpecGrad)" stroke-width="1.4" opacity="0.9" />
+    <ellipse cx="399.2" cy="309.2" rx="175" ry="58" transform="rotate(234.00 400 310)" fill="none" stroke="url(#goldSpecGrad)" stroke-width="1.4" opacity="0.9" />
+    <ellipse cx="399.2" cy="309.2" rx="175" ry="58" transform="rotate(252.00 400 310)" fill="none" stroke="url(#goldSpecGrad)" stroke-width="1.4" opacity="0.9" />
+    <ellipse cx="399.2" cy="309.2" rx="175" ry="58" transform="rotate(270.00 400 310)" fill="none" stroke="url(#goldSpecGrad)" stroke-width="1.4" opacity="0.9" />
+    <ellipse cx="399.2" cy="309.2" rx="175" ry="58" transform="rotate(288.00 400 310)" fill="none" stroke="url(#goldSpecGrad)" stroke-width="1.4" opacity="0.9" />
+    <ellipse cx="399.2" cy="309.2" rx="175" ry="58" transform="rotate(306.00 400 310)" fill="none" stroke="url(#goldSpecGrad)" stroke-width="1.4" opacity="0.9" />
+    <ellipse cx="399.2" cy="309.2" rx="175" ry="58" transform="rotate(324.00 400 310)" fill="none" stroke="url(#goldSpecGrad)" stroke-width="1.4" opacity="0.9" />
+    <ellipse cx="399.2" cy="309.2" rx="175" ry="58" transform="rotate(342.00 400 310)" fill="none" stroke="url(#goldSpecGrad)" stroke-width="1.4" opacity="0.9" />
+      </g>
+      <circle cx="0" cy="0" r="35" fill="none" stroke="url(#goldMaster3D)" stroke-width="2.4" />
+      <circle cx="0" cy="0" r="35" fill="none" stroke="url(#goldSpecGrad)" stroke-width="0.9" />
+      <rect x="-1" y="-25" width="2" height="50" rx="1" fill="url(#goldRodGrad)" stroke="url(#goldSpecGrad)" stroke-width="0.4" />
+      
+      <!-- Leaf -->
+      <g transform="translate(-19, 0) scale(0.6)">
+        <path d="M 0 -46 C -17 -26, -17 -6, 0 8 C 17 -6, 17 -26, 0 -46 Z" fill="none" stroke="url(#goldMaster3D)" stroke-width="6.5" />
+        <path d="M -6 -13 C -33 -32, -44 -9, -8 4 C -3 3, -1 -2, -6 -13 Z" fill="none" stroke="url(#goldMaster3D)" stroke-width="6" />
+        <path d="M 6 -13 C 33 -32, 44 -9, 8 4 C 3 3, 1 -2, 6 -13 Z" fill="none" stroke="url(#goldMaster3D)" stroke-width="6" />
+        <path d="M 0 8 L 0 36" stroke="url(#goldMaster3D)" stroke-width="6.2" stroke-linecap="round" />
+      </g>
+      <!-- C -->
+      <g transform="translate(19, 0) scale(0.6)">
+        <path d="M 35 -36 C 29 -45, 20 -50, 7 -50 C -19 -50 -36 -30 -36 0 C -36 30 -19 50 7 50 C 21 50 31 43 36 35 L 28 29 C 23 36 16 41 7 41 C -12 41 -24 25 -24 0 C -24 -25 -12 -41 7 -41 C 16 -41 23 -37 27 -31 Z" fill="url(#goldMaster3D)" stroke="url(#goldSpecGrad)" stroke-width="2" />
+        <circle cx="34" cy="-34" r="7.2" fill="url(#goldMaster3D)" stroke="url(#goldSpecGrad)" stroke-width="1.2" />
+        <path d="M 25 29 L 41 37 L 27 43 Z" fill="url(#goldMaster3D)" />
+      </g>
+    </g>
+
+    <!-- CARe Wordmark -->
+    <g transform="translate(122, 62)">
+      <text font-family="'Cinzel', 'Playfair Display', Georgia, serif" 
+            font-size="52" 
+            font-weight="900" 
+            letter-spacing="8" 
+            fill="url(#goldMaster3D)" 
+            stroke="url(#goldSpecGrad)" 
+            stroke-width="1.2">
+        <tspan x="0">C</tspan>
+        <tspan x="45">A</tspan>
+        <tspan x="92">R</tspan>
+        <tspan x="140" font-size="46" dy="1">e</tspan>
+      </text>
+    </g>
+
+    <!-- Flourish divider -->
+    <g transform="translate(225, 96)">
+      <line x1="-102" y1="0" x2="-18" y2="0" stroke="url(#goldMaster3D)" stroke-width="1.6" />
+      <circle cx="0" cy="0" r="2.5" fill="url(#goldMaster3D)" />
+      <line x1="18" y1="0" x2="102" y2="0" stroke="url(#goldMaster3D)" stroke-width="1.6" />
+    </g>
+
+    <!-- Tagline -->
+    <g transform="translate(225, 118)">
+      <text font-family="'Cinzel', 'Playfair Display', sans-serif" 
+            font-size="12" 
+            font-weight="700" 
+            letter-spacing="6" 
+            fill="url(#goldMaster3D)" 
+            text-anchor="middle">
+        A BEAUTY SOLUTION
+      </text>
+    </g>
+
+  </g>
+</svg>

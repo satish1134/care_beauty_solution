@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Star, ShoppingBag, ShieldCheck, CheckCircle2, MessageSquare, Send, Orbit } from 'lucide-react';
 import { Product, ProductVariant, Review } from '../types';
 import { AntiGravityProductViewer } from './AntiGravityProductViewer';
+import { getOptimizedCloudinaryUrl } from '../lib/cloudinaryClient';
 
 interface ProductDetailModalProps {
   product: Product | null;
@@ -66,8 +67,9 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
             <div className="md:col-span-6 space-y-4">
               <div className="aspect-square bg-slate-50 rounded-2xl overflow-hidden border border-slate-200 shadow-inner relative">
                 <img
-                  src={selectedImage || product.images[0]?.url}
+                  src={getOptimizedCloudinaryUrl(selectedImage || product.images[0]?.url, { width: 800, height: 800, quality: 'auto', crop: 'limit' })}
                   alt={product.name}
+                  referrerPolicy="no-referrer"
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute top-3 left-3 bg-slate-900/80 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
@@ -85,7 +87,12 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                       selectedImage === img.url ? 'border-emerald-600 shadow-md ring-2 ring-emerald-500/30' : 'border-slate-200 opacity-60 hover:opacity-100'
                     }`}
                   >
-                    <img src={img.url} alt={img.altText} className="w-full h-full object-cover" />
+                    <img
+                      src={getOptimizedCloudinaryUrl(img.url, { width: 120, height: 120, quality: 'auto', crop: 'fill' })}
+                      alt={img.altText}
+                      referrerPolicy="no-referrer"
+                      className="w-full h-full object-cover"
+                    />
                   </button>
                 ))}
               </div>
@@ -98,9 +105,9 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                   {product.categoryName}
                 </span>
 
-                <h2 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900 mt-2">
+                <h1 id="modal-product-name" className="text-2xl sm:text-3xl font-serif font-bold text-slate-900 mt-2">
                   {product.name}
-                </h2>
+                </h1>
 
                 <p className="text-sm text-slate-600 mt-1 font-normal">{product.tagline}</p>
 

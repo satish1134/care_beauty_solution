@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, ShieldCheck, Truck, Award, CheckCircle2, ChevronLeft, ChevronRight, ShoppingBag, ArrowRight, Eye, Image as ImageIcon, Droplets, Star, RefreshCw, ZoomIn, Layers } from 'lucide-react';
+import { Zap, Sparkles, ShieldCheck, Flame, Star, ShoppingBag, ArrowRight, Eye, Droplets, Image as ImageIcon, Layers, RefreshCw, CheckCircle2, ChevronLeft, ChevronRight, Activity } from 'lucide-react';
 import { Product, ProductVariant } from '../types';
 
 interface BannerProps {
@@ -15,22 +15,23 @@ export const Banner: React.FC<BannerProps> = ({ products = [], onAddToCart, onBu
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [activeViewMode, setActiveViewMode] = useState<'STUDIO' | 'FORMULA' | 'TEXTURE'>('STUDIO');
-  const [isZoomed, setIsZoomed] = useState(false);
   const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
 
-  // 3 Core Clinical Hero Formulations with Authentic Studio Angles & Dermatological Profiles
+  // 3 Core Clinical Hero Formulations
   const slides = [
     {
       id: 'prod-refreshing-skin-cleanser',
-      badge: 'FLAGSHIP FORMULATION • pH 5.5 BALANCED',
+      sticker: '⚡ 100% SOAP-FREE • pH 5.5',
+      stickerColor: 'bg-[#CCFF00] text-black',
+      viralTag: '🔥 #1 BESTSELLER',
       title: 'Soap-Free Barrier Gel Cleanser',
-      tagline: 'Pure Niacinamide & Panthenol Gentle Facial & Body Wash',
-      subtitle: 'Dermatologist-engineered soap-free clinical cleanser that deeply dissolves impurities and environmental pollutants without stripping vital epidermal lipids.',
+      tagline: '2% Niacinamide + D-Panthenol B5 Deep Epidermal Cleanser',
+      subtitle: 'Clinical high-potency barrier wash engineered to purge daily micro-pollutants and sebum without stripping your moisture barrier.',
       clinicalClaims: [
         'Soap-Free & pH 5.5 Balanced',
-        'Pure Niacinamide + Panthenol B5',
-        'Non-Comedogenic & 0% Fragrance',
-        'Preserves Natural Skin Barrier'
+        '2% Niacinamide + Panthenol B5',
+        'Zero White Foam & 0% Stripping',
+        'Acne & Sensitive Skin Safe'
       ],
       price: 499,
       originalPrice: 699,
@@ -39,10 +40,10 @@ export const Banner: React.FC<BannerProps> = ({ products = [], onAddToCart, onBu
       reviewCount: 1240,
       slug: 'refreshing-skin-cleanser',
       formulaHighlights: {
-        active: '2% Niacinamide + 1% D-Panthenol',
+        active: '2.0% Niacinamide + 1.0% D-Panthenol',
         texture: 'Crystal Clear Non-Foaming Gel',
-        skinType: 'All Skin Types (Sensitive & Acne-Prone)',
-        usage: 'Morning & Night Daily Wash'
+        skinType: 'All Skin Types (Acne & Sensitive)',
+        usage: 'AM / PM Daily Barrier Reset'
       },
       imageUrl: '/images/care-cleanser-1-hero-marble.svg',
       photoAngles: [
@@ -59,15 +60,17 @@ export const Banner: React.FC<BannerProps> = ({ products = [], onAddToCart, onBu
     },
     {
       id: 'prod-hydrating-moisturizer',
-      badge: '72-HOUR HYDRATION • 3X CERAMIDES',
+      sticker: '💧 72H HYDRATION LOCK',
+      stickerColor: 'bg-[#00F0FF] text-black',
+      viralTag: '🧪 3X CERAMIDES NP/AP/EOP',
       title: '72-Hour Ceramide Moisture Lock',
-      tagline: 'Ceramides NP/AP/EOP + Hyaluronic Acid Deep Barrier Repair',
-      subtitle: 'Clinical restorative barrier cream designed to rapidly repair dry, compromised, and sensitized skin while restoring lipid equilibrium.',
+      tagline: 'Triple Ceramide Complex + Hyaluronic Acid Lipid Shield',
+      subtitle: 'Clinical intensive recovery matrix designed to instantly soothe dry, compromised barriers and lock in high-gloss moisture.',
       clinicalClaims: [
         '3x Essential Ceramide Complex',
         'Hyaluronic Acid Moisture Magnet',
-        '0% Artificial Fragrances or Dyes',
-        'Clinically Proven 72-Hour Retention'
+        'Non-Greasy Velvet Absorption',
+        '72-Hour Continuous Hydration'
       ],
       price: 599,
       originalPrice: 799,
@@ -76,10 +79,10 @@ export const Banner: React.FC<BannerProps> = ({ products = [], onAddToCart, onBu
       reviewCount: 980,
       slug: 'hydrating-moisturizer',
       formulaHighlights: {
-        active: 'Ceramide NP/AP/EOP Complex + 2% HA',
-        texture: 'Rich Velvet Non-Greasy Cream',
-        skinType: 'Dry, Dehydrated & Damaged Barrier',
-        usage: 'Twice daily after cleansing'
+        active: 'Ceramides NP/AP/EOP + 2% HA',
+        texture: 'Ultra-Rich Velvet Barrier Cream',
+        skinType: 'Dry, Dehydrated & Damaged Skin',
+        usage: 'Twice Daily Post-Cleanse'
       },
       imageUrl: '/images/care-hydrating-moisturizer.svg',
       photoAngles: [
@@ -90,15 +93,17 @@ export const Banner: React.FC<BannerProps> = ({ products = [], onAddToCart, onBu
     },
     {
       id: 'prod-ray-barrier-sunscreen',
-      badge: 'MAXIMUM PHOTOPROTECTION • SPF 50+ PA++++',
+      sticker: '☀️ SPF 50+ PA++++ DEFENSE',
+      stickerColor: 'bg-[#FF007F] text-white',
+      viralTag: '⚡ ZERO WHITE CAST',
       title: 'Broad Spectrum SPF 50+ PA++++',
-      tagline: 'Invisible Water-Light Gel Sunscreen with Anti-Pollution Shield',
-      subtitle: 'Ultra-lightweight invisible gel sunscreen engineered for humid Indian climates. Leaves zero white cast and delivers 80-minute water resistance.',
+      tagline: 'Invisible Water-Light Gel Sunscreen + Anti-Pollution Shield',
+      subtitle: 'Ultra-lightweight invisible shield formulated for hot and humid climates. Leaves zero sticky residue and delivers 80-minute sweat resistance.',
       clinicalClaims: [
-        'PA++++ Highest UVA/UVB Defense',
-        'Zero White Cast Clear Matte Finish',
-        '80-Minute Water & Sweat Resistant',
-        'Infused with Blue Light Filters'
+        'PA++++ Highest Defense Rating',
+        'Zero White Cast Clear Finish',
+        '80-Min Sweat & Water Resistant',
+        'Blue Light & Infrared Filter'
       ],
       price: 649,
       originalPrice: 849,
@@ -107,10 +112,10 @@ export const Banner: React.FC<BannerProps> = ({ products = [], onAddToCart, onBu
       reviewCount: 1120,
       slug: 'ray-barrier-sunscreen',
       formulaHighlights: {
-        active: 'Next-Gen Photostable UV Filters',
-        texture: 'Ultra-Lightweight Invisible Gel',
+        active: 'Photostable Hybrid UV Filters',
+        texture: 'Water-Burst Clear Matte Gel',
         skinType: 'All Skin Types (Oil-Control)',
-        usage: 'Apply 15 mins before sun exposure'
+        usage: 'Apply generously 15m prior to sun'
       },
       imageUrl: '/images/care-ray-barrier-sunscreen.svg',
       photoAngles: [
@@ -135,17 +140,16 @@ export const Banner: React.FC<BannerProps> = ({ products = [], onAddToCart, onBu
     setActiveViewMode('STUDIO');
   };
 
-  // Autoplay carousel
   useEffect(() => {
-    if (!isPaused && !isZoomed) {
+    if (!isPaused) {
       autoPlayRef.current = setInterval(() => {
         nextSlide();
-      }, 8000);
+      }, 7500);
     }
     return () => {
       if (autoPlayRef.current) clearInterval(autoPlayRef.current);
     };
-  }, [isPaused, currentSlide, isZoomed]);
+  }, [isPaused, currentSlide]);
 
   const activeSlide = slides[currentSlide];
   const activeProduct = products.find(p => p.id === activeSlide.id || p.slug === activeSlide.slug) || products[0];
@@ -180,209 +184,226 @@ export const Banner: React.FC<BannerProps> = ({ products = [], onAddToCart, onBu
 
   return (
     <section
-      aria-label="Hero Showcase"
+      aria-label="Acid Beauty Cyber Showcase"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      className="relative overflow-hidden bg-gradient-to-b from-white via-amber-50/20 to-slate-50 border-b border-amber-200/50"
+      className="relative overflow-hidden bg-[#06070B] text-slate-100 py-8 lg:py-14 border-b border-white/10 bg-cyber-grid"
     >
-      {/* Subtle Warm Golden & Ambient Radial Glows */}
-      <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-gradient-to-br from-amber-200/20 via-yellow-100/15 to-transparent rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-20 left-10 w-[500px] h-[500px] bg-gradient-to-tr from-emerald-100/20 via-amber-100/10 to-transparent rounded-full blur-3xl pointer-events-none" />
+      {/* High-Energy Neon Ambient Glows */}
+      <div className="absolute top-1/4 -left-20 w-96 h-96 bg-[#CCFF00]/15 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-10 right-10 w-96 h-96 bg-[#00F0FF]/15 rounded-full blur-[130px] pointer-events-none" />
+      <div className="absolute top-10 right-1/4 w-80 h-80 bg-[#FF007F]/10 rounded-full blur-[100px] pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-14 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
-        {/* Top Announcement & Social Proof Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-200/80">
-          <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-600 via-amber-700 to-amber-900 text-amber-50 text-[11px] font-black uppercase tracking-wider shadow-[0_2px_10px_rgba(180,83,9,0.25)]">
-              <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
-              <span>CARe A BEAUTY SOLUTION</span>
+        {/* Asymmetric Cyber Header Bar with Holographic Stickers */}
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b border-white/10">
+          <div className="flex items-center gap-2.5 flex-wrap">
+            {/* Sticker Pill 1 */}
+            <span className="sticker-tag bg-[#CCFF00] text-black text-[11px] px-3.5 py-1 rotate-[-2deg]">
+              <Zap className="w-3.5 h-3.5 fill-black" />
+              <span>ACID BEAUTY PROTOCOL</span>
             </span>
-            <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-700 font-semibold bg-white/90 px-3 py-1 rounded-full border border-amber-200 shadow-xs">
-              <ShieldCheck className="w-4 h-4 text-amber-700" />
-              <span>Dermatologist Formulated for Indian Skin</span>
-            </div>
+
+            {/* Sticker Pill 2 */}
+            <span className="sticker-tag bg-[#00F0FF] text-black text-[11px] px-3 py-1 rotate-[1deg] hidden sm:inline-flex">
+              <Sparkles className="w-3.5 h-3.5 fill-black" />
+              <span>CLINICAL ZERO-G LAB</span>
+            </span>
+
+            {/* Live Lab Batch Status */}
+            <span className="flex items-center gap-1.5 text-xs text-slate-300 font-mono bg-white/5 border border-white/10 px-3 py-1 rounded-full">
+              <span className="w-2 h-2 rounded-full bg-[#CCFF00] animate-ping" />
+              <span>LAB BATCH: FRESH 2026-AUG</span>
+            </span>
           </div>
 
-          {/* Social Proof Star Rating */}
-          <div className="flex items-center gap-2 bg-white/90 px-3.5 py-1 rounded-full border border-slate-200 shadow-xs text-xs">
-            <div className="flex items-center text-amber-500">
+          {/* Social Proof Counter */}
+          <div className="flex items-center gap-2 bg-[#121624] px-4 py-1.5 rounded-2xl border border-white/15 shadow-neon-lime text-xs">
+            <div className="flex items-center text-[#FFE600]">
               {[1, 2, 3, 4, 5].map(star => (
-                <Star key={star} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                <Star key={star} className="w-3.5 h-3.5 fill-[#FFE600] text-[#FFE600]" />
               ))}
             </div>
-            <span className="font-bold text-slate-900">{activeSlide.rating}</span>
-            <span className="text-slate-500 font-medium">({activeSlide.reviewCount.toLocaleString()} Verified Reviews)</span>
+            <span className="font-black text-white">{activeSlide.rating}</span>
+            <span className="text-slate-400 font-medium">({activeSlide.reviewCount.toLocaleString()} Verified Drops)</span>
           </div>
         </div>
 
-        {/* Main 2-Column Editorial Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+        {/* Main Asymmetric 2-Column Cyber Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
           
-          {/* Left Column: Semantic H1, Clinical Copy, Pricing, Instant CTAs */}
-          <div className="lg:col-span-6 space-y-6">
+          {/* Left Column: Neon Typography, Clinical Specs, Pricing & Actions */}
+          <div className="lg:col-span-7 space-y-6">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentSlide}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -12 }}
-                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.35, ease: 'easeOut' }}
                 className="space-y-5"
               >
-                {/* Clinical Badge */}
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-black uppercase tracking-widest text-amber-900 bg-amber-100/80 px-3 py-1 rounded-md border border-amber-300/80">
-                    {activeSlide.badge}
+                {/* Floating Sticker Tags */}
+                <div className="flex items-center gap-2.5 flex-wrap">
+                  <span className={`sticker-tag ${activeSlide.stickerColor} text-xs px-3.5 py-1 rotate-[-1deg]`}>
+                    {activeSlide.sticker}
                   </span>
-                  <span className="text-xs font-mono font-bold text-slate-500">
-                    Slide 0{currentSlide + 1} of 0{totalSlides}
+                  <span className="sticker-tag bg-white text-black text-xs px-3 py-1 rotate-[2deg]">
+                    {activeSlide.viralTag}
+                  </span>
+                  <span className="text-xs font-mono font-bold text-[#CCFF00] bg-black/60 px-2.5 py-1 rounded-md border border-[#CCFF00]/40">
+                    SLIDE 0{currentSlide + 1} / 0{totalSlides}
                   </span>
                 </div>
 
-                {/* Primary Semantic H1 Heading */}
-                <h1 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-serif font-black tracking-tight leading-[1.12] text-slate-950">
+                {/* Primary Semantic H1 Heading with Cyber-Glow */}
+                <h1 className="text-3xl sm:text-5xl lg:text-[3.25rem] font-black tracking-tight leading-[1.08] text-white">
                   {activeSlide.title}
                 </h1>
 
-                {/* Tagline & Descriptive Subtitle */}
-                <p className="text-sm sm:text-base font-semibold text-amber-950/80">
+                {/* Tagline & Subtitle */}
+                <p className="text-base sm:text-lg font-bold text-[#00F0FF]">
                   {activeSlide.tagline}
                 </p>
-                <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
+                <p className="text-slate-300 text-sm sm:text-base leading-relaxed max-w-2xl">
                   {activeSlide.subtitle}
                 </p>
 
-                {/* Clinical Guarantee Badges */}
+                {/* Clinical Proof Matrix with Tactile Claymorphic Chips */}
                 <div className="grid grid-cols-2 gap-2.5 pt-1">
                   {activeSlide.clinicalClaims.map((claim, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center gap-2 bg-white/95 px-3 py-2 rounded-xl border border-slate-200/90 shadow-xs text-xs font-medium text-slate-800"
+                      className="flex items-center gap-2 bg-[#121624] px-3.5 py-2.5 rounded-2xl border border-white/10 shadow-inner text-xs font-bold text-slate-200"
                     >
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-[#CCFF00] shrink-0" />
                       <span className="truncate">{claim}</span>
                     </div>
                   ))}
                 </div>
 
-                {/* Transparent Visible Pricing Box */}
+                {/* Claymorphic Cyber Pricing Container */}
                 <div className="pt-2">
-                  <div className="bg-white p-4 rounded-2xl border border-amber-300/80 shadow-sm flex flex-wrap items-center justify-between gap-4">
+                  <div className="clay-card p-4 sm:p-5 border border-white/15 flex flex-wrap items-center justify-between gap-4">
                     <div>
-                      <div className="flex items-baseline gap-2.5">
-                        <span className="text-3xl font-serif font-black text-slate-950">
+                      <div className="flex items-baseline gap-3">
+                        <span className="text-3xl sm:text-4xl font-black text-white tracking-tight">
                           ₹{activeSlide.price}
                         </span>
-                        <span className="text-sm text-slate-400 line-through font-medium">
-                          MRP: ₹{activeSlide.originalPrice}
+                        <span className="text-base text-slate-400 line-through font-mono">
+                          ₹{activeSlide.originalPrice}
                         </span>
-                        <span className="text-xs font-black text-amber-900 bg-amber-100 px-2.5 py-0.5 rounded-full uppercase border border-amber-300">
-                          Save {activeSlide.discount}
+                        <span className="sticker-tag bg-[#CCFF00] text-black text-[11px] px-2.5 py-0.5 rotate-[-2deg]">
+                          SAVE {activeSlide.discount}
                         </span>
                       </div>
-                      <p className="text-[11px] text-emerald-700 font-semibold mt-1">
-                        ✓ Inclusive of all taxes • Free express doorstep delivery
+                      <p className="text-xs text-[#00F0FF] font-mono mt-1 font-semibold">
+                        ✓ All Taxes Included • Free Express Courier
                       </p>
                     </div>
 
-                    {/* Stock status */}
-                    <div className="text-right">
-                      <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                        In Stock (Fresh Lab Batch)
+                    {/* Stock status indicator */}
+                    <div className="flex items-center gap-2 bg-black/60 px-3.5 py-1.5 rounded-xl border border-[#CCFF00]/40">
+                      <Activity className="w-4 h-4 text-[#CCFF00] animate-pulse" />
+                      <span className="text-xs font-mono font-bold text-slate-200">
+                        In Stock (Ships Today)
                       </span>
                     </div>
                   </div>
                 </div>
 
-                {/* Conversion Action Buttons */}
-                <div className="flex flex-wrap items-center gap-3 pt-2">
-                  {/* BUY NOW Button */}
+                {/* High-Energy Tactile CTA Buttons */}
+                <div className="flex flex-wrap items-center gap-3.5 pt-2">
+                  {/* BUY NOW Button (Claymorphic Lime Button) */}
                   <button
                     onClick={handleBuyNow}
-                    className="flex-1 sm:flex-initial px-8 py-3.5 rounded-2xl bg-gradient-to-r from-amber-700 via-amber-600 to-amber-800 hover:from-amber-600 hover:to-amber-700 text-white font-serif font-black text-sm tracking-wide shadow-[0_4px_18px_rgba(180,83,9,0.35)] transition-all transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                    className="flex-1 sm:flex-initial px-8 py-4 rounded-2xl clay-button-lime text-black font-black text-sm uppercase tracking-wider shadow-neon-lime transition-all transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
                   >
-                    <ShoppingBag className="w-4 h-4 text-amber-200" />
-                    <span>BUY NOW — ₹{activeSlide.price}</span>
+                    <Zap className="w-4 h-4 fill-black" />
+                    <span>INSTANT BUY — ₹{activeSlide.price}</span>
                   </button>
 
-                  {/* ADD TO BAG Button */}
+                  {/* ADD TO BAG Button (Claymorphic Cyan Button) */}
                   <button
                     onClick={handleAddToCart}
-                    className="px-6 py-3.5 rounded-2xl bg-slate-900 hover:bg-black text-amber-100 font-bold text-sm border border-slate-800 shadow-md transition-all transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                    className="px-6 py-4 rounded-2xl clay-button-cyan text-black font-black text-sm uppercase tracking-wider shadow-neon-cyan transition-all transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
                   >
-                    <span>+ Add to Bag</span>
+                    <ShoppingBag className="w-4 h-4 fill-black" />
+                    <span>+ DROP IN BAG</span>
                   </button>
 
-                  {/* EXPLORE DETAILS Button */}
+                  {/* EXPLORE Button */}
                   <button
                     onClick={handleExplore}
-                    className="px-4 py-3.5 rounded-2xl bg-white hover:bg-slate-100 text-slate-800 font-semibold text-xs border border-slate-200 shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                    className="px-4 py-4 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                   >
-                    <span>View Product Details</span>
-                    <ArrowRight className="w-3.5 h-3.5 text-amber-700" />
+                    <span>Full Specs</span>
+                    <ArrowRight className="w-4 h-4 text-[#CCFF00]" />
                   </button>
                 </div>
               </motion.div>
             </AnimatePresence>
           </div>
 
-          {/* Right Column: High-Definition Multi-Angle Studio Showcase */}
-          <div className="lg:col-span-6 flex flex-col items-center">
+          {/* Right Column: Glassmorphic 3D Showcase & Multi-Angle Controller */}
+          <div className="lg:col-span-5 flex flex-col items-center">
             
-            {/* View Mode Switcher (Studio Multi-Angle vs Clinical Formula vs Texture Swatch) */}
-            <div className="w-full max-w-lg mb-3 flex items-center justify-between">
-              <div className="bg-white/90 p-1 rounded-xl border border-slate-200 shadow-xs flex items-center gap-1">
+            {/* View Mode Pill Selector */}
+            <div className="w-full max-w-md mb-3 flex items-center justify-between">
+              <div className="bg-[#121624] p-1 rounded-2xl border border-white/15 flex items-center gap-1">
                 <button
                   onClick={() => setActiveViewMode('STUDIO')}
-                  className={`px-3 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-black uppercase transition flex items-center gap-1.5 cursor-pointer ${
                     activeViewMode === 'STUDIO'
-                      ? 'bg-slate-900 text-white shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                      ? 'bg-[#CCFF00] text-black shadow-neon-lime'
+                      : 'text-slate-400 hover:text-white'
                   }`}
                 >
-                  <ImageIcon className="w-3.5 h-3.5 text-amber-400" />
-                  <span>360° Studio Photos</span>
+                  <ImageIcon className="w-3.5 h-3.5" />
+                  <span>360° Studio</span>
                 </button>
 
                 <button
                   onClick={() => setActiveViewMode('FORMULA')}
-                  className={`px-3 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-black uppercase transition flex items-center gap-1.5 cursor-pointer ${
                     activeViewMode === 'FORMULA'
-                      ? 'bg-slate-900 text-white shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                      ? 'bg-[#00F0FF] text-black shadow-neon-cyan'
+                      : 'text-slate-400 hover:text-white'
                   }`}
                 >
-                  <Layers className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Formula Breakdown</span>
+                  <Layers className="w-3.5 h-3.5" />
+                  <span>Formula</span>
                 </button>
 
                 <button
                   onClick={() => setActiveViewMode('TEXTURE')}
-                  className={`px-3 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-black uppercase transition flex items-center gap-1.5 cursor-pointer ${
                     activeViewMode === 'TEXTURE'
-                      ? 'bg-slate-900 text-white shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                      ? 'bg-[#FF007F] text-white shadow-neon-pink'
+                      : 'text-slate-400 hover:text-white'
                   }`}
                 >
-                  <Droplets className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Texture Swatch</span>
+                  <Droplets className="w-3.5 h-3.5" />
+                  <span>Texture</span>
                 </button>
               </div>
 
-              <div className="text-[11px] font-mono text-slate-500 font-semibold hidden sm:block">
-                {activeSlide.photoAngles ? `${activeSlide.photoAngles.length} Angle Views` : 'Studio View'}
-              </div>
+              <span className="text-[11px] font-mono text-[#00F0FF] font-bold">
+                {activeSlide.photoAngles?.length || 1} ANGLES
+              </span>
             </div>
 
-            {/* Main Stage Card */}
-            <div className="w-full max-w-lg relative bg-white rounded-3xl p-4 sm:p-6 border border-slate-200/90 shadow-xl overflow-hidden">
+            {/* Main Stage Glassmorphic Container with Neon Glares */}
+            <div className="w-full max-w-md relative glass-cyber-glow rounded-3xl p-5 border border-white/20 shadow-2xl overflow-hidden">
               
-              {/* Studio Mode View */}
+              {/* Top Cyber Accent Lines */}
+              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#CCFF00] via-[#00F0FF] to-[#FF007F]" />
+
+              {/* STUDIO MODE */}
               {activeViewMode === 'STUDIO' && (
                 <div className="space-y-4">
-                  <div className="relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-b from-slate-50 via-white to-amber-50/30 flex items-center justify-center p-4 border border-slate-100 group">
+                  <div className="relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-b from-[#151928] via-[#0e121d] to-[#090b12] flex items-center justify-center p-4 border border-white/10 group">
                     <img
                       src={currentDisplayImage}
                       alt={activeSlide.title}
@@ -390,37 +411,37 @@ export const Banner: React.FC<BannerProps> = ({ products = [], onAddToCart, onBu
                       referrerPolicy="no-referrer"
                     />
 
-                    {/* Floating Angle Seal */}
-                    <div className="absolute top-3 left-3 bg-slate-950/80 backdrop-blur text-amber-200 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm border border-white/10">
-                      📷 {activeSlide.photoAngles && activeSlide.photoAngles[activePhotoIndex] ? activeSlide.photoAngles[activePhotoIndex].title : 'Studio Front'}
+                    {/* Floating Holographic Badge */}
+                    <div className="absolute top-3 left-3 bg-black/80 backdrop-blur text-[#CCFF00] text-[10px] font-mono font-bold px-3 py-1 rounded-full uppercase border border-[#CCFF00]/40">
+                      📷 {activeSlide.photoAngles?.[activePhotoIndex]?.title || 'Hero View'}
                     </div>
 
-                    {/* Quick View Button */}
+                    {/* Full Specs Button */}
                     <button
                       onClick={handleExplore}
-                      className="absolute bottom-3 right-3 bg-white/95 backdrop-blur hover:bg-slate-900 hover:text-white text-slate-900 text-xs font-bold px-3.5 py-2 rounded-xl shadow-md border border-slate-200 transition-all flex items-center gap-1.5 cursor-pointer"
+                      className="absolute bottom-3 right-3 bg-black/80 backdrop-blur hover:bg-[#CCFF00] hover:text-black text-white text-xs font-bold px-3.5 py-1.5 rounded-xl border border-white/20 transition-all flex items-center gap-1.5 cursor-pointer"
                     >
-                      <Eye className="w-3.5 h-3.5 text-amber-700" />
-                      <span>Full Specs</span>
+                      <Eye className="w-3.5 h-3.5 text-[#00F0FF]" />
+                      <span>Inspect</span>
                     </button>
                   </div>
 
-                  {/* Multi-Angle Interactive Thumbnails Carousel Strip */}
+                  {/* Multi-Angle Interactive Thumbnails Strip */}
                   {activeSlide.photoAngles && activeSlide.photoAngles.length > 1 && (
                     <div className="space-y-1.5">
-                      <div className="flex items-center justify-between text-[11px] font-bold text-slate-600">
-                        <span className="uppercase tracking-wider">Select Photoshoot Angle:</span>
-                        <span className="text-amber-800">{activeSlide.photoAngles[activePhotoIndex]?.label}</span>
+                      <div className="flex items-center justify-between text-[11px] font-mono text-slate-300">
+                        <span className="uppercase tracking-wider font-bold">Select Angle:</span>
+                        <span className="text-[#CCFF00]">{activeSlide.photoAngles[activePhotoIndex]?.label}</span>
                       </div>
                       <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
                         {activeSlide.photoAngles.map((angle, idx) => (
                           <button
                             key={idx}
                             onClick={() => setActivePhotoIndex(idx)}
-                            className={`w-12 h-12 rounded-xl overflow-hidden border-2 transition-all shrink-0 p-0.5 bg-slate-50 cursor-pointer ${
+                            className={`w-12 h-12 rounded-xl overflow-hidden border-2 transition-all shrink-0 p-0.5 bg-[#090B12] cursor-pointer ${
                               activePhotoIndex === idx
-                                ? 'border-amber-700 ring-2 ring-amber-500/30 scale-105 shadow-md'
-                                : 'border-slate-200 opacity-60 hover:opacity-100 hover:border-slate-400'
+                                ? 'border-[#CCFF00] ring-2 ring-[#CCFF00]/40 scale-105 shadow-neon-lime'
+                                : 'border-white/10 opacity-50 hover:opacity-100 hover:border-white/40'
                             }`}
                             title={angle.title}
                           >
@@ -433,71 +454,71 @@ export const Banner: React.FC<BannerProps> = ({ products = [], onAddToCart, onBu
                 </div>
               )}
 
-              {/* Clinical Formula Mode View */}
+              {/* FORMULA MODE */}
               {activeViewMode === 'FORMULA' && (
-                <div className="aspect-square flex flex-col justify-between p-4 bg-slate-900 text-white rounded-2xl space-y-4">
-                  <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                    <span className="text-xs font-bold text-amber-400 uppercase tracking-widest">
-                      🔬 Lab Formulation Analysis
+                <div className="aspect-square flex flex-col justify-between p-4 bg-[#090C16] text-white rounded-2xl space-y-4 border border-white/10">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+                    <span className="text-xs font-black text-[#00F0FF] uppercase tracking-wider flex items-center gap-1.5">
+                      <Layers className="w-4 h-4" /> Actives Breakdown
                     </span>
-                    <span className="text-[10px] font-mono text-emerald-400">
-                      ISO 9001:2026 Verified
+                    <span className="text-[10px] font-mono text-[#CCFF00] bg-[#CCFF00]/10 px-2 py-0.5 rounded border border-[#CCFF00]/30">
+                      ISO 9001:2026
                     </span>
                   </div>
 
-                  <div className="space-y-3 text-xs">
-                    <div className="bg-slate-800/80 p-3 rounded-xl border border-slate-700">
-                      <p className="text-slate-400 text-[10px] uppercase font-bold">Key Active Concentration:</p>
-                      <p className="font-bold text-amber-300 text-sm mt-0.5">{activeSlide.formulaHighlights.active}</p>
+                  <div className="space-y-2.5 text-xs font-mono">
+                    <div className="bg-white/5 p-3 rounded-xl border border-white/10">
+                      <p className="text-slate-400 text-[10px] uppercase font-bold">Concentration Target:</p>
+                      <p className="font-bold text-[#CCFF00] text-sm mt-0.5">{activeSlide.formulaHighlights.active}</p>
                     </div>
 
-                    <div className="bg-slate-800/80 p-3 rounded-xl border border-slate-700">
-                      <p className="text-slate-400 text-[10px] uppercase font-bold">Galenic Formula Texture:</p>
+                    <div className="bg-white/5 p-3 rounded-xl border border-white/10">
+                      <p className="text-slate-400 text-[10px] uppercase font-bold">Galenic Matrix:</p>
                       <p className="font-semibold text-slate-200 mt-0.5">{activeSlide.formulaHighlights.texture}</p>
                     </div>
 
-                    <div className="bg-slate-800/80 p-3 rounded-xl border border-slate-700">
-                      <p className="text-slate-400 text-[10px] uppercase font-bold">Target Epidermal Profile:</p>
+                    <div className="bg-white/5 p-3 rounded-xl border border-white/10">
+                      <p className="text-slate-400 text-[10px] uppercase font-bold">Target Epidermal Barrier:</p>
                       <p className="font-semibold text-slate-200 mt-0.5">{activeSlide.formulaHighlights.skinType}</p>
                     </div>
                   </div>
 
                   <button
                     onClick={() => setActiveViewMode('STUDIO')}
-                    className="w-full py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold text-xs transition text-center cursor-pointer"
+                    className="w-full py-2.5 rounded-xl bg-[#00F0FF] text-black font-black text-xs uppercase transition text-center cursor-pointer shadow-neon-cyan"
                   >
-                    Back to 360° Studio Photography
+                    Back to 360° Studio
                   </button>
                 </div>
               )}
 
-              {/* Texture Swatch Mode View */}
+              {/* TEXTURE MODE */}
               {activeViewMode === 'TEXTURE' && (
-                <div className="aspect-square flex flex-col justify-between p-4 bg-gradient-to-b from-amber-50 to-white rounded-2xl border border-amber-200 space-y-4">
-                  <div className="flex items-center justify-between border-b border-amber-200/80 pb-2">
-                    <span className="text-xs font-bold text-amber-900 uppercase tracking-widest">
-                      💧 Sensorial Gel / Cream Texture
+                <div className="aspect-square flex flex-col justify-between p-4 bg-[#090C16] rounded-2xl border border-white/10 space-y-3">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                    <span className="text-xs font-black text-[#FF007F] uppercase tracking-wider flex items-center gap-1.5">
+                      <Droplets className="w-4 h-4" /> Sensorial Texture Macro
                     </span>
-                    <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                      Lightweight & Non-Sticky
+                    <span className="text-[10px] font-bold text-white bg-[#FF007F]/20 px-2 py-0.5 rounded border border-[#FF007F]/40">
+                      Non-Comedogenic
                     </span>
                   </div>
 
                   <div className="flex-1 flex items-center justify-center p-2">
                     <img
-                      src={activeSlide.photoAngles && activeSlide.photoAngles.find(a => a.label.includes('Texture') || a.label.includes('Swatch'))?.url || activeSlide.imageUrl}
+                      src={activeSlide.photoAngles?.find(a => a.label.includes('Texture') || a.label.includes('Swatch'))?.url || activeSlide.imageUrl}
                       alt="Texture Swatch"
-                      className="max-h-48 object-contain rounded-xl shadow-md border border-amber-100"
+                      className="max-h-44 object-contain rounded-xl shadow-neon-pink border border-white/20"
                     />
                   </div>
 
-                  <p className="text-xs text-slate-600 text-center font-medium">
-                    Fast-absorbing, non-comedogenic texture formulated specifically for tropical & humid climates.
+                  <p className="text-xs text-slate-300 text-center font-mono">
+                    Zero white-cast, rapid penetration matrix designed for tropical climates.
                   </p>
 
                   <button
                     onClick={() => setActiveViewMode('STUDIO')}
-                    className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-black text-amber-100 font-bold text-xs transition text-center cursor-pointer"
+                    className="w-full py-2.5 rounded-xl bg-[#FF007F] text-white font-black text-xs uppercase transition text-center cursor-pointer shadow-neon-pink"
                   >
                     Return to Product View
                   </button>
@@ -505,8 +526,8 @@ export const Banner: React.FC<BannerProps> = ({ products = [], onAddToCart, onBu
               )}
             </div>
 
-            {/* 3 Core Product Quick Select Cards (Cleanser, Moisturizer, Sunscreen) */}
-            <div className="w-full max-w-lg grid grid-cols-3 gap-2.5 mt-4">
+            {/* Quick Product Select Chips */}
+            <div className="w-full max-w-md grid grid-cols-3 gap-2 mt-4">
               {slides.map((slide, idx) => (
                 <button
                   key={slide.id}
@@ -515,23 +536,23 @@ export const Banner: React.FC<BannerProps> = ({ products = [], onAddToCart, onBu
                     setActivePhotoIndex(0);
                     setActiveViewMode('STUDIO');
                   }}
-                  className={`p-2.5 rounded-2xl border text-left transition-all flex items-center gap-2 cursor-pointer ${
+                  className={`p-2 rounded-2xl border text-left transition-all flex items-center gap-2 cursor-pointer ${
                     currentSlide === idx
-                      ? 'bg-white border-amber-600 shadow-[0_4px_16px_rgba(180,83,9,0.2)] ring-2 ring-amber-500/40 scale-[1.02]'
-                      : 'bg-white/80 border-slate-200 text-slate-600 hover:bg-amber-50/50'
+                      ? 'bg-[#181D2F] border-[#CCFF00] shadow-neon-lime ring-1 ring-[#CCFF00] scale-[1.02]'
+                      : 'bg-[#0E121E] border-white/10 text-slate-400 hover:bg-[#151928]'
                   }`}
                 >
                   <img
                     src={slide.imageUrl}
                     alt={slide.title}
-                    className="w-9 h-9 object-cover rounded-xl shrink-0 border border-slate-200"
+                    className="w-8 h-8 object-cover rounded-lg shrink-0 border border-white/10"
                     referrerPolicy="no-referrer"
                   />
                   <div className="overflow-hidden">
-                    <p className={`text-[9px] font-bold uppercase tracking-wider truncate ${currentSlide === idx ? 'text-amber-800 font-black' : 'text-slate-500'}`}>
+                    <p className={`text-[9px] font-mono font-bold uppercase truncate ${currentSlide === idx ? 'text-[#CCFF00]' : 'text-slate-400'}`}>
                       0{idx + 1} {slide.title.split(' ')[0]}
                     </p>
-                    <p className="text-[11px] font-serif font-black text-slate-900 truncate">
+                    <p className="text-[11px] font-black text-white truncate">
                       ₹{slide.price}
                     </p>
                   </div>
@@ -541,55 +562,55 @@ export const Banner: React.FC<BannerProps> = ({ products = [], onAddToCart, onBu
           </div>
         </div>
 
-        {/* Slide Arrows */}
+        {/* Slide Carousel Navigation Arrows */}
         <div className="absolute top-1/2 -translate-y-1/2 left-2 lg:left-4 z-20">
           <button
             onClick={prevSlide}
-            className="p-3 rounded-full bg-white/95 text-slate-800 hover:bg-amber-50 border border-slate-200 shadow-lg transition active:scale-90 cursor-pointer"
-            aria-label="Previous Clinical Formulation"
+            className="p-3 rounded-full bg-black/80 text-white hover:bg-[#CCFF00] hover:text-black border border-white/20 transition active:scale-90 cursor-pointer shadow-lg"
+            aria-label="Previous Formulation"
           >
-            <ChevronLeft className="w-5 h-5 text-slate-800" />
+            <ChevronLeft className="w-5 h-5" />
           </button>
         </div>
         <div className="absolute top-1/2 -translate-y-1/2 right-2 lg:right-4 z-20">
           <button
             onClick={nextSlide}
-            className="p-3 rounded-full bg-white/95 text-slate-800 hover:bg-amber-50 border border-slate-200 shadow-lg transition active:scale-90 cursor-pointer"
-            aria-label="Next Clinical Formulation"
+            className="p-3 rounded-full bg-black/80 text-white hover:bg-[#CCFF00] hover:text-black border border-white/20 transition active:scale-90 cursor-pointer shadow-lg"
+            aria-label="Next Formulation"
           >
-            <ChevronRight className="w-5 h-5 text-slate-800" />
+            <ChevronRight className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Bottom Trust & Authenticity Badges */}
-        <div className="mt-10 pt-6 border-t border-slate-200/80 grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-white/95 p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-xl bg-amber-100 border border-amber-300 flex items-center justify-center shrink-0">
-              <ShieldCheck className="w-6 h-6 text-amber-800" />
+        {/* Bottom Acid Beauty Trust Ribbon */}
+        <div className="mt-10 pt-6 border-t border-white/10 grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="clay-card p-4 flex items-center gap-3.5 border border-white/10">
+            <div className="w-11 h-11 rounded-2xl bg-[#CCFF00]/10 border border-[#CCFF00]/30 flex items-center justify-center shrink-0">
+              <Zap className="w-6 h-6 text-[#CCFF00]" />
             </div>
             <div>
-              <h3 className="text-xs font-bold text-slate-900">100% Authentic Clinical Skincare</h3>
-              <p className="text-[11px] text-slate-500">Freshly manufactured in certified laboratory.</p>
+              <h3 className="text-xs font-black text-white uppercase tracking-wider">100% Bio-Active Formulations</h3>
+              <p className="text-[11px] text-slate-400 font-mono">0% Sulfates, 0% Parabens, 0% Artificial Fillers.</p>
             </div>
           </div>
 
-          <div className="bg-white/95 p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-xl bg-emerald-100 border border-emerald-300 flex items-center justify-center shrink-0">
-              <Truck className="w-6 h-6 text-emerald-800" />
+          <div className="clay-card p-4 flex items-center gap-3.5 border border-white/10">
+            <div className="w-11 h-11 rounded-2xl bg-[#00F0FF]/10 border border-[#00F0FF]/30 flex items-center justify-center shrink-0">
+              <ShieldCheck className="w-6 h-6 text-[#00F0FF]" />
             </div>
             <div>
-              <h3 className="text-xs font-bold text-slate-900">Free Express Shipping in India</h3>
-              <p className="text-[11px] text-slate-500">Fast 2-4 day dispatch with real-time tracking.</p>
+              <h3 className="text-xs font-black text-white uppercase tracking-wider">Derm Tested for Indian Skin</h3>
+              <p className="text-[11px] text-slate-400 font-mono">Clinically trialed under tropical humidity.</p>
             </div>
           </div>
 
-          <div className="bg-white/95 p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-xl bg-cyan-100 border border-cyan-300 flex items-center justify-center shrink-0">
-              <Award className="w-6 h-6 text-cyan-800" />
+          <div className="clay-card p-4 flex items-center gap-3.5 border border-white/10">
+            <div className="w-11 h-11 rounded-2xl bg-[#FF007F]/10 border border-[#FF007F]/30 flex items-center justify-center shrink-0">
+              <Flame className="w-6 h-6 text-[#FF007F]" />
             </div>
             <div>
-              <h3 className="text-xs font-bold text-slate-900">Dermatologist Recommended</h3>
-              <p className="text-[11px] text-slate-500">Formulated with 0% parabens, 0% sulfates.</p>
+              <h3 className="text-xs font-black text-white uppercase tracking-wider">Fast 2-4 Day Pan-India Dispatch</h3>
+              <p className="text-[11px] text-slate-400 font-mono">Real-time SMS &amp; WhatsApp order tracking.</p>
             </div>
           </div>
         </div>

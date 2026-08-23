@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
-import { Banner } from './components/Banner';
+import { Flagship3DProductShowcase } from './components/Flagship3DProductShowcase';
+import { CyberBentoHero } from './components/CyberBentoHero';
 import { ProductCard } from './components/ProductCard';
 import { ProductDetailModal } from './components/ProductDetailModal';
 import { ProductListingPage } from './components/ProductListingPage';
@@ -97,6 +98,9 @@ export default function App() {
   });
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
   const [discountAmount, setDiscountAmount] = useState<number>(0);
+
+  // Active Stage for Flagship Showcase (0: Cleanser, 1: Moisturizer, 2: Sunscreen)
+  const [activeStageIndex, setActiveStageIndex] = useState<number>(0);
 
   // User Auth State
   const [user, setUser] = useState<{
@@ -400,34 +404,21 @@ export default function App() {
 
   // CUSTOMER STOREFRONT VIEW (Clean, No Admin controls shown)
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col selection:bg-amber-300 selection:text-emerald-950">
-      {/* Customer Header Navbar */}
+    <div className="min-h-screen bg-[#FAFAFA] text-[#0D261B] flex flex-col selection:bg-[#C86D51] selection:text-white">
+      {/* Hyper-Minimal Luxury Navigation Bar */}
       <Navbar
-        categories={categories}
-        selectedCategory={selectedCategory}
-        onSelectCategory={catId => {
-          setSelectedCategory(catId);
-          if (currentPath !== '/') navigateTo('/');
-        }}
-        selectedSkinConcern={selectedSkinConcern}
-        onSelectSkinConcern={concern => {
-          setSelectedSkinConcern(concern);
-          if (currentPath !== '/') navigateTo('/');
-        }}
-        searchQuery={searchQuery}
-        onSearchChange={q => setSearchQuery(q)}
         cartCount={totalCartItems}
         onOpenCart={() => setIsCartOpen(true)}
-        onOpenAuth={() => setIsAuthOpen(true)}
-        onOpenOrders={() => setIsOrdersOpen(true)}
-        onOpenAddresses={() => setIsAddressesOpen(true)}
-        userPhone={user?.phone || null}
-        userEmail={user?.email || null}
-        userName={user?.fullName || null}
-        onLogout={handleLogout}
+        activeStageIndex={activeStageIndex}
+        onSelectStage={setActiveStageIndex}
       />
 
-      <main className="flex-1">
+      <main id="main-content" className="flex-1">
+        {/* Primary Screen Reader & SEO Title */}
+        <h1 id="storefront-primary-heading" className="sr-only">
+          CARe Beauty Solution — Flagship 3D Skincare Formulations
+        </h1>
+
         {/* Render PDP route if on /product/:slug */}
         {activePdpProduct ? (
           <ProductDetailPage
@@ -455,95 +446,17 @@ export default function App() {
             onOpenProductDetail={p => navigateTo(`/product/${p.slug}`)}
           />
         ) : (
-          /* Home View: Hero Banner + Interactive Customer Engagement Hub + Full PLP Catalog Grid */
-          <div>
-            <Banner
-              products={products}
-              onAddToCart={handleAddToCart}
-              onBuyNow={handleBuyNow}
-              onSelectProduct={p => navigateTo(`/product/${p.slug}`)}
-            />
-
-            {/* Interactive Clinical Customer Engagement Hub */}
-            <CustomerEngagementHub
-              products={products}
-              onAddToCart={handleAddToCart}
-              onSelectProduct={p => navigateTo(`/product/${p.slug}`)}
-            />
-
-            {/* Core Featured Formulations Section */}
-            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
-              <div className="flex flex-wrap items-end justify-between gap-4 border-b border-amber-200/60 pb-4">
-                <div>
-                  <span className="text-xs font-black uppercase tracking-widest text-amber-900 bg-amber-100/70 px-3.5 py-1 rounded-full border border-amber-300">
-                    ✨ Clinical Formulations
-                  </span>
-                  <h2 className="text-2xl sm:text-3xl font-serif font-black text-slate-900 mt-2">
-                    {selectedCategory
-                      ? categories.find(c => c.id === selectedCategory)?.name
-                      : selectedSkinConcern
-                      ? `Formulations for ${selectedSkinConcern}`
-                      : 'Featured Formulations'}
-                  </h2>
-                  <p className="text-xs text-slate-500 mt-1">
-                    Dermatologically tested, 100% fragrance-free, soap-free pH 5.5 formulations for Indian skin
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  {(selectedCategory || selectedSkinConcern || searchQuery) && (
-                    <button
-                      onClick={() => {
-                        setSelectedCategory(null);
-                        setSelectedSkinConcern(null);
-                        setSearchQuery('');
-                      }}
-                      className="text-xs text-amber-900 font-bold bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3.5 py-1.5 rounded-full transition cursor-pointer"
-                    >
-                      Reset Filters ✕
-                    </button>
-                  )}
-
-                  <button
-                    onClick={() => navigateTo('/catalog')}
-                    className="bg-gradient-to-r from-amber-700 via-amber-600 to-yellow-600 text-white font-extrabold text-xs px-5 py-2.5 rounded-2xl flex items-center gap-1.5 shadow-[0_3px_12px_rgba(180,83,9,0.3)] hover:opacity-95 transition cursor-pointer active:scale-95 border border-amber-400/40"
-                  >
-                    <span>View Full Catalog</span>
-                    <ArrowRight className="w-3.5 h-3.5 text-yellow-200" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Product Grid */}
-              {filteredProducts.length === 0 ? (
-                <div className="text-center py-16 bg-white rounded-3xl border border-amber-100 space-y-3 shadow-xs">
-                  <p className="text-slate-500 text-sm">No formulations matching your search criteria.</p>
-                  <button
-                    onClick={() => {
-                      setSelectedCategory(null);
-                      setSelectedSkinConcern(null);
-                      setSearchQuery('');
-                    }}
-                    className="bg-gradient-to-r from-amber-700 to-amber-600 text-white font-bold text-xs px-4 py-2 rounded-xl cursor-pointer"
-                  >
-                    View All Products
-                  </button>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {filteredProducts.map(product => (
-                    <ProductCard
-                      key={product.id}
-                      product={product}
-                      onAddToCart={handleAddToCart}
-                      onBuyNow={handleBuyNow}
-                      onOpenQuickView={p => navigateTo(`/product/${p.slug}`)}
-                    />
-                  ))}
-                </div>
-              )}
-            </section>
-          </div>
+          /* Home View: High-Energy, Premium Light-Mode 3D Interactive Showcase Built Exclusively for Flagship Products */
+          <Flagship3DProductShowcase
+            products={products}
+            activeStageIndexProp={activeStageIndex}
+            onStageChange={setActiveStageIndex}
+            onAddToCart={handleAddToCart}
+            onBuyNow={handleBuyNow}
+            onSelectProduct={p => navigateTo(`/product/${p.slug}`)}
+            onOpenCart={() => setIsCartOpen(true)}
+            cartCount={totalCartItems}
+          />
         )}
       </main>
 

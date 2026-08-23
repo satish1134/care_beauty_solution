@@ -71,7 +71,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
       >
         <div>
           <div className="flex items-center gap-2">
-            <h2 className={`text-2xl font-bold font-serif ${textPrimary}`}>Executive Command Center</h2>
+            <h1 id="admin-dashboard-title" className={`text-2xl font-bold font-serif ${textPrimary}`}>Executive Command Center</h1>
             <span className="bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 text-xs font-mono px-2.5 py-0.5 rounded-full font-bold">
               LIVE SYSTEM
             </span>

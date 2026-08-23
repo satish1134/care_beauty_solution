@@ -135,14 +135,14 @@ export const ProductListingPage: React.FC<ProductListingPageProps> = ({
   const skinTypesList: SkinType[] = ['All Skin Types', 'Dry', 'Oily', 'Sensitive', 'Combination'];
 
   return (
-    <div id="product-listing-page" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <div id="catalog-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 scroll-mt-24">
       {/* Editorial Header Banner */}
       <div className="bg-gradient-to-r from-emerald-950 via-teal-950 to-emerald-950 text-white rounded-3xl p-8 sm:p-12 shadow-2xl relative overflow-hidden border border-emerald-800/80">
         <div className="relative z-10 max-w-2xl space-y-3">
           <span className="bg-amber-400 text-emerald-950 text-[10px] font-bold uppercase tracking-widest px-3.5 py-1 rounded-full inline-block shadow-md border border-amber-200">
             Dermatological Catalog
           </span>
-          <h1 className="text-3xl sm:text-5xl font-serif font-bold tracking-tight text-emerald-50">
+          <h1 id="catalog-heading" className="text-3xl sm:text-5xl font-serif font-bold tracking-tight text-emerald-50">
             Clinical Active Skincare Formulations
           </h1>
           <p className="text-emerald-100 text-sm sm:text-base leading-relaxed font-light">
@@ -155,7 +155,7 @@ export const ProductListingPage: React.FC<ProductListingPageProps> = ({
       {/* Main Grid Layout: Desktop Sidebar + Catalog Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Desktop Sidebar Filters */}
-        <aside className="hidden lg:block lg:col-span-1 space-y-6 bg-white p-6 rounded-3xl border border-stone-200/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] h-fit sticky top-28">
+        <aside id="catalog-filters-sidebar" aria-label="Product Catalog Filters" className="hidden lg:block lg:col-span-1 space-y-6 bg-white p-6 rounded-3xl border border-stone-200/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] h-fit sticky top-28">
           <div className="flex items-center justify-between pb-4 border-b border-stone-200">
             <h2 className="text-sm font-serif font-bold text-stone-900 flex items-center gap-2">
               <Filter className="w-4 h-4 text-emerald-800" />
@@ -173,7 +173,7 @@ export const ProductListingPage: React.FC<ProductListingPageProps> = ({
 
           {/* Search Filter */}
           <div className="space-y-2">
-            <label className="text-[10px] font-bold text-stone-500 uppercase tracking-widest">Search Actives</label>
+            <h3 id="heading-filter-search" className="text-[10px] font-bold text-stone-500 uppercase tracking-widest">Search Actives</h3>
             <div className="relative">
               <Search className="w-4 h-4 text-stone-400 absolute left-3 top-2.5" />
               <input
@@ -188,7 +188,7 @@ export const ProductListingPage: React.FC<ProductListingPageProps> = ({
 
           {/* Category Filter */}
           <div className="space-y-2">
-            <label className="text-[10px] font-bold text-stone-500 uppercase tracking-widest">Category</label>
+            <h3 id="heading-filter-category" className="text-[10px] font-bold text-stone-500 uppercase tracking-widest">Category</h3>
             <div className="space-y-1">
               <button
                 onClick={() => onSelectCategory(null)}
@@ -219,7 +219,7 @@ export const ProductListingPage: React.FC<ProductListingPageProps> = ({
 
           {/* Skin Concern Filter */}
           <div className="space-y-2">
-            <label className="text-[10px] font-bold text-stone-500 uppercase tracking-widest">Skin Concern</label>
+            <h3 id="heading-filter-concern" className="text-[10px] font-bold text-stone-500 uppercase tracking-widest">Skin Concern</h3>
             <div className="flex flex-wrap gap-1.5">
               {skinConcernsList.map(concern => (
                 <button
@@ -239,7 +239,7 @@ export const ProductListingPage: React.FC<ProductListingPageProps> = ({
 
           {/* Skin Type Filter */}
           <div className="space-y-2">
-            <label className="text-[10px] font-bold text-stone-500 uppercase tracking-widest">Skin Type</label>
+            <h3 id="heading-filter-skintype" className="text-[10px] font-bold text-stone-500 uppercase tracking-widest">Skin Type</h3>
             <div className="flex flex-wrap gap-1.5">
               {skinTypesList.map(st => (
                 <button
@@ -260,7 +260,7 @@ export const ProductListingPage: React.FC<ProductListingPageProps> = ({
           {/* Price Range Slider */}
           <div className="space-y-2 pt-2 border-t border-stone-100">
             <div className="flex justify-between items-center text-xs font-bold text-stone-700">
-              <span className="uppercase tracking-widest text-[10px] text-stone-500">Max Price</span>
+              <h3 id="heading-filter-price" className="uppercase tracking-widest text-[10px] text-stone-500 font-bold">Max Price</h3>
               <span className="text-emerald-950 font-extrabold text-sm">₹{priceRange[1]}</span>
             </div>
             <input

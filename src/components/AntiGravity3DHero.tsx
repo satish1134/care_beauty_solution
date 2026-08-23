@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
-import { Sparkles, Compass, Eye, Maximize2, RotateCcw, Zap, Flame, Shield, Droplets } from 'lucide-react';
+import { Zap, Sparkles, Compass, Eye, RotateCcw, Droplets, Activity, Layers, Flame } from 'lucide-react';
 import { Product } from '../types';
 
 interface AntiGravity3DHeroProps {
@@ -13,10 +13,9 @@ export const AntiGravity3DHero: React.FC<AntiGravity3DHeroProps> = ({
   onExploreProduct,
 }) => {
   const mountRef = useRef<HTMLDivElement>(null);
-  const [activeTheme, setActiveTheme] = useState<'BIOTECH' | 'CYAN' | 'SOLAR' | 'ARCTIC'>('BIOTECH');
+  const [activeTheme, setActiveTheme] = useState<'ACID_LIME' | 'CYBER_CYAN' | 'HYPER_PINK' | 'SOLAR_GOLD'>('ACID_LIME');
   const [isRotating, setIsRotating] = useState(true);
-  const [gravityMode, setGravityMode] = useState<'ZERO_G' | 'PULSE' | 'ORBIT'>('ZERO_G');
-  const [fpsReady, setFpsReady] = useState(false);
+  const [gravityMode, setGravityMode] = useState<'ZERO_G' | 'WARP' | 'PULSE'>('ZERO_G');
 
   const sceneRef = useRef<{
     scene: THREE.Scene;
@@ -24,11 +23,13 @@ export const AntiGravity3DHero: React.FC<AntiGravity3DHeroProps> = ({
     renderer: THREE.WebGLRenderer;
     mainBottleGroup: THREE.Group;
     dropletsGroup: THREE.Group;
+    quantumRings: THREE.Group;
     particles: THREE.Points;
     lights: {
       ambient: THREE.AmbientLight;
-      pointGold: THREE.PointLight;
-      pointTeal: THREE.PointLight;
+      pointLime: THREE.PointLight;
+      pointCyan: THREE.PointLight;
+      pointPink: THREE.PointLight;
       directional: THREE.DirectionalLight;
     };
     clock: THREE.Clock;
@@ -44,12 +45,12 @@ export const AntiGravity3DHero: React.FC<AntiGravity3DHeroProps> = ({
     const width = container.clientWidth || 550;
     const height = container.clientHeight || 450;
 
-    // 1. Scene & Camera Setup
+    // 1. Scene & Camera
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
     camera.position.set(0, 0, 8.5);
 
-    // 2. WebGL Renderer with High Precision & Alpha
+    // 2. WebGL Renderer
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
       alpha: true,
@@ -58,262 +59,227 @@ export const AntiGravity3DHero: React.FC<AntiGravity3DHeroProps> = ({
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.3;
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMappingExposure = 1.4;
 
     container.replaceChildren(renderer.domElement);
 
-    // 3. Dynamic Studio Lights
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
+    // 3. Cyber Studio Lights
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.4);
     scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xfffaed, 2.5);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 2.5);
     directionalLight.position.set(5, 8, 5);
-    directionalLight.castShadow = true;
     scene.add(directionalLight);
 
-    const pointGold = new THREE.PointLight(0xf59e0b, 3.5, 20);
-    pointGold.position.set(-4, 3, 4);
-    scene.add(pointGold);
+    const pointLime = new THREE.PointLight(0xccff00, 4.5, 25);
+    pointLime.position.set(-4, 3, 4);
+    scene.add(pointLime);
 
-    const pointTeal = new THREE.PointLight(0x06b6d4, 2.5, 20);
-    pointTeal.position.set(4, -3, 3);
-    scene.add(pointTeal);
+    const pointCyan = new THREE.PointLight(0x00f0ff, 4.0, 25);
+    pointCyan.position.set(4, -3, 3);
+    scene.add(pointCyan);
 
-    // 4. Create Luxury 3D Cosmetic Bottle Group
+    const pointPink = new THREE.PointLight(0xff007f, 3.5, 20);
+    pointPink.position.set(0, 5, -3);
+    scene.add(pointPink);
+
+    // 4. Main 3D Cosmetic Bottle Group
     const mainBottleGroup = new THREE.Group();
     scene.add(mainBottleGroup);
 
-    // Bottle Body (Cylinder with Frosted Glass look)
+    // Frosted Glass Bottle Body
     const bodyGeometry = new THREE.CylinderGeometry(1.05, 1.05, 3.2, 48);
     const bodyMaterial = new THREE.MeshPhysicalMaterial({
-      color: 0xfbfbf9,
-      transparent: true,
-      opacity: 0.88,
-      roughness: 0.15,
-      metalness: 0.05,
-      transmission: 0.6,
-      ior: 1.5,
-      clearcoat: 0.9,
-      clearcoatRoughness: 0.1,
-    });
-    const bottleBody = new THREE.Mesh(bodyGeometry, bodyMaterial);
-    bottleBody.position.y = 0;
-    bottleBody.castShadow = true;
-    mainBottleGroup.add(bottleBody);
-
-    // Inner Serum Fluid
-    const fluidGeometry = new THREE.CylinderGeometry(0.96, 0.96, 2.9, 32);
-    const fluidMaterial = new THREE.MeshStandardMaterial({
-      color: 0xfef08a,
-      roughness: 0.2,
-      metalness: 0.1,
-      transparent: true,
-      opacity: 0.7,
-    });
-    const bottleFluid = new THREE.Mesh(fluidGeometry, fluidMaterial);
-    bottleFluid.position.y = -0.1;
-    mainBottleGroup.add(bottleFluid);
-
-    // Bottle Shoulder & Neck
-    const shoulderGeometry = new THREE.ConeGeometry(1.05, 0.5, 48);
-    const shoulderMaterial = new THREE.MeshStandardMaterial({
-      color: 0xfefefe,
-      metalness: 0.1,
-      roughness: 0.2,
-    });
-    const shoulder = new THREE.Mesh(shoulderGeometry, shoulderMaterial);
-    shoulder.position.y = 1.85;
-    mainBottleGroup.add(shoulder);
-
-    const neckGeometry = new THREE.CylinderGeometry(0.45, 0.45, 0.6, 32);
-    const neckMaterial = new THREE.MeshStandardMaterial({
-      color: 0xe5e7eb,
-      metalness: 0.8,
-      roughness: 0.2,
-    });
-    const neck = new THREE.Mesh(neckGeometry, neckMaterial);
-    neck.position.y = 2.15;
-    mainBottleGroup.add(neck);
-
-    // Luxury Gold Pump Dispenser
-    const pumpCapGeometry = new THREE.CylinderGeometry(0.5, 0.5, 0.45, 32);
-    const goldCapMaterial = new THREE.MeshStandardMaterial({
-      color: 0xd97706,
-      metalness: 0.9,
-      roughness: 0.15,
-    });
-    const pumpCap = new THREE.Mesh(pumpCapGeometry, goldCapMaterial);
-    pumpCap.position.y = 2.45;
-    mainBottleGroup.add(pumpCap);
-
-    // Pump Nozzle
-    const nozzleGeometry = new THREE.BoxGeometry(0.25, 0.2, 0.7);
-    const nozzle = new THREE.Mesh(nozzleGeometry, goldCapMaterial);
-    nozzle.position.set(0, 2.65, 0.25);
-    mainBottleGroup.add(nozzle);
-
-    // Luxury Brand Label on Bottle Front
-    const labelGeometry = new THREE.CylinderGeometry(1.06, 1.06, 1.8, 32, 1, true, -Math.PI / 3, (Math.PI * 2) / 3);
-    const labelMaterial = new THREE.MeshStandardMaterial({
-      color: 0xffffff,
-      roughness: 0.3,
-      metalness: 0.05,
-      side: THREE.DoubleSide,
-    });
-    const label = new THREE.Mesh(labelGeometry, labelMaterial);
-    label.position.y = 0.05;
-    mainBottleGroup.add(label);
-
-    // 5. Anti-Gravity Floating Serum Droplets
-    const dropletsGroup = new THREE.Group();
-    scene.add(dropletsGroup);
-
-    const dropletGeom = new THREE.SphereGeometry(0.12, 24, 24);
-    const dropletMat = new THREE.MeshPhysicalMaterial({
-      color: 0xf59e0b,
+      color: 0x111625,
       transparent: true,
       opacity: 0.85,
       roughness: 0.1,
-      metalness: 0.2,
+      metalness: 0.1,
+      transmission: 0.7,
+      ior: 1.55,
+      clearcoat: 1.0,
+      clearcoatRoughness: 0.05,
+    });
+    const bottleBody = new THREE.Mesh(bodyGeometry, bodyMaterial);
+    mainBottleGroup.add(bottleBody);
+
+    // Liquid Core with Neon Fluorescence
+    const liquidGeo = new THREE.CylinderGeometry(0.96, 0.96, 2.8, 36);
+    const liquidMat = new THREE.MeshPhysicalMaterial({
+      color: 0xccff00,
+      emissive: 0x224400,
+      emissiveIntensity: 0.6,
+      transparent: true,
+      opacity: 0.6,
+      roughness: 0.2,
+      transmission: 0.4,
+    });
+    const liquidCore = new THREE.Mesh(liquidGeo, liquidMat);
+    liquidCore.position.y = -0.15;
+    mainBottleGroup.add(liquidCore);
+
+    // Cyber Chrome Pump Dispenser
+    const pumpBaseGeo = new THREE.CylinderGeometry(1.08, 1.08, 0.45, 48);
+    const pumpBaseMat = new THREE.MeshStandardMaterial({
+      color: 0xd4d8e0,
+      metalness: 0.95,
+      roughness: 0.15,
+    });
+    const pumpBase = new THREE.Mesh(pumpBaseGeo, pumpBaseMat);
+    pumpBase.position.y = 1.82;
+    mainBottleGroup.add(pumpBase);
+
+    // Spout
+    const spoutGeo = new THREE.CylinderGeometry(0.32, 0.32, 0.75, 32);
+    const spoutMat = new THREE.MeshStandardMaterial({
+      color: 0x181a24,
+      metalness: 0.8,
+      roughness: 0.2,
+    });
+    const spout = new THREE.Mesh(spoutGeo, spoutMat);
+    spout.position.y = 2.3;
+    mainBottleGroup.add(spout);
+
+    // Horizontal Nozzle
+    const nozzleGeo = new THREE.CylinderGeometry(0.18, 0.18, 0.9, 24);
+    const nozzle = new THREE.Mesh(nozzleGeo, spoutMat);
+    nozzle.rotation.z = Math.PI / 2;
+    nozzle.position.set(0.45, 2.55, 0);
+    mainBottleGroup.add(nozzle);
+
+    // Holographic Label Band
+    const labelGeo = new THREE.CylinderGeometry(1.06, 1.06, 1.6, 48, 1, true, -Math.PI / 2, Math.PI);
+    const labelMat = new THREE.MeshStandardMaterial({
+      color: 0x090c15,
+      metalness: 0.3,
+      roughness: 0.4,
+      side: THREE.DoubleSide,
+    });
+    const labelMesh = new THREE.Mesh(labelGeo, labelMat);
+    labelMesh.position.y = -0.1;
+    mainBottleGroup.add(labelMesh);
+
+    // 5. Orbiting Quantum Hologram Rings
+    const quantumRings = new THREE.Group();
+    scene.add(quantumRings);
+
+    const ring1Geo = new THREE.TorusGeometry(2.2, 0.03, 16, 100);
+    const ring1Mat = new THREE.MeshBasicMaterial({ color: 0xccff00 });
+    const ring1 = new THREE.Mesh(ring1Geo, ring1Mat);
+    ring1.rotation.x = Math.PI / 3;
+    quantumRings.add(ring1);
+
+    const ring2Geo = new THREE.TorusGeometry(2.6, 0.025, 16, 100);
+    const ring2Mat = new THREE.MeshBasicMaterial({ color: 0x00f0ff });
+    const ring2 = new THREE.Mesh(ring2Geo, ring2Mat);
+    ring2.rotation.y = Math.PI / 4;
+    ring2.rotation.x = -Math.PI / 4;
+    quantumRings.add(ring2);
+
+    // 6. Floating Molecular Droplets
+    const dropletsGroup = new THREE.Group();
+    scene.add(dropletsGroup);
+
+    const dropletGeo = new THREE.SphereGeometry(0.15, 24, 24);
+    const dropletMat = new THREE.MeshPhysicalMaterial({
+      color: 0x00f0ff,
+      emissive: 0x003344,
+      emissiveIntensity: 0.8,
+      transparent: true,
+      opacity: 0.9,
+      roughness: 0.05,
       transmission: 0.8,
       ior: 1.4,
-      clearcoat: 1.0,
     });
 
-    const droplets: { mesh: THREE.Mesh; speed: number; phase: number; radius: number; angle: number }[] = [];
-    for (let i = 0; i < 18; i++) {
-      const mesh = new THREE.Mesh(dropletGeom, dropletMat);
-      const scale = 0.5 + Math.random() * 1.2;
-      mesh.scale.set(scale, scale * 1.3, scale);
-      
-      const angle = (i / 18) * Math.PI * 2 + Math.random() * 0.5;
-      const radius = 2.2 + Math.random() * 1.8;
-      const y = (Math.random() - 0.5) * 4;
-      mesh.position.set(Math.cos(angle) * radius, y, Math.sin(angle) * radius);
-
-      dropletsGroup.add(mesh);
-      droplets.push({
-        mesh,
-        speed: 0.4 + Math.random() * 0.8,
-        phase: Math.random() * Math.PI * 2,
-        radius,
-        angle,
-      });
+    for (let i = 0; i < 14; i++) {
+      const drop = new THREE.Mesh(dropletGeo, dropletMat);
+      const angle = (i / 14) * Math.PI * 2;
+      const radius = 2.0 + Math.sin(i * 3) * 0.8;
+      drop.position.set(
+        Math.cos(angle) * radius,
+        (Math.random() - 0.5) * 3.5,
+        Math.sin(angle) * radius
+      );
+      drop.scale.setScalar(0.4 + Math.random() * 0.7);
+      dropletsGroup.add(drop);
     }
 
-    // 6. Floating Luminous Stardust & Herbal Mist Particles
+    // 7. Particle Vortex Field
     const particleCount = 200;
-    const particleGeometry = new THREE.BufferGeometry();
     const particlePositions = new Float32Array(particleCount * 3);
-    const particleColors = new Float32Array(particleCount * 3);
-
     for (let i = 0; i < particleCount * 3; i += 3) {
       particlePositions[i] = (Math.random() - 0.5) * 12;
-      particlePositions[i + 1] = (Math.random() - 0.5) * 10;
+      particlePositions[i + 1] = (Math.random() - 0.5) * 12;
       particlePositions[i + 2] = (Math.random() - 0.5) * 8;
-
-      // Golden and soft emerald hues
-      if (Math.random() > 0.4) {
-        particleColors[i] = 0.98; // R
-        particleColors[i + 1] = 0.75; // G
-        particleColors[i + 2] = 0.2; // B
-      } else {
-        particleColors[i] = 0.2;
-        particleColors[i + 1] = 0.85;
-        particleColors[i + 2] = 0.75;
-      }
     }
-
-    particleGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
-    particleGeometry.setAttribute('color', new THREE.BufferAttribute(particleColors, 3));
-
-    const particleMaterial = new THREE.PointsMaterial({
-      size: 0.08,
-      vertexColors: true,
+    const particleGeo = new THREE.BufferGeometry();
+    particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+    const particleMat = new THREE.PointsMaterial({
+      color: 0xccff00,
+      size: 0.05,
       transparent: true,
-      opacity: 0.75,
-      blending: THREE.AdditiveBlending,
+      opacity: 0.6,
     });
-
-    const particles = new THREE.Points(particleGeometry, particleMaterial);
+    const particles = new THREE.Points(particleGeo, particleMat);
     scene.add(particles);
 
-    // Initial positioning
-    mainBottleGroup.position.set(0, -0.2, 0);
-    mainBottleGroup.rotation.set(0.2, 0.4, -0.15);
-
-    const clock = new THREE.Clock();
-    const targetRotation = { x: 0.2, y: 0.4 };
-    const currentRotation = { x: 0.2, y: 0.4 };
-
+    // Save refs
     sceneRef.current = {
       scene,
       camera,
       renderer,
       mainBottleGroup,
       dropletsGroup,
+      quantumRings,
       particles,
-      lights: {
-        ambient: ambientLight,
-        pointGold,
-        pointTeal,
-        directional: directionalLight,
-      },
-      clock,
-      targetRotation,
-      currentRotation,
+      lights: { ambient: ambientLight, pointLime, pointCyan, pointPink, directional: directionalLight },
+      clock: new THREE.Clock(),
+      targetRotation: { x: 0.2, y: 0.3 },
+      currentRotation: { x: 0.2, y: 0.3 },
     };
 
-    setFpsReady(true);
-
-    // 7. Render Loop with Smooth Anti-Gravity Floating Physics
+    // Animation Loop
     const animate = () => {
-      const state = sceneRef.current;
-      if (!state) return;
+      if (!sceneRef.current) return;
+      const { mainBottleGroup, dropletsGroup, quantumRings, particles, clock, targetRotation, currentRotation } = sceneRef.current;
+      const elapsedTime = clock.getElapsedTime();
 
-      const elapsedTime = state.clock.getElapsedTime();
-
-      // Smooth mouse tilt lerp
-      state.currentRotation.x += (state.targetRotation.x - state.currentRotation.x) * 0.06;
-      state.currentRotation.y += (state.targetRotation.y - state.currentRotation.y) * 0.06;
-
-      // Base rotation + anti-gravity floating bob
-      const floatY = Math.sin(elapsedTime * 1.5) * 0.25;
-      const wobbleZ = Math.cos(elapsedTime * 1.1) * 0.08;
-
-      state.mainBottleGroup.position.y = -0.2 + floatY;
-      state.mainBottleGroup.rotation.z = -0.12 + wobbleZ;
+      // Smooth mouse follow
+      currentRotation.x += (targetRotation.x - currentRotation.x) * 0.05;
+      currentRotation.y += (targetRotation.y - currentRotation.y) * 0.05;
 
       if (isRotating) {
-        state.mainBottleGroup.rotation.y += 0.008;
+        mainBottleGroup.rotation.y = elapsedTime * 0.4 + currentRotation.y;
+        mainBottleGroup.rotation.x = Math.sin(elapsedTime * 0.5) * 0.08 + currentRotation.x;
       } else {
-        state.mainBottleGroup.rotation.y = state.currentRotation.y;
+        mainBottleGroup.rotation.y = currentRotation.y;
+        mainBottleGroup.rotation.x = currentRotation.x;
       }
-      state.mainBottleGroup.rotation.x = state.currentRotation.x + Math.sin(elapsedTime * 0.8) * 0.05;
 
-      // Animate floating droplets
-      droplets.forEach((d, idx) => {
-        d.angle += 0.006 * d.speed;
-        d.mesh.position.x = Math.cos(d.angle) * d.radius;
-        d.mesh.position.z = Math.sin(d.angle) * d.radius;
-        d.mesh.position.y += Math.sin(elapsedTime * 2 + d.phase) * 0.015;
-        d.mesh.rotation.x += 0.02;
-        d.mesh.rotation.y += 0.03;
+      // Anti-Gravity Hover Physics
+      mainBottleGroup.position.y = Math.sin(elapsedTime * 1.8) * 0.22;
+
+      // Rings Rotation
+      quantumRings.rotation.x = elapsedTime * 0.3;
+      quantumRings.rotation.y = elapsedTime * 0.5;
+      quantumRings.position.y = Math.sin(elapsedTime * 1.8) * 0.22;
+
+      // Orbiting droplets
+      dropletsGroup.rotation.y = -elapsedTime * 0.35;
+      dropletsGroup.children.forEach((drop, idx) => {
+        drop.position.y += Math.sin(elapsedTime * 2 + idx) * 0.005;
       });
 
-      // Animate particles swirl
-      state.particles.rotation.y = elapsedTime * 0.03;
-      state.particles.rotation.x = Math.sin(elapsedTime * 0.02) * 0.1;
+      // Particle float
+      particles.rotation.y = elapsedTime * 0.04;
 
-      state.renderer.render(state.scene, state.camera);
-      state.animId = requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+      sceneRef.current.animId = requestAnimationFrame(animate);
     };
 
     animate();
 
-    // 8. Resize Handler
     const handleResize = () => {
       if (!container || !sceneRef.current) return;
       const w = container.clientWidth;
@@ -327,85 +293,54 @@ export const AntiGravity3DHero: React.FC<AntiGravity3DHeroProps> = ({
 
     return () => {
       window.removeEventListener('resize', handleResize);
-      if (sceneRef.current?.animId) {
-        cancelAnimationFrame(sceneRef.current.animId);
-      }
+      if (sceneRef.current?.animId) cancelAnimationFrame(sceneRef.current.animId);
       renderer.dispose();
-      bodyGeometry.dispose();
-      bodyMaterial.dispose();
-      dropletGeom.dispose();
-      dropletMat.dispose();
-      particleGeometry.dispose();
-      particleMaterial.dispose();
     };
   }, [isRotating]);
 
-  // Mouse move handler for interactive parallax
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!mountRef.current || !sceneRef.current) return;
-    const rect = mountRef.current.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-
-    sceneRef.current.targetRotation.y = x * 1.5;
-    sceneRef.current.targetRotation.x = y * 1.2 + 0.2;
-  };
-
-  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
-    if (!mountRef.current || !sceneRef.current || e.touches.length === 0) return;
-    const rect = mountRef.current.getBoundingClientRect();
-    const x = (e.touches[0].clientX - rect.left) / rect.width - 0.5;
-    const y = (e.touches[0].clientY - rect.top) / rect.height - 0.5;
-
-    sceneRef.current.targetRotation.y = x * 1.2;
-    sceneRef.current.targetRotation.x = y * 1.0 + 0.2;
-  };
-
-  // Change lighting themes
-  const applyLightingTheme = (theme: 'BIOTECH' | 'CYAN' | 'SOLAR' | 'ARCTIC') => {
+  const applyLightingTheme = (theme: 'ACID_LIME' | 'CYBER_CYAN' | 'HYPER_PINK' | 'SOLAR_GOLD') => {
     setActiveTheme(theme);
     if (!sceneRef.current) return;
     const { lights } = sceneRef.current;
 
-    switch (theme) {
-      case 'BIOTECH':
-        lights.pointGold.color.setHex(0x10b981);
-        lights.pointGold.intensity = 4.2;
-        lights.pointTeal.color.setHex(0x06b6d4);
-        lights.pointTeal.intensity = 3.0;
-        break;
-      case 'CYAN':
-        lights.pointGold.color.setHex(0x06b6d4);
-        lights.pointGold.intensity = 4.0;
-        lights.pointTeal.color.setHex(0x2563eb);
-        lights.pointTeal.intensity = 3.5;
-        break;
-      case 'SOLAR':
-        lights.pointGold.color.setHex(0xf59e0b);
-        lights.pointGold.intensity = 4.5;
-        lights.pointTeal.color.setHex(0x10b981);
-        lights.pointTeal.intensity = 2.0;
-        break;
-      case 'ARCTIC':
-        lights.pointGold.color.setHex(0x38bdf8);
-        lights.pointGold.intensity = 4.5;
-        lights.pointTeal.color.setHex(0x0284c7);
-        lights.pointTeal.intensity = 3.5;
-        break;
+    if (theme === 'ACID_LIME') {
+      lights.pointLime.color.setHex(0xccff00);
+      lights.pointCyan.color.setHex(0x00f0ff);
+      lights.pointPink.color.setHex(0x224400);
+    } else if (theme === 'CYBER_CYAN') {
+      lights.pointLime.color.setHex(0x00f0ff);
+      lights.pointCyan.color.setHex(0x38bdf8);
+      lights.pointPink.color.setHex(0x0284c7);
+    } else if (theme === 'HYPER_PINK') {
+      lights.pointLime.color.setHex(0xff007f);
+      lights.pointCyan.color.setHex(0xd946ef);
+      lights.pointPink.color.setHex(0x831843);
+    } else if (theme === 'SOLAR_GOLD') {
+      lights.pointLime.color.setHex(0xffe600);
+      lights.pointCyan.color.setHex(0xf59e0b);
+      lights.pointPink.color.setHex(0xd97706);
     }
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!sceneRef.current) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    const y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
+    sceneRef.current.targetRotation.x = y * 0.4;
+    sceneRef.current.targetRotation.y = x * 0.8;
   };
 
   const handleResetOrientation = () => {
     if (!sceneRef.current) return;
     sceneRef.current.targetRotation.x = 0.2;
-    sceneRef.current.targetRotation.y = 0.4;
+    sceneRef.current.targetRotation.y = 0.3;
   };
 
   return (
     <div
-      className="relative w-full h-[480px] lg:h-[540px] flex items-center justify-center select-none"
+      className="relative w-full h-[460px] lg:h-[520px] flex items-center justify-center select-none bg-cyber-grid"
       onMouseMove={handleMouseMove}
-      onTouchMove={handleTouchMove}
     >
       {/* 3D WebGL Canvas Viewport */}
       <div
@@ -413,73 +348,65 @@ export const AntiGravity3DHero: React.FC<AntiGravity3DHeroProps> = ({
         className="w-full h-full cursor-grab active:cursor-grabbing flex items-center justify-center"
       />
 
-      {/* Floating Anti-Gravity Spatial HUD Badges */}
+      {/* Floating Anti-Gravity Cyber HUD Badges */}
       <div className="absolute top-3 left-4 flex flex-col gap-2 z-20 pointer-events-auto">
-        <div className="bg-white/90 backdrop-blur-xl border border-emerald-300/60 shadow-xl px-3.5 py-1.5 rounded-2xl flex items-center gap-2 text-xs font-bold text-emerald-950 transition hover:scale-105">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-          </span>
-          <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-          <span>Anti-Gravity 3D Engine</span>
+        <div className="sticker-tag bg-[#CCFF00] text-black text-[11px] px-3.5 py-1 rotate-[-2deg]">
+          <Zap className="w-3.5 h-3.5 fill-black" />
+          <span>CYBER-GLOW 3D SIMULATOR</span>
         </div>
 
-        <div className="bg-slate-950/85 backdrop-blur-xl border border-white/20 shadow-xl px-3 py-1 rounded-xl text-[10px] font-mono text-emerald-300 flex items-center gap-2">
-          <Droplets className="w-3 h-3 text-cyan-400" />
-          <span>Real-Time Ray Optics • 60 FPS</span>
+        <div className="bg-[#090C16]/90 backdrop-blur-md border border-white/20 shadow-xl px-3 py-1 rounded-xl text-[10px] font-mono text-[#00F0FF] flex items-center gap-2">
+          <Droplets className="w-3 h-3 text-[#00F0FF]" />
+          <span>REAL-TIME RAYTRACING • 60 FPS</span>
         </div>
       </div>
 
-      {/* Anti-Gravity Controls Bar (Bottom) */}
-      <div className="absolute bottom-4 inset-x-4 sm:inset-x-8 z-20 flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-2xl bg-white/85 backdrop-blur-xl border border-emerald-100 shadow-2xl">
+      {/* Controls Bar (Bottom) */}
+      <div className="absolute bottom-4 inset-x-4 sm:inset-x-8 z-20 flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-2xl glass-cyber-glow border border-white/15 shadow-2xl">
         {/* Lighting Theme Switchers */}
         <div className="flex items-center gap-1.5">
-          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider hidden sm:inline mr-1">
-            Studio Light:
+          <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider hidden sm:inline mr-1">
+            Shader Light:
           </span>
           <button
-            onClick={() => applyLightingTheme('BIOTECH')}
-            className={`px-2.5 py-1 rounded-xl text-xs font-bold transition flex items-center gap-1 ${
-              activeTheme === 'BIOTECH'
-                ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md'
-                : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+            onClick={() => applyLightingTheme('ACID_LIME')}
+            className={`px-2.5 py-1 rounded-xl text-xs font-black uppercase transition flex items-center gap-1 cursor-pointer ${
+              activeTheme === 'ACID_LIME'
+                ? 'bg-[#CCFF00] text-black shadow-neon-lime'
+                : 'bg-white/5 text-slate-300 hover:bg-white/10'
             }`}
-            title="Biotech Emerald & Mint Luminescence"
           >
-            <span className="w-2 h-2 rounded-full bg-emerald-400" /> Emerald
+            <span className="w-2 h-2 rounded-full bg-[#CCFF00]" /> Lime
           </button>
           <button
-            onClick={() => applyLightingTheme('CYAN')}
-            className={`px-2.5 py-1 rounded-xl text-xs font-bold transition flex items-center gap-1 ${
-              activeTheme === 'CYAN'
-                ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md'
-                : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+            onClick={() => applyLightingTheme('CYBER_CYAN')}
+            className={`px-2.5 py-1 rounded-xl text-xs font-black uppercase transition flex items-center gap-1 cursor-pointer ${
+              activeTheme === 'CYBER_CYAN'
+                ? 'bg-[#00F0FF] text-black shadow-neon-cyan'
+                : 'bg-white/5 text-slate-300 hover:bg-white/10'
             }`}
-            title="Electric Cyan & Cobalt Radiance"
           >
-            <span className="w-2 h-2 rounded-full bg-cyan-400" /> Cyan
+            <span className="w-2 h-2 rounded-full bg-[#00F0FF]" /> Cyan
           </button>
           <button
-            onClick={() => applyLightingTheme('SOLAR')}
-            className={`px-2.5 py-1 rounded-xl text-xs font-bold transition flex items-center gap-1 ${
-              activeTheme === 'SOLAR'
-                ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md'
-                : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+            onClick={() => applyLightingTheme('HYPER_PINK')}
+            className={`px-2.5 py-1 rounded-xl text-xs font-black uppercase transition flex items-center gap-1 cursor-pointer ${
+              activeTheme === 'HYPER_PINK'
+                ? 'bg-[#FF007F] text-white shadow-neon-pink'
+                : 'bg-white/5 text-slate-300 hover:bg-white/10'
             }`}
-            title="Solar Gold & Warm Amber"
           >
-            <span className="w-2 h-2 rounded-full bg-amber-400" /> Solar
+            <span className="w-2 h-2 rounded-full bg-[#FF007F]" /> Pink
           </button>
           <button
-            onClick={() => applyLightingTheme('ARCTIC')}
-            className={`px-2.5 py-1 rounded-xl text-xs font-bold transition flex items-center gap-1 ${
-              activeTheme === 'ARCTIC'
-                ? 'bg-gradient-to-r from-sky-500 to-indigo-600 text-white shadow-md'
-                : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+            onClick={() => applyLightingTheme('SOLAR_GOLD')}
+            className={`px-2.5 py-1 rounded-xl text-xs font-black uppercase transition flex items-center gap-1 cursor-pointer ${
+              activeTheme === 'SOLAR_GOLD'
+                ? 'bg-[#FFE600] text-black shadow-neon-gold'
+                : 'bg-white/5 text-slate-300 hover:bg-white/10'
             }`}
-            title="Arctic Glacier Frost"
           >
-            <span className="w-2 h-2 rounded-full bg-sky-300" /> Arctic
+            <span className="w-2 h-2 rounded-full bg-[#FFE600]" /> Gold
           </button>
         </div>
 
@@ -487,12 +414,11 @@ export const AntiGravity3DHero: React.FC<AntiGravity3DHeroProps> = ({
         <div className="flex items-center gap-1.5">
           <button
             onClick={() => setIsRotating(!isRotating)}
-            className={`px-3 py-1 rounded-xl text-xs font-bold transition flex items-center gap-1.5 border ${
+            className={`px-3 py-1 rounded-xl text-xs font-mono font-bold transition flex items-center gap-1.5 border cursor-pointer ${
               isRotating
-                ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
-                : 'bg-slate-100 text-slate-700 border-slate-200'
+                ? 'bg-[#CCFF00]/20 text-[#CCFF00] border-[#CCFF00]/50 shadow-neon-lime'
+                : 'bg-white/5 text-slate-300 border-white/10'
             }`}
-            title="Toggle Continuous 3D Orbit"
           >
             <Compass className={`w-3.5 h-3.5 ${isRotating ? 'animate-spin' : ''}`} />
             <span>{isRotating ? 'Auto-Orbit' : 'Paused'}</span>
@@ -500,7 +426,7 @@ export const AntiGravity3DHero: React.FC<AntiGravity3DHeroProps> = ({
 
           <button
             onClick={handleResetOrientation}
-            className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition"
+            className="p-1.5 rounded-xl bg-white/5 hover:bg-white/15 text-slate-300 border border-white/10 transition cursor-pointer"
             title="Reset Perspective"
           >
             <RotateCcw className="w-3.5 h-3.5" />

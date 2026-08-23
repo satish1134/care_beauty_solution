@@ -29,6 +29,7 @@ import { runInfrastructureHealthCheck } from './src/lib/diagnostics';
 import { seedDatabase } from './src/lib/seed';
 import { queryDb } from './src/lib/db';
 import { AdminPermission, AdminRole, MonitoringToolConfig, MarketplaceChannel, SeoCampaign } from './src/types';
+import { uploadProductImage, deleteProductImage, isCloudinaryConfigured, getCloudinaryPublicConfig, generateUploadSignature } from './src/lib/cloudinary';
 
 // User Account Interface
 export interface DBUser {
@@ -1789,23 +1790,139 @@ app.get('/api/admin/audit-logs', (req: Request, res: Response) => {
 });
 
 // ==========================================
-// 8. FILE UPLOAD (Temporary Storage for Product Images)
+// 8. CLOUDINARY & FILE UPLOAD API
 // ==========================================
-app.post('/api/upload', (req: Request, res: Response) => {
+
+// Get Cloudinary public status & cloud name
+app.get('/api/cloudinary/config', (req: Request, res: Response) => {
+  res.json({
+    success: true,
+    ...getCloudinaryPublicConfig(),
+  });
+});
+
+// Upload image directly to Cloudinary
+app.post('/api/cloudinary/upload', async (req: Request, res: Response) => {
   try {
-    const { imageBase64, imageName } = req.body;
+    const { imageBase64, folder, tags, publicId } = req.body;
+    if (!imageBase64) {
+      return res.status(400).json({ success: false, message: 'No image payload provided (imageBase64 required)' });
+    }
+
+    if (isCloudinaryConfigured()) {
+      const uploadResult = await uploadProductImage(imageBase64, {
+        folder: folder || 'care_beauty_products',
+        tags: tags || ['care_beauty', 'product_image'],
+        publicId,
+      });
+
+      return res.json({
+        success: true,
+        source: 'CLOUDINARY',
+        ...uploadResult,
+        message: 'Image uploaded successfully to Cloudinary CDN',
+      });
+    } else {
+      // Fallback if Cloudinary environment credentials are not yet set
+      const imageId = `img-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+      uploadedImages[imageId] = imageBase64;
+      const imageUrl = imageBase64.startsWith('data:') ? imageBase64 : `data:image/jpeg;base64,${imageBase64}`;
+
+      return res.json({
+        success: true,
+        source: 'LOCAL_FALLBACK',
+        url: imageUrl,
+        imageId,
+        format: 'webp',
+        width: 800,
+        height: 800,
+        message: 'Image stored in temporary memory. To host on Cloudinary CDN, configure CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET in Settings.',
+      });
+    }
+  } catch (err: any) {
+    console.error('[API CLOUDINARY UPLOAD ERROR]', err);
+    res.status(500).json({ success: false, message: err.message || 'Cloudinary upload failed' });
+  }
+});
+
+// Generate signed upload signature for direct client-side uploads
+app.post('/api/cloudinary/sign', (req: Request, res: Response) => {
+  try {
+    if (!isCloudinaryConfigured()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Cloudinary credentials are not configured on the server',
+      });
+    }
+
+    const { folder = 'care_beauty_products', timestamp = Math.round(new Date().getTime() / 1000) } = req.body;
+    const paramsToSign = {
+      folder,
+      timestamp,
+    };
+
+    const signatureData = generateUploadSignature(paramsToSign);
+    res.json({
+      success: true,
+      ...signatureData,
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// Delete an asset from Cloudinary
+app.post('/api/cloudinary/delete', async (req: Request, res: Response) => {
+  try {
+    const { publicId } = req.body;
+    if (!publicId) {
+      return res.status(400).json({ success: false, message: 'publicId is required to delete an image' });
+    }
+
+    if (!isCloudinaryConfigured()) {
+      return res.status(400).json({ success: false, message: 'Cloudinary is not configured' });
+    }
+
+    const result = await deleteProductImage(publicId);
+    res.json({ success: true, result, message: `Image ${publicId} deleted successfully` });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// Standard product image upload route (auto-routes to Cloudinary if configured)
+app.post('/api/upload', async (req: Request, res: Response) => {
+  try {
+    const { imageBase64, imageName, folder } = req.body;
     if (!imageBase64) {
       return res.status(400).json({ success: false, message: 'No image payload provided' });
     }
 
+    if (isCloudinaryConfigured()) {
+      try {
+        const uploadResult = await uploadProductImage(imageBase64, {
+          folder: folder || 'care_beauty_products',
+        });
+        return res.json({
+          success: true,
+          source: 'CLOUDINARY',
+          url: uploadResult.url,
+          imageId: uploadResult.publicId,
+          format: uploadResult.format,
+          message: 'Product image uploaded to Cloudinary CDN',
+        });
+      } catch (cloudErr: any) {
+        console.warn('[CLOUDINARY UPLOAD FALLBACK]', cloudErr.message);
+      }
+    }
+
     const imageId = `img-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
     uploadedImages[imageId] = imageBase64;
-
-    // Return mock served URL / base64 preview URL
     const imageUrl = imageBase64.startsWith('data:') ? imageBase64 : `data:image/jpeg;base64,${imageBase64}`;
 
     res.json({
       success: true,
+      source: 'LOCAL_FALLBACK',
       url: imageUrl,
       imageId,
       message: 'Product image uploaded to temporary storage endpoint',

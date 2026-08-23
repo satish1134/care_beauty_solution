@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Package,
   Plus,
@@ -11,9 +11,13 @@ import {
   X,
   Sparkles,
   Layers,
+  Image as ImageIcon,
+  Cloud,
+  Loader2,
 } from 'lucide-react';
 import { Product, Category } from '../../types';
 import { BulkProductEditor } from './BulkProductEditor';
+import { uploadImageToCloudinary } from '../../lib/cloudinaryClient';
 
 interface ProductManagerProps {
   products: Product[];
@@ -48,12 +52,38 @@ export const ProductManager: React.FC<ProductManagerProps> = ({
   const [description, setDescription] = useState('');
   const [categoryId, setCategoryId] = useState(categories[0]?.id || '');
   const [imageUrl, setImageUrl] = useState('/images/care-hydrating-moisturizer.svg');
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [uploadSuccessInfo, setUploadSuccessInfo] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [variantName, setVariantName] = useState('50 ml Tube');
   const [variantPrice, setVariantPrice] = useState('599');
   const [variantComparePrice, setVariantComparePrice] = useState('799');
   const [variantStock, setVariantStock] = useState('50');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedbackMsg, setFeedbackMsg] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  const handleFileUpload = async (file: File) => {
+    if (!file) return;
+    setIsUploadingImage(true);
+    setUploadSuccessInfo(null);
+    setFeedbackMsg(null);
+
+    try {
+      const result = await uploadImageToCloudinary(file, 'care_beauty_products');
+      if (result && result.url) {
+        setImageUrl(result.url);
+        setUploadSuccessInfo(result.publicId ? `Hosted on Cloudinary CDN (${result.format?.toUpperCase() || 'WebP'})` : 'Uploaded to CDN');
+      }
+    } catch (err: any) {
+      console.error('[IMAGE UPLOAD FAILED]', err);
+      setFeedbackMsg({
+        type: 'error',
+        message: err.message || 'Image upload failed. Check Cloudinary settings.',
+      });
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
 
   const filteredProducts = products.filter(p => {
     const matchesSearch =
@@ -417,15 +447,74 @@ export const ProductManager: React.FC<ProductManagerProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-slate-300 font-medium mb-1">SVG Image Asset URL</label>
-                  <input
-                    type="text"
-                    required
-                    value={imageUrl}
-                    onChange={e => setImageUrl(e.target.value)}
-                    placeholder="/images/care-hydrating-moisturizer.svg"
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white font-mono text-[11px] focus:outline-none focus:border-amber-500"
-                  />
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-slate-300 font-medium">Product Image Asset</label>
+                    <span className="text-[10px] font-mono text-amber-400 flex items-center gap-1">
+                      <Cloud className="w-3 h-3" /> Cloudinary CDN Supported
+                    </span>
+                  </div>
+                  
+                  <div className="flex gap-2 items-center">
+                    <div className="relative flex-1">
+                      <input
+                        type="text"
+                        required
+                        value={imageUrl}
+                        onChange={e => setImageUrl(e.target.value)}
+                        placeholder="https://res.cloudinary.com/... or /images/..."
+                        className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-white font-mono text-[11px] focus:outline-none focus:border-amber-500"
+                      />
+                    </div>
+
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={e => {
+                        const file = e.target.files?.[0];
+                        if (file) handleFileUpload(file);
+                      }}
+                    />
+
+                    <button
+                      type="button"
+                      disabled={isUploadingImage}
+                      onClick={() => fileInputRef.current?.click()}
+                      className="px-3 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 shrink-0 transition cursor-pointer disabled:opacity-50"
+                    >
+                      {isUploadingImage ? (
+                        <>
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          <span>Uploading...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-3.5 h-3.5" />
+                          <span>Upload</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Image Preview & Status */}
+                  <div className="mt-2 flex items-center gap-3 p-2 bg-slate-800/80 rounded-xl border border-slate-700/60">
+                    <img
+                      src={imageUrl}
+                      alt="Preview"
+                      referrerPolicy="no-referrer"
+                      className="w-10 h-10 rounded-lg object-cover bg-slate-900 border border-slate-700"
+                      onError={e => {
+                        (e.target as HTMLImageElement).src = '/images/care-hydrating-moisturizer.svg';
+                      }}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[11px] text-slate-300 font-mono truncate">{imageUrl}</p>
+                      <p className="text-[10px] text-slate-500 font-sans">
+                        {uploadSuccessInfo || (imageUrl.includes('cloudinary.com') ? '⚡ Live on Cloudinary CDN' : 'Local or external image')}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
 

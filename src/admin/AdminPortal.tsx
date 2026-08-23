@@ -169,7 +169,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               <div className="w-14 h-14 mx-auto rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shadow-lg">
                 <Lock className="w-6 h-6" />
               </div>
-              <h2 className="text-2xl font-bold font-serif text-white">Back-Office Security Passcode</h2>
+              <h1 id="admin-auth-heading" className="text-2xl font-bold font-serif text-white">Back-Office Security Passcode</h1>
               <p className="text-slate-400 text-xs">Enter administrative credentials to access command center.</p>
             </div>
 
