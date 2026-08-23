@@ -6,18 +6,27 @@ if (typeof globalThis.WebSocket !== 'undefined') {
 }
 
 let pool: Pool | null = null;
+let warnLogged = false;
 
 /**
  * Lazy initialization of Neon PostgreSQL connection pool using pooled connection string.
  * Prevents "too many connections" on serverless/edge scale.
  */
-export function getDbPool(): Pool {
+export function getDbPool(): Pool | null {
   if (!pool) {
     const connectionString = process.env.DATABASE_URL;
     if (!connectionString) {
-      throw new Error('[DB ERROR] DATABASE_URL environment variable is missing.');
+      if (!warnLogged) {
+        console.warn('[DB INFO] DATABASE_URL not configured. Running with in-memory store.');
+        warnLogged = true;
+      }
+      return null;
     }
-    pool = new Pool({ connectionString });
+    try {
+      pool = new Pool({ connectionString });
+    } catch {
+      return null;
+    }
   }
   return pool;
 }
@@ -27,11 +36,15 @@ export function getDbPool(): Pool {
  */
 export async function queryDb<T = any>(text: string, params: any[] = []): Promise<T[]> {
   const client = getDbPool();
+  if (!client) {
+    return [];
+  }
   try {
     const result = await client.query(text, params);
     return result.rows as T[];
   } catch (error: any) {
-    console.error('[DB QUERY ERROR]', error.message);
-    throw error;
+    console.warn('[DB QUERY WARN]', error.message);
+    return [];
   }
 }
+
