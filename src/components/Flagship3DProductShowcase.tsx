@@ -711,6 +711,60 @@ export const Flagship3DProductShowcase: React.FC<Flagship3DProductShowcaseProps>
           </div>
 
           {/* =====================================================================
+              SIGNATURE ROUTINE FEATURE BLOCK (USING LOCAL BRAND ASSETS)
+              ===================================================================== */}
+          <div className="mb-6 pointer-events-auto">
+            <div className="rounded-[28px] border border-black/5 bg-white/70 backdrop-blur-md shadow-[0_18px_40px_rgba(13,38,27,0.06)] p-4 sm:p-5">
+              <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
+                <div className="flex items-center gap-4 sm:gap-5">
+                  <img
+                    src="/images/care-header-no-tagline.svg"
+                    alt="CARe Logo"
+                    className="w-36 sm:w-44 xl:w-52 h-auto object-contain"
+                  />
+                  <div>
+                    <p className="text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.26em] text-[#0D261B]/55">
+                      Signature routine
+                    </p>
+                    <h2 className="font-syne text-xl sm:text-2xl xl:text-3xl font-black uppercase tracking-tight text-[#0D261B]">
+                      Cleanse • Hydrate • Defend
+                    </h2>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-center xl:justify-end gap-2.5 sm:gap-3">
+                  {[
+                    { index: 0, name: 'Cleanser', image: '/images/care-cleanser-1-hero-marble.svg', accent: 'bg-[#EAF9C4]' },
+                    { index: 1, name: 'Moisturizer', image: '/images/care-hydrating-moisturizer.svg', accent: 'bg-[#DFF6FF]' },
+                    { index: 2, name: 'Sunscreen', image: '/images/care-ray-barrier-sunscreen.svg', accent: 'bg-[#F8E7F7]' },
+                  ].map((tile) => (
+                    <button
+                      key={tile.index}
+                      type="button"
+                      onClick={() => switchProductStage(tile.index)}
+                      className={`group flex items-center gap-2.5 rounded-2xl border border-black/5 ${tile.accent} px-2.5 py-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_24px_rgba(13,38,27,0.08)] cursor-pointer`}
+                    >
+                      <img
+                        src={tile.image}
+                        alt={tile.name}
+                        className="h-12 w-12 sm:h-14 sm:w-14 object-contain rounded-xl bg-white/70 p-1.5 shadow-sm"
+                      />
+                      <div className="text-left leading-none">
+                        <div className="text-[9px] sm:text-[10px] font-mono uppercase tracking-[0.18em] text-[#0D261B]/55">
+                          0{tile.index + 1}
+                        </div>
+                        <div className="mt-1 text-[11px] sm:text-xs font-syne font-bold uppercase tracking-wide text-[#0D261B]">
+                          {tile.name}
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* =====================================================================
               EDITORIAL 2-COLUMN LUXURY SHOWCASE
               ===================================================================== */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center my-auto pointer-events-none">
