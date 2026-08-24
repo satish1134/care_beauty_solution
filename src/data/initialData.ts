@@ -250,7 +250,7 @@ export const INITIAL_PRODUCTS: Product[] = [
       },
       {
         id: 'img-clean-6',
-        url: '/images/Header logo.png',
+        url: '/images/header-logo.png',
         altText: 'CARe Cleanser Bathroom Vanity Setup with Gold Mirror and Plush Towels',
         isPrimary: false,
       },

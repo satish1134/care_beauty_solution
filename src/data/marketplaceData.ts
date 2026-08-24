@@ -62,10 +62,10 @@ export const MARKETPLACE_PRODUCTS: MarketplaceProduct[] = [
     rating: 4.9,
     reviewCount: 3420,
     images: [
-      '/images/care-ray-barrier-sunscreen.svg',
+      '/images/product-1.jpeg',
       '/images/hero.png',
-      '/images/Header logo.png',
-      '/images/Full_LOGO.png',
+      '/images/header-logo.png',
+      '/images/full-logo.png',
     ],
     variants: [
       { id: 'sun_50ml', name: '50 ml', sku: 'CBS-SUN-50', price: 499, mrp: 699, stock: 250 },
@@ -147,10 +147,10 @@ export const MARKETPLACE_PRODUCTS: MarketplaceProduct[] = [
     rating: 4.9,
     reviewCount: 2840,
     images: [
-      '/images/care-hydrating-moisturizer.svg',
+      '/images/product-2.jpeg',
       '/images/care-cleanser-texture.svg',
       '/images/hero.png',
-      '/images/Header logo.png',
+      '/images/header-logo.png',
     ],
     variants: [
       { id: 'moist_50ml', name: '50 ml', sku: 'CBS-MST-50', price: 449, mrp: 599, stock: 310 },
@@ -218,8 +218,8 @@ export const MARKETPLACE_PRODUCTS: MarketplaceProduct[] = [
     rating: 4.9,
     reviewCount: 1980,
     images: [
+      '/images/product-3.jpeg',
       '/images/hero.png',
-      '/images/care-refreshing-skin-cleanser.svg',
       '/images/care-cleanser-1-hero-marble.svg',
       '/images/care-cleanser-2-studio-isolated.svg',
       '/images/care-cleanser-3-lifestyle-vanity.svg',
