@@ -1,6 +1,6 @@
 {
   "name": "Care Beauty Solution",
-  "description": "Production-Grade D2C Skincare E-Commerce Platform for India (www.carebeautysolution.com)",
+  "description": "Clinical barrier skincare e-commerce marketplace featuring dermat-tested Sunscreen, Cleanser, Moisturizer, and complete Daily Routine Kits.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
