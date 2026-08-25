@@ -4,6 +4,12 @@ import {
   SavedAddress,
   OrderRecord,
 } from '../types/marketplace';
+import product1Img from '../assets/product-1.jpeg';
+import product2Img from '../assets/product-2.jpeg';
+import product3Img from '../assets/product-3.jpeg';
+import heroImg from '../assets/hero.png';
+import headerLogoImg from '../assets/header-logo.png';
+import fullLogoImg from '../assets/full-logo.png';
 
 export const MOCK_COUPONS: CouponCode[] = [
   {
@@ -62,10 +68,10 @@ export const MARKETPLACE_PRODUCTS: MarketplaceProduct[] = [
     rating: 4.9,
     reviewCount: 3420,
     images: [
-      '/images/product-1.jpeg',
-      '/images/hero.png',
-      '/images/header-logo.png',
-      '/images/full-logo.png',
+      product1Img,
+      heroImg,
+      headerLogoImg,
+      fullLogoImg,
     ],
     variants: [
       { id: 'sun_50ml', name: '50 ml', sku: 'CBS-SUN-50', price: 499, mrp: 699, stock: 250 },
@@ -147,10 +153,10 @@ export const MARKETPLACE_PRODUCTS: MarketplaceProduct[] = [
     rating: 4.9,
     reviewCount: 2840,
     images: [
-      '/images/product-2.jpeg',
+      product2Img,
       '/images/care-cleanser-texture.svg',
-      '/images/hero.png',
-      '/images/header-logo.png',
+      heroImg,
+      headerLogoImg,
     ],
     variants: [
       { id: 'moist_50ml', name: '50 ml', sku: 'CBS-MST-50', price: 449, mrp: 599, stock: 310 },
@@ -218,8 +224,8 @@ export const MARKETPLACE_PRODUCTS: MarketplaceProduct[] = [
     rating: 4.9,
     reviewCount: 1980,
     images: [
-      '/images/product-3.jpeg',
-      '/images/hero.png',
+      product3Img,
+      heroImg,
       '/images/care-cleanser-1-hero-marble.svg',
       '/images/care-cleanser-2-studio-isolated.svg',
       '/images/care-cleanser-3-lifestyle-vanity.svg',

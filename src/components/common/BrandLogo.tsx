@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import headerLogoPng from '../../assets/header-logo.png';
+import fullLogoPng from '../../assets/full-logo.png';
+import logoPng from '../../assets/logo.png';
 
 interface BrandLogoProps {
   variant?: 'header' | 'footer' | 'emblem' | 'light' | 'dark';
@@ -12,18 +15,19 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
   className = '',
   heightClass = 'h-9 sm:h-11',
 }) => {
-  const [imgSrc, setImgSrc] = useState(
-    variant === 'emblem' ? '/images/full-logo.png' : '/images/header-logo.png'
-  );
+  const defaultSrc = variant === 'emblem' ? fullLogoPng : headerLogoPng;
+  const [imgSrc, setImgSrc] = useState<string>(defaultSrc);
 
   const handleImgError = () => {
-    // Fallback gracefully between original PNG images
-    if (imgSrc === '/images/header-logo.png') {
+    // Gracefully fallback between imported assets and static image paths
+    if (imgSrc === headerLogoPng) {
+      setImgSrc(logoPng);
+    } else if (imgSrc === logoPng) {
+      setImgSrc(fullLogoPng);
+    } else if (imgSrc === fullLogoPng) {
+      setImgSrc('/images/header-logo.png');
+    } else if (imgSrc === '/images/header-logo.png') {
       setImgSrc('/images/logo.png');
-    } else if (imgSrc === '/images/logo.png') {
-      setImgSrc('/images/full-logo.png');
-    } else if (imgSrc === '/images/full-logo.png') {
-      setImgSrc('/images/Header logo.png');
     }
   };
 
