@@ -32,30 +32,30 @@ export const DealOfTheDayBanner: React.FC = () => {
   return (
     <section
       id="deal-of-the-day-banner"
-      className="bg-[#1A1A1A] text-white py-6 border-b border-[#E5E5E5] relative overflow-hidden"
+      className="bg-[#1A1A1A] text-white py-4 sm:py-6 border-b border-[#E5E5E5] relative overflow-hidden"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3.5 sm:gap-6">
           {/* Left Title & Timer */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 text-left">
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-xl bg-[#E85D5D] flex items-center justify-center text-white shrink-0">
-                <Zap className="w-5 h-5 fill-white animate-pulse" />
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 text-left">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#E85D5D] flex items-center justify-center text-white shrink-0 shadow-xs">
+                <Zap className="w-4 h-4 sm:w-5 sm:h-5 fill-white animate-pulse" />
               </div>
               <div>
                 <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#E5C378] block">
                   Special Launch Offer
                 </span>
-                <h3 className="text-base sm:text-lg font-black text-white">
+                <h3 className="text-xs sm:text-base font-black text-white leading-snug">
                   Flat 15% OFF + Free Express Shipping with CARE15
                 </h3>
               </div>
             </div>
 
             {/* Live Countdown Clock */}
-            <div className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-lg border border-white/10 text-xs font-mono">
+            <div className="flex items-center gap-1.5 bg-white/10 px-2.5 py-1 rounded-lg border border-white/10 text-[11px] sm:text-xs font-mono shrink-0">
               <Clock className="w-3.5 h-3.5 text-[#E85D5D]" />
-              <span>Ends in: </span>
+              <span className="hidden xs:inline">Ends in: </span>
               <span className="font-bold text-[#E5C378]">
                 {String(timeLeft.hours).padStart(2, '0')}h :{' '}
                 {String(timeLeft.minutes).padStart(2, '0')}m :{' '}
@@ -65,10 +65,12 @@ export const DealOfTheDayBanner: React.FC = () => {
           </div>
 
           {/* Right Coupon & Action Button */}
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="flex items-center border border-dashed border-[#E5C378] rounded-lg px-3 py-1.5 bg-black/40 text-xs">
-              <span className="text-neutral-400 mr-2">Use Code:</span>
-              <span className="font-bold font-mono text-[#E5C378] tracking-wider mr-2">CARE15</span>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+            <div className="flex items-center justify-between sm:justify-start border border-dashed border-[#E5C378] rounded-lg px-3 py-1.5 bg-black/40 text-xs">
+              <div className="flex items-center">
+                <span className="text-neutral-400 mr-2 text-[11px]">Use Code:</span>
+                <span className="font-bold font-mono text-[#E5C378] tracking-wider mr-2">CARE15</span>
+              </div>
               <button
                 onClick={handleCopyCode}
                 className="text-[11px] text-[#E85D5D] hover:text-white transition flex items-center gap-1 font-semibold"
@@ -83,7 +85,7 @@ export const DealOfTheDayBanner: React.FC = () => {
                 if (featuredProduct) openPdp(featuredProduct);
                 else openPlp();
               }}
-              className="btn-primary-coral text-xs font-bold px-4 py-2 flex items-center gap-1.5 shadow-xs"
+              className="btn-primary-coral text-xs font-bold px-4 py-2 flex items-center justify-center gap-1.5 shadow-xs w-full sm:w-auto"
             >
               <span>Shop Formulations</span>
               <ArrowRight className="w-3.5 h-3.5" />

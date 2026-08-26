@@ -39,7 +39,7 @@ const MarketplaceAppContent: React.FC = () => {
       <MegaMenu />
 
       {/* 2. Dynamic View Router */}
-      <main id="main-content-view" className="flex-1">
+      <main id="main-content-view" className="flex-1 pb-16 lg:pb-0">
         {currentView === 'HOME' && (
           <>
             <HeroCarousel />

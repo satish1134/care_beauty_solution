@@ -1,117 +1,172 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 160" width="100%" height="100%">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 260" width="100%" height="100%">
   <defs>
-    <linearGradient id="hlGold3D" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#663F05" />
-      <stop offset="12%" stop-color="#9C7215" />
-      <stop offset="26%" stop-color="#DBB030" />
-      <stop offset="42%" stop-color="#FFF9DE" />
-      <stop offset="56%" stop-color="#ECC664" />
-      <stop offset="72%" stop-color="#A57A18" />
-      <stop offset="88%" stop-color="#FAE89E" />
-      <stop offset="100%" stop-color="#522F02" />
+    <!-- Ultra-realistic 3D Gold Gradient for Letters & Medallion -->
+    <linearGradient id="finalGold3D" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#734B0B" />
+      <stop offset="10%" stop-color="#A27819" />
+      <stop offset="22%" stop-color="#DCAE31" />
+      <stop offset="38%" stop-color="#FFF8DC" />
+      <stop offset="52%" stop-color="#F3CE67" />
+      <stop offset="68%" stop-color="#AD811A" />
+      <stop offset="84%" stop-color="#FDE89C" />
+      <stop offset="100%" stop-color="#5E3804" />
     </linearGradient>
 
-    <linearGradient id="hlGoldWire" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#734907" />
-      <stop offset="25%" stop-color="#D8AF33" />
-      <stop offset="50%" stop-color="#FFF6D0" />
-      <stop offset="75%" stop-color="#9E7317" />
-      <stop offset="100%" stop-color="#5B3402" />
+    <!-- Braided Wreath Gold Gradient -->
+    <linearGradient id="finalGoldWire" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7D5208" />
+      <stop offset="25%" stop-color="#DBB030" />
+      <stop offset="50%" stop-color="#FFF7CE" />
+      <stop offset="75%" stop-color="#A77C18" />
+      <stop offset="100%" stop-color="#653D03" />
     </linearGradient>
 
-    <linearGradient id="hlGoldSpec" x1="0%" y1="100%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#3A1E00" stop-opacity="0.1" />
-      <stop offset="35%" stop-color="#FFFFFF" stop-opacity="0.95" />
-      <stop offset="70%" stop-color="#EAC45F" stop-opacity="0.45" />
+    <!-- Specular Highlight for Gleam & Bevel -->
+    <linearGradient id="finalGoldSpec" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#422400" stop-opacity="0.15" />
+      <stop offset="30%" stop-color="#FFFFFF" stop-opacity="0.95" />
+      <stop offset="65%" stop-color="#F2CB63" stop-opacity="0.45" />
       <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.95" />
     </linearGradient>
 
-    <filter id="hlBevel" x="-15%" y="-15%" width="130%" height="130%">
-      <feDropShadow dx="1.8" dy="3.2" stdDeviation="2.4" flood-color="#241300" flood-opacity="0.36" />
-      <feDropShadow dx="-0.8" dy="-0.8" stdDeviation="1.0" flood-color="#FFFDEE" flood-opacity="0.88" />
+    <linearGradient id="finalDividerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#DCAE31" stop-opacity="0.05" />
+      <stop offset="15%" stop-color="#AD811A" stop-opacity="0.7" />
+      <stop offset="50%" stop-color="#FFF8DC" stop-opacity="1" />
+      <stop offset="85%" stop-color="#AD811A" stop-opacity="0.7" />
+      <stop offset="100%" stop-color="#DCAE31" stop-opacity="0.05" />
+    </linearGradient>
+
+    <!-- Subtle Premium Drop Shadow -->
+    <filter id="finalBevelGlow" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="1.5" dy="2.8" stdDeviation="2.2" flood-color="#2D1900" flood-opacity="0.32" />
+      <feDropShadow dx="-0.6" dy="-0.6" stdDeviation="0.8" flood-color="#FFFDEE" flood-opacity="0.8" />
     </filter>
   </defs>
 
-  <g id="header-logo-group" filter="url(#hlBevel)">
-    <!-- LEFT: EMBLEM (Center X=80, Y=80, Radius ~68) -->
-    <g transform="translate(80, 80)">
-      <!-- Guilloche Wreath -->
-      <g transform="scale(0.42) translate(-400, -310)">
-        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(0.00 400 310)" fill="none" stroke="url(#hlGoldWire)" stroke-width="5.0" />
-        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(18.00 400 310)" fill="none" stroke="url(#hlGoldWire)" stroke-width="5.0" />
-        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(36.00 400 310)" fill="none" stroke="url(#hlGoldWire)" stroke-width="5.0" />
-        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(54.00 400 310)" fill="none" stroke="url(#hlGoldWire)" stroke-width="5.0" />
-        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(72.00 400 310)" fill="none" stroke="url(#hlGoldWire)" stroke-width="5.0" />
-        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(90.00 400 310)" fill="none" stroke="url(#hlGoldWire)" stroke-width="5.0" />
-        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(108.00 400 310)" fill="none" stroke="url(#hlGoldWire)" stroke-width="5.0" />
-        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(126.00 400 310)" fill="none" stroke="url(#hlGoldWire)" stroke-width="5.0" />
-        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(144.00 400 310)" fill="none" stroke="url(#hlGoldWire)" stroke-width="5.0" />
-        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(162.00 400 310)" fill="none" stroke="url(#hlGoldWire)" stroke-width="5.0" />
-        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(180.00 400 310)" fill="none" stroke="url(#hlGoldWire)" stroke-width="5.0" />
-        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(198.00 400 310)" fill="none" stroke="url(#hlGoldWire)" stroke-width="5.0" />
-        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(216.00 400 310)" fill="none" stroke="url(#hlGoldWire)" stroke-width="5.0" />
-        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(234.00 400 310)" fill="none" stroke="url(#hlGoldWire)" stroke-width="5.0" />
-        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(252.00 400 310)" fill="none" stroke="url(#hlGoldWire)" stroke-width="5.0" />
-        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(270.00 400 310)" fill="none" stroke="url(#hlGoldWire)" stroke-width="5.0" />
-        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(288.00 400 310)" fill="none" stroke="url(#hlGoldWire)" stroke-width="5.0" />
-        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(306.00 400 310)" fill="none" stroke="url(#hlGoldWire)" stroke-width="5.0" />
-        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(324.00 400 310)" fill="none" stroke="url(#hlGoldWire)" stroke-width="5.0" />
-        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(342.00 400 310)" fill="none" stroke="url(#hlGoldWire)" stroke-width="5.0" />
-        <ellipse cx="399" cy="309" rx="175" ry="58" transform="rotate(0.00 400 310)" fill="none" stroke="url(#hlGoldSpec)" stroke-width="1.6" opacity="0.9" />
-        <ellipse cx="399" cy="309" rx="175" ry="58" transform="rotate(36.00 400 310)" fill="none" stroke="url(#hlGoldSpec)" stroke-width="1.6" opacity="0.9" />
-        <ellipse cx="399" cy="309" rx="175" ry="58" transform="rotate(72.00 400 310)" fill="none" stroke="url(#hlGoldSpec)" stroke-width="1.6" opacity="0.9" />
-        <ellipse cx="399" cy="309" rx="175" ry="58" transform="rotate(108.00 400 310)" fill="none" stroke="url(#hlGoldSpec)" stroke-width="1.6" opacity="0.9" />
-        <ellipse cx="399" cy="309" rx="175" ry="58" transform="rotate(144.00 400 310)" fill="none" stroke="url(#hlGoldSpec)" stroke-width="1.6" opacity="0.9" />
-        <ellipse cx="399" cy="309" rx="175" ry="58" transform="rotate(180.00 400 310)" fill="none" stroke="url(#hlGoldSpec)" stroke-width="1.6" opacity="0.9" />
-        <ellipse cx="399" cy="309" rx="175" ry="58" transform="rotate(216.00 400 310)" fill="none" stroke="url(#hlGoldSpec)" stroke-width="1.6" opacity="0.9" />
-        <ellipse cx="399" cy="309" rx="175" ry="58" transform="rotate(252.00 400 310)" fill="none" stroke="url(#hlGoldSpec)" stroke-width="1.6" opacity="0.9" />
-        <ellipse cx="399" cy="309" rx="175" ry="58" transform="rotate(288.00 400 310)" fill="none" stroke="url(#hlGoldSpec)" stroke-width="1.6" opacity="0.9" />
-        <ellipse cx="399" cy="309" rx="175" ry="58" transform="rotate(324.00 400 310)" fill="none" stroke="url(#hlGoldSpec)" stroke-width="1.6" opacity="0.9" />
+  <g id="care-final-logo" filter="url(#finalBevelGlow)">
+    <!-- ========================================== -->
+    <!-- LEFT: CIRCULAR EMBLEM (X=135, Y=130, R=105) -->
+    <!-- ========================================== -->
+    <g transform="translate(135, 130)">
+      <!-- Intricate Guilloche / Braided Lattice Knot Ring -->
+      <g transform="scale(0.58) translate(-400, -310)">
+        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(0.00 400 310)" fill="none" stroke="url(#finalGoldWire)" stroke-width="5.0" />
+        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(18.00 400 310)" fill="none" stroke="url(#finalGoldWire)" stroke-width="5.0" />
+        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(36.00 400 310)" fill="none" stroke="url(#finalGoldWire)" stroke-width="5.0" />
+        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(54.00 400 310)" fill="none" stroke="url(#finalGoldWire)" stroke-width="5.0" />
+        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(72.00 400 310)" fill="none" stroke="url(#finalGoldWire)" stroke-width="5.0" />
+        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(90.00 400 310)" fill="none" stroke="url(#finalGoldWire)" stroke-width="5.0" />
+        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(108.00 400 310)" fill="none" stroke="url(#finalGoldWire)" stroke-width="5.0" />
+        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(126.00 400 310)" fill="none" stroke="url(#finalGoldWire)" stroke-width="5.0" />
+        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(144.00 400 310)" fill="none" stroke="url(#finalGoldWire)" stroke-width="5.0" />
+        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(162.00 400 310)" fill="none" stroke="url(#finalGoldWire)" stroke-width="5.0" />
+        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(180.00 400 310)" fill="none" stroke="url(#finalGoldWire)" stroke-width="5.0" />
+        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(198.00 400 310)" fill="none" stroke="url(#finalGoldWire)" stroke-width="5.0" />
+        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(216.00 400 310)" fill="none" stroke="url(#finalGoldWire)" stroke-width="5.0" />
+        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(234.00 400 310)" fill="none" stroke="url(#finalGoldWire)" stroke-width="5.0" />
+        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(252.00 400 310)" fill="none" stroke="url(#finalGoldWire)" stroke-width="5.0" />
+        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(270.00 400 310)" fill="none" stroke="url(#finalGoldWire)" stroke-width="5.0" />
+        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(288.00 400 310)" fill="none" stroke="url(#finalGoldWire)" stroke-width="5.0" />
+        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(306.00 400 310)" fill="none" stroke="url(#finalGoldWire)" stroke-width="5.0" />
+        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(324.00 400 310)" fill="none" stroke="url(#finalGoldWire)" stroke-width="5.0" />
+        <ellipse cx="400" cy="310" rx="175" ry="58" transform="rotate(342.00 400 310)" fill="none" stroke="url(#finalGoldWire)" stroke-width="5.0" />
+        <!-- Highlights -->
+        <ellipse cx="399" cy="309" rx="175" ry="58" transform="rotate(0.00 400 310)" fill="none" stroke="url(#finalGoldSpec)" stroke-width="1.8" opacity="0.9" />
+        <ellipse cx="399" cy="309" rx="175" ry="58" transform="rotate(36.00 400 310)" fill="none" stroke="url(#finalGoldSpec)" stroke-width="1.8" opacity="0.9" />
+        <ellipse cx="399" cy="309" rx="175" ry="58" transform="rotate(72.00 400 310)" fill="none" stroke="url(#finalGoldSpec)" stroke-width="1.8" opacity="0.9" />
+        <ellipse cx="399" cy="309" rx="175" ry="58" transform="rotate(108.00 400 310)" fill="none" stroke="url(#finalGoldSpec)" stroke-width="1.8" opacity="0.9" />
+        <ellipse cx="399" cy="309" rx="175" ry="58" transform="rotate(144.00 400 310)" fill="none" stroke="url(#finalGoldSpec)" stroke-width="1.8" opacity="0.9" />
+        <ellipse cx="399" cy="309" rx="175" ry="58" transform="rotate(180.00 400 310)" fill="none" stroke="url(#finalGoldSpec)" stroke-width="1.8" opacity="0.9" />
+        <ellipse cx="399" cy="309" rx="175" ry="58" transform="rotate(216.00 400 310)" fill="none" stroke="url(#finalGoldSpec)" stroke-width="1.8" opacity="0.9" />
+        <ellipse cx="399" cy="309" rx="175" ry="58" transform="rotate(252.00 400 310)" fill="none" stroke="url(#finalGoldSpec)" stroke-width="1.8" opacity="0.9" />
+        <ellipse cx="399" cy="309" rx="175" ry="58" transform="rotate(288.00 400 310)" fill="none" stroke="url(#finalGoldSpec)" stroke-width="1.8" opacity="0.9" />
+        <ellipse cx="399" cy="309" rx="175" ry="58" transform="rotate(324.00 400 310)" fill="none" stroke="url(#finalGoldSpec)" stroke-width="1.8" opacity="0.9" />
       </g>
 
       <!-- Inner Circles -->
-      <circle cx="0" cy="0" r="44.5" fill="none" stroke="url(#hlGold3D)" stroke-width="3.2" />
-      <circle cx="0" cy="0" r="44.5" fill="none" stroke="url(#hlGoldSpec)" stroke-width="1.0" />
-      <circle cx="0" cy="0" r="41.5" fill="none" stroke="url(#hlGold3D)" stroke-width="1.6" />
+      <circle cx="0" cy="0" r="62" fill="none" stroke="url(#finalGold3D)" stroke-width="4.2" />
+      <circle cx="0" cy="0" r="62" fill="none" stroke="url(#finalGoldSpec)" stroke-width="1.4" />
+      <circle cx="0" cy="0" r="58" fill="none" stroke="url(#finalGold3D)" stroke-width="2.2" />
 
-      <!-- Center Divider Bar -->
-      <rect x="-1.4" y="-30" width="2.8" height="60" rx="1.4" fill="url(#hlGold3D)" stroke="url(#hlGoldSpec)" stroke-width="0.5" />
-      <line x1="-0.4" y1="-29" x2="-0.4" y2="29" stroke="#FFFFFF" stroke-width="0.6" opacity="0.9" />
+      <!-- Center Vertical Divider Bar -->
+      <rect x="-2" y="-42" width="4" height="84" rx="2" fill="url(#finalGold3D)" stroke="url(#finalGoldSpec)" stroke-width="0.8" />
+      <line x1="-0.5" y1="-40" x2="-0.5" y2="40" stroke="#FFFFFF" stroke-width="0.8" opacity="0.9" />
 
-      <!-- Left Botanical Leaf -->
-      <g transform="translate(-21, 0) scale(0.68)">
-        <path d="M 0 -42 C -15 -24, -15 -5, 0 8 C 15 -5, 15 -24, 0 -42 Z" fill="url(#hlGold3D)" stroke="url(#hlGoldSpec)" stroke-width="2.5" />
-        <path d="M -5 -11 C -30 -28, -40 -8, -7 4 C -3 3, -1 -2, -5 -11 Z" fill="url(#hlGold3D)" stroke="url(#hlGoldSpec)" stroke-width="2" />
-        <path d="M 5 -11 C 30 -28, 40 -8, 7 4 C 3 3, 1 -2, 5 -11 Z" fill="url(#hlGold3D)" stroke="url(#hlGoldSpec)" stroke-width="2" />
-        <path d="M -5 6 C -24 5, -29 18, -6 14 Z" fill="url(#hlGold3D)" stroke="url(#hlGoldSpec)" stroke-width="1.8" />
-        <path d="M 5 6 C 24 5, 29 18, 6 14 Z" fill="url(#hlGold3D)" stroke="url(#hlGoldSpec)" stroke-width="1.8" />
-        <path d="M 0 8 L 0 32" stroke="url(#hlGold3D)" stroke-width="5" stroke-linecap="round" />
+      <!-- Left Botanical Leaf Motif -->
+      <g transform="translate(-29, 0) scale(0.92)">
+        <path d="M 0 -42 C -15 -24, -15 -5, 0 8 C 15 -5, 15 -24, 0 -42 Z" fill="url(#finalGold3D)" stroke="url(#finalGoldSpec)" stroke-width="2.5" />
+        <path d="M -5 -11 C -30 -28, -40 -8, -7 4 C -3 3, -1 -2, -5 -11 Z" fill="url(#finalGold3D)" stroke="url(#finalGoldSpec)" stroke-width="2" />
+        <path d="M 5 -11 C 30 -28, 40 -8, 7 4 C 3 3, 1 -2, 5 -11 Z" fill="url(#finalGold3D)" stroke="url(#finalGoldSpec)" stroke-width="2" />
+        <path d="M -5 6 C -24 5, -29 18, -6 14 Z" fill="url(#finalGold3D)" stroke="url(#finalGoldSpec)" stroke-width="1.8" />
+        <path d="M 5 6 C 24 5, 29 18, 6 14 Z" fill="url(#finalGold3D)" stroke="url(#finalGoldSpec)" stroke-width="1.8" />
+        <path d="M 0 8 L 0 32" stroke="url(#finalGold3D)" stroke-width="5" stroke-linecap="round" />
       </g>
 
       <!-- Right Roman 'c' -->
-      <g transform="translate(21, 0) scale(0.68)">
+      <g transform="translate(29, 0) scale(0.92)">
         <path d="M 32 -32 C 26 -40, 18 -44, 6 -44 C -17 -44 -32 -26 -32 0 C -32 26 -17 44 6 44 C 19 44 28 38 32 31 L 25 26 C 21 32 15 36 7 36 C -10 36 -21 22 -21 0 C -21 -22 -10 -36 7 -36 C 15 -36 21 -32 24 -27 Z" 
-              fill="url(#hlGold3D)" stroke="url(#hlGoldSpec)" stroke-width="1.8" />
-        <circle cx="31" cy="-30" r="5.5" fill="url(#hlGold3D)" stroke="url(#hlGoldSpec)" stroke-width="1" />
-        <path d="M 23 26 L 36 33 L 24 38 Z" fill="url(#hlGold3D)" />
+              fill="url(#finalGold3D)" stroke="url(#finalGoldSpec)" stroke-width="2.2" />
+        <circle cx="31" cy="-30" r="5.5" fill="url(#finalGold3D)" stroke="url(#finalGoldSpec)" stroke-width="1.2" />
+        <path d="M 23 26 L 36 33 L 24 38 Z" fill="url(#finalGold3D)" />
       </g>
     </g>
 
-    <!-- RIGHT: CARe BRAND NAME -->
-    <g transform="translate(182, 102)">
-      <!-- Roman Font Letters -->
-      <text font-family="'Cinzel', 'Playfair Display', 'Times New Roman', Georgia, serif" 
-            font-size="80" 
-            font-weight="700" 
-            letter-spacing="5" 
-            fill="url(#hlGold3D)" 
-            stroke="url(#hlGoldSpec)" 
-            stroke-width="1.2">
-        <tspan x="0">C</tspan>
-        <tspan dx="4">A</tspan>
-        <tspan dx="4">R</tspan>
-        <tspan dx="4" font-size="70" dy="-1">e</tspan>
-      </text>
+    <!-- ========================================== -->
+    <!-- RIGHT: "CARe" + ORNAMENTAL RULE + SUBTITLE -->
+    <!-- ========================================== -->
+    <g transform="translate(285, 0)">
+      <!-- 1. "CARe" Big Serif 3D Text -->
+      <g transform="translate(0, 140)">
+        <text font-family="'Cinzel', 'Playfair Display', 'Times New Roman', Georgia, serif" 
+              font-size="124" 
+              font-weight="700" 
+              letter-spacing="6" 
+              fill="url(#finalGold3D)" 
+              stroke="url(#finalGoldSpec)" 
+              stroke-width="1.8">
+          <tspan x="0">C</tspan>
+          <tspan dx="4">A</tspan>
+          <tspan dx="4">R</tspan>
+          <tspan dx="4" font-size="110" dy="-2">e</tspan>
+        </text>
+      </g>
+
+      <!-- 2. Filigree Horizontal Divider Line with Center Flourish -->
+      <g transform="translate(0, 172)">
+        <!-- Left line segment -->
+        <line x1="0" y1="0" x2="225" y2="0" stroke="url(#finalDividerGrad)" stroke-width="2.8" stroke-linecap="round" />
+        <!-- Right line segment -->
+        <line x1="285" y1="0" x2="510" y2="0" stroke="url(#finalDividerGrad)" stroke-width="2.8" stroke-linecap="round" />
+        
+        <!-- Center Fleur/Clover Ornament (X=255, Y=0) -->
+        <g transform="translate(255, 0) scale(0.7)">
+          <!-- Top petal -->
+          <path d="M 0 -16 C -8 -8, -8 0, 0 0 C 8 0, 8 -8, 0 -16 Z" fill="url(#finalGold3D)" stroke="url(#finalGoldSpec)" stroke-width="1.2" />
+          <!-- Bottom petal -->
+          <path d="M 0 16 C -8 8, -8 0, 0 0 C 8 0, 8 8, 0 16 Z" fill="url(#finalGold3D)" stroke="url(#finalGoldSpec)" stroke-width="1.2" />
+          <!-- Left petal -->
+          <path d="M -16 0 C -8 -8, 0 -8, 0 0 C 0 8, -8 8, -16 0 Z" fill="url(#finalGold3D)" stroke="url(#finalGoldSpec)" stroke-width="1.2" />
+          <!-- Right petal -->
+          <path d="M 16 0 C 8 -8, 0 -8, 0 0 C 0 8, 8 8, 16 0 Z" fill="url(#finalGold3D)" stroke="url(#finalGoldSpec)" stroke-width="1.2" />
+          <!-- Center bead -->
+          <circle cx="0" cy="0" r="4.2" fill="url(#finalGold3D)" stroke="url(#finalGoldSpec)" stroke-width="1" />
+        </g>
+      </g>
+
+      <!-- 3. Subtitle "A BEAUTY SOLUTION" -->
+      <g transform="translate(255, 206)">
+        <text text-anchor="middle"
+              font-family="'Cinzel', 'Playfair Display', 'Times New Roman', Georgia, serif" 
+              font-size="22" 
+              font-weight="600" 
+              letter-spacing="14" 
+              fill="url(#finalGold3D)" 
+              stroke="url(#finalGoldSpec)" 
+              stroke-width="0.6">
+          A BEAUTY SOLUTION
+        </text>
+      </g>
     </g>
   </g>
 </svg>

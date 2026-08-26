@@ -2663,6 +2663,11 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 // ==========================================
 // 10. VITE DEV SERVER / STATIC SERVING
 // ==========================================
+// Serve images directory directly
+app.use('/images', express.static(path.join(process.cwd(), 'images')));
+app.use('/images', express.static(path.join(process.cwd(), 'public/images')));
+app.use(express.static(path.join(process.cwd(), 'public')));
+
 async function startServer() {
   const distPath = path.join(process.cwd(), 'dist');
   const distExists = fs.existsSync(distPath);

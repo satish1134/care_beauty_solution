@@ -86,7 +86,7 @@ export const FooterMarketplace: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
           {/* Brand Col */}
           <div className="md:col-span-4 space-y-4">
-            <BrandLogo variant="footer" heightClass="h-10" />
+            <BrandLogo variant="footer" />
             <p className="text-xs text-neutral-400 leading-relaxed max-w-sm">
               Nature Distilled Skincare &amp; Clinical Aesthetics. Engineered with 3x Bio-Identical Ceramides, Colloidal Oat, and Hybrid SPF 50+ Solar Filters to restore physiological skin health without compromise.
             </p>

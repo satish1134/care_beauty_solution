@@ -91,29 +91,29 @@ export const NavbarMarketplace: React.FC = () => {
 
   return (
     <header className="bg-white border-b border-[#E5E5E5] sticky top-0 z-40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 sm:h-20 gap-3 sm:gap-6">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between min-h-[4rem] sm:min-h-[5rem] md:min-h-[6rem] py-1 gap-2 sm:gap-6">
           {/* 1. Mobile Menu Button & Brand Logo */}
-          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-4 shrink-0 min-w-0">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 text-[#1A1A1A] hover:text-[#E85D5D] focus:outline-none"
+              className="md:hidden p-1.5 -ml-1 text-[#1A1A1A] hover:text-[#E85D5D] focus:outline-none shrink-0"
               aria-label="Open Navigation Menu"
             >
-              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
 
             {/* Official Brand Logo */}
             <button
               onClick={openHome}
-              className="flex items-center gap-2 focus:outline-none group text-left"
+              className="flex items-center focus:outline-none group text-left shrink-0 py-1"
               aria-label="Care Beauty Solution Home"
             >
-              <BrandLogo variant="header" heightClass="h-9 sm:h-11" />
+              <BrandLogo variant="header" />
             </button>
           </div>
 
-          {/* 2. Global Predictive Search Bar */}
+          {/* 2. Global Predictive Search Bar (Desktop / Tablet) */}
           <div ref={searchContainerRef} className="flex-1 max-w-xl relative hidden sm:block">
             <form onSubmit={handleSearchSubmit} className="relative">
               <div className="relative flex items-center">
@@ -228,14 +228,14 @@ export const NavbarMarketplace: React.FC = () => {
           </div>
 
           {/* 3. Action Icons (Wishlist, Account, Cart Bag) */}
-          <div className="flex items-center gap-1.5 sm:gap-3">
-            {/* Account Profile / Login */}
+          <div className="flex items-center gap-1 sm:gap-3 shrink-0">
+            {/* Account Profile / Login (Shown on tablet/desktop) */}
             {currentUser ? (
               <button
                 onClick={openAccount}
-                className="flex items-center gap-2 p-2 rounded-xl hover:bg-[#FAF9F6] text-[#1A1A1A] transition text-left"
+                className="hidden sm:flex items-center gap-2 p-1.5 sm:p-2 rounded-xl hover:bg-[#FAF9F6] text-[#1A1A1A] transition text-left"
               >
-                <div className="w-8 h-8 rounded-full bg-[#E85D5D] text-white flex items-center justify-center font-bold text-xs">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#E85D5D] text-white flex items-center justify-center font-bold text-xs">
                   {currentUser.name.charAt(0)}
                 </div>
                 <div className="hidden lg:block">
@@ -248,7 +248,7 @@ export const NavbarMarketplace: React.FC = () => {
             ) : (
               <button
                 onClick={() => setIsAuthModalOpen(true)}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-[#1A1A1A] hover:bg-[#FAF9F6] hover:text-[#E85D5D] transition"
+                className="hidden sm:flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-xs font-bold text-[#1A1A1A] hover:bg-[#FAF9F6] hover:text-[#E85D5D] transition"
               >
                 <UserIcon className="w-4 h-4" />
                 <span className="hidden sm:inline">Sign In</span>
@@ -258,12 +258,12 @@ export const NavbarMarketplace: React.FC = () => {
             {/* Wishlist */}
             <button
               onClick={openWishlist}
-              className="relative p-2.5 rounded-xl hover:bg-[#FAF9F6] text-[#1A1A1A] hover:text-[#E85D5D] transition focus:outline-none"
+              className="relative p-2 rounded-xl hover:bg-[#FAF9F6] text-[#1A1A1A] hover:text-[#E85D5D] transition focus:outline-none"
               title="View Wishlist"
             >
-              <Heart className="w-5 h-5" />
+              <Heart className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
               {wishlist.length > 0 && (
-                <span className="absolute top-1 right-1 bg-[#E85D5D] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
+                <span className="absolute top-0.5 right-0.5 bg-[#E85D5D] text-white text-[9px] sm:text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
                   {wishlist.length}
                 </span>
               )}
@@ -272,7 +272,7 @@ export const NavbarMarketplace: React.FC = () => {
             {/* Cart Bag Drawer Trigger */}
             <button
               onClick={() => setIsCartDrawerOpen(true)}
-              className="relative flex items-center gap-2 bg-[#1A1A1A] hover:bg-[#E85D5D] text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-full transition shadow-xs group focus:outline-none"
+              className="relative flex items-center gap-1.5 sm:gap-2 bg-[#1A1A1A] hover:bg-[#E85D5D] text-white px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full transition shadow-xs group focus:outline-none"
               id="header-cart-bag-btn"
             >
               <ShoppingBag className="w-4 h-4 transition-transform group-hover:scale-110" />
@@ -285,16 +285,25 @@ export const NavbarMarketplace: React.FC = () => {
         </div>
 
         {/* Mobile Search input */}
-        <div className="pb-3 sm:hidden">
+        <div className="pb-2.5 sm:hidden">
           <form onSubmit={handleSearchSubmit} className="relative">
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search Sunscreen, Cleanser, Moisturizer..."
-              className="w-full bg-[#FAF9F6] border border-[#E5E5E5] text-xs text-[#1A1A1A] placeholder-[#6B6B6B] rounded-full py-2 pl-9 pr-8 focus:outline-none focus:border-[#E85D5D]"
+              className="w-full bg-[#FAF9F6] border border-[#E5E5E5] text-xs text-[#1A1A1A] placeholder-[#6B6B6B] rounded-full py-2 pl-8.5 pr-8 focus:outline-none focus:border-[#E85D5D] shadow-2xs"
             />
             <Search className="w-3.5 h-3.5 text-[#6B6B6B] absolute left-3 top-2.5" />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2.5 top-2 p-0.5 text-neutral-400 hover:text-neutral-600 rounded-full"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
           </form>
         </div>
       </div>
@@ -304,7 +313,7 @@ export const NavbarMarketplace: React.FC = () => {
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs md:hidden">
           <div className="bg-white w-4/5 max-w-sm h-full flex flex-col p-5 shadow-2xl overflow-y-auto">
             <div className="flex items-center justify-between pb-4 border-b border-[#E5E5E5]">
-              <BrandLogo variant="header" heightClass="h-8" />
+              <BrandLogo variant="header" heightClass="h-10" />
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="p-1 rounded-full text-neutral-500 hover:bg-neutral-100"

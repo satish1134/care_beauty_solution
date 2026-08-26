@@ -8,8 +8,8 @@ import product1Img from '../assets/product-1.jpeg';
 import product2Img from '../assets/product-2.jpeg';
 import product3Img from '../assets/product-3.jpeg';
 import heroImg from '../assets/hero.png';
-import headerLogoImg from '../assets/header-logo.png';
-import fullLogoImg from '../assets/full-logo.png';
+import headerLogoImg from '../assets/white-background.png';
+import fullLogoImg from '../assets/white-background.png';
 
 export const MOCK_COUPONS: CouponCode[] = [
   {

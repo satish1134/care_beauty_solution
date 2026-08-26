@@ -23,42 +23,42 @@ export const TopStrip: React.FC = () => {
 
   return (
     <>
-      <div id="top-notification-strip" className="bg-[#1A1A1A] text-neutral-300 text-xs py-2 px-4 border-b border-neutral-800">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div id="top-notification-strip" className="bg-[#1A1A1A] text-neutral-300 text-[11px] sm:text-xs py-1.5 sm:py-2 px-3 sm:px-4 border-b border-neutral-800 overflow-hidden">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
           {/* Left message with free shipping callout */}
-          <div className="flex items-center gap-2">
-            <Truck className="w-3.5 h-3.5 text-[#E85D5D]" />
-            <span>
+          <div className="flex items-center gap-1.5 sm:gap-2 truncate">
+            <Truck className="w-3.5 h-3.5 text-[#E85D5D] shrink-0" />
+            <span className="truncate">
               <strong className="text-white font-semibold">FREE Express Shipping</strong> on all orders above ₹499
             </span>
             <span className="hidden md:inline text-neutral-500">|</span>
             <button
               onClick={() => openPlp()}
-              className="hidden md:inline-block text-[#E85D5D] hover:underline font-medium"
+              className="hidden md:inline-block text-[#E85D5D] hover:underline font-medium shrink-0"
             >
               Use code: <strong>CARE15</strong> for 15% OFF
             </button>
           </div>
 
           {/* Right quick utility links */}
-          <div className="flex items-center gap-4 text-neutral-400">
-            <div className="hidden sm:flex items-center gap-1.5 hover:text-white transition cursor-pointer">
+          <div className="flex items-center gap-3 sm:gap-4 text-neutral-400 shrink-0">
+            <div className="hidden md:flex items-center gap-1.5 hover:text-white transition cursor-pointer">
               <ShieldCheck className="w-3.5 h-3.5 text-[#2D5A3D]" />
-              <span>100% Authentic Products</span>
+              <span>100% Authentic</span>
             </div>
             <button
               onClick={() => setIsAppModalOpen(true)}
               className="hidden sm:flex items-center gap-1.5 hover:text-white transition cursor-pointer text-left focus:outline-none"
             >
               <Smartphone className="w-3.5 h-3.5 text-neutral-400" />
-              <span className="hover:text-[#E85D5D] transition">Download CBS App</span>
+              <span className="hover:text-[#E85D5D] transition">App</span>
             </button>
             <a
               href="mailto:support@carebeautysolution.com"
-              className="flex items-center gap-1.5 hover:text-white transition cursor-pointer"
+              className="flex items-center gap-1 hover:text-white transition cursor-pointer text-[11px] sm:text-xs"
             >
               <HelpCircle className="w-3.5 h-3.5 text-neutral-400" />
-              <span>Help Center</span>
+              <span className="hidden xs:inline">Help</span>
             </a>
           </div>
         </div>

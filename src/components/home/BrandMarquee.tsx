@@ -14,15 +14,15 @@ export const BrandMarquee: React.FC = () => {
   ];
 
   return (
-    <div id="clinical-certifications-marquee" className="bg-white border-b border-[#E5E5E5] py-4 overflow-hidden">
+    <div id="clinical-certifications-marquee" className="bg-white border-b border-[#E5E5E5] py-3.5 sm:py-4 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between flex-wrap gap-4 sm:gap-6">
+        <div className="grid grid-cols-2 md:flex md:items-center md:justify-between gap-3 sm:gap-6">
           {BADGES.slice(0, 4).map((badge, idx) => (
-            <div key={idx} className="flex items-center gap-2 text-xs font-bold text-[#1A1A1A]">
-              <div className="p-1 rounded-md bg-[#FAF9F6] border border-[#E5E5E5]">
+            <div key={idx} className="flex items-center gap-2 text-[11px] sm:text-xs font-bold text-[#1A1A1A]">
+              <div className="p-1 rounded-md bg-[#FAF9F6] border border-[#E5E5E5] shrink-0">
                 {badge.icon}
               </div>
-              <span>{badge.label}</span>
+              <span className="leading-tight">{badge.label}</span>
             </div>
           ))}
         </div>
