@@ -1,6 +1,6 @@
 {
-  "name": "Care Beauty Solution",
-  "description": "Clinical barrier skincare e-commerce marketplace featuring dermat-tested Sunscreen, Cleanser, Moisturizer, and complete Daily Routine Kits.",
+  "name": "CARE Beauty Solution",
+  "description": "Production-grade infrastructure foundation, DevOps, CI/CD pipelines, observability, security hardening, and pre-launch e-commerce platform for Care Beauty Solution.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

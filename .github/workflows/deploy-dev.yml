@@ -1,0 +1,104 @@
+name: CD - Deploy to Development VPS
+
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  build-and-push:
+    name: Build & Push Immutable Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set lower-case image name
+        run: echo "IMAGE_NAME=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push container image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: infrastructure/docker/Dockerfile
+          push: true
+          build-args: |
+            NEXT_PUBLIC_ENABLE_DEVOPS_CONSOLE=false
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:develop
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy-dev:
+    name: Deploy to Dev VPS
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set lower-case image name
+        run: echo "IMAGE_NAME=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+      - name: Copy docker-compose and configs to Dev VPS
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: "infrastructure/docker/docker-compose.dev.yml,infrastructure/nginx/nginx.conf,infrastructure/nginx/conf.d/**,infrastructure/scripts/ssl-manager.sh"
+          target: "/opt/care-beauty/dev"
+          strip_components: 0
+
+      - name: Execute Remote Deployment Script
+        uses: appleboy/ssh-action@v1
+        env:
+          GIT_COMMIT_SHA: ${{ github.sha }}
+          IMAGE_NAME: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          GHCR_USER: ${{ github.actor }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          envs: GIT_COMMIT_SHA,IMAGE_NAME,GHCR_USER,GHCR_TOKEN
+          script: |
+            set -eu
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+            docker pull "${IMAGE_NAME}:${GIT_COMMIT_SHA}"
+            docker stop care_app_dev 2>/dev/null || true
+            docker rm care_app_dev 2>/dev/null || true
+            docker run -d \
+              --name care_app_dev \
+              --restart unless-stopped \
+              --network host \
+              -e NODE_ENV=production \
+              -e HOSTNAME=127.0.0.1 \
+              -e PORT=3002 \
+              "${IMAGE_NAME}:${GIT_COMMIT_SHA}"
+            # Verify health probe
+            sleep 3
+            curl -f http://127.0.0.1:3002/api/health || curl -I http://127.0.0.1:3002
+            docker image prune -f
+

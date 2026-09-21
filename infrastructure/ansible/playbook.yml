@@ -1,0 +1,7 @@
+---
+- name: Bootstrap & Harden Care Beauty Solution VPS Nodes
+  hosts: all
+  become: true
+  roles:
+    - hardening
+    - docker

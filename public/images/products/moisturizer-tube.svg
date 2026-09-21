@@ -1,0 +1,151 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1200" width="100%" height="100%">
+  <defs>
+    <!-- Background marble lighting -->
+    <linearGradient id="bgGradM" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDFBF9"/>
+      <stop offset="50%" stop-color="#F7F3EC"/>
+      <stop offset="100%" stop-color="#EFE8DD"/>
+    </linearGradient>
+    <radialGradient id="sunGlowM" cx="60%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.9"/>
+      <stop offset="60%" stop-color="#FBF7EE" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#EAE3D7" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Tube 3D Shading -->
+    <linearGradient id="tubeShade" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#E2DDD5"/>
+      <stop offset="7%" stop-color="#F6F4F0"/>
+      <stop offset="28%" stop-color="#FFFFFF"/>
+      <stop offset="72%" stop-color="#FAF8F5"/>
+      <stop offset="92%" stop-color="#ECE6DC"/>
+      <stop offset="100%" stop-color="#DBD4C7"/>
+    </linearGradient>
+    <!-- Cap Shading -->
+    <linearGradient id="capShade" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#D5CEBE"/>
+      <stop offset="10%" stop-color="#F0ECE4"/>
+      <stop offset="50%" stop-color="#FCFAF7"/>
+      <stop offset="90%" stop-color="#EDE7DC"/>
+      <stop offset="100%" stop-color="#CCC4B4"/>
+    </linearGradient>
+    <linearGradient id="goldCapRing" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#B88A14"/>
+      <stop offset="35%" stop-color="#F9E8B2"/>
+      <stop offset="65%" stop-color="#D4AF37"/>
+      <stop offset="100%" stop-color="#996E06"/>
+    </linearGradient>
+    <linearGradient id="goldMandala" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D4AF37"/>
+      <stop offset="50%" stop-color="#F3E5AB"/>
+      <stop offset="100%" stop-color="#AA820A"/>
+    </linearGradient>
+    <!-- Soft shadow filter -->
+    <filter id="dropShadowM" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="26" stdDeviation="22" flood-color="#362919" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="1200" fill="url(#bgGradM)"/>
+  <rect width="800" height="1200" fill="url(#sunGlowM)"/>
+
+  <!-- Soft Palm Shadow Texture -->
+  <path d="M 0 100 Q 300 250 500 150 T 800 220 L 800 0 L 0 0 Z" fill="#2E4035" opacity="0.035"/>
+  <path d="M 800 450 Q 500 600 300 520 T 0 680 L 0 350 L 800 300 Z" fill="#2E4035" opacity="0.03"/>
+
+  <!-- Grounding Shadow under Cap -->
+  <ellipse cx="400" cy="1075" rx="190" ry="22" fill="#2A241E" opacity="0.16"/>
+  <ellipse cx="400" cy="1072" rx="130" ry="11" fill="#1C1814" opacity="0.22"/>
+
+  <!-- TUBE GROUP -->
+  <g filter="url(#dropShadowM)">
+    <!-- Main Squeeze Tube Body (standing inverted on cap) -->
+    <!-- Top crimp seal -->
+    <rect x="230" y="160" width="340" height="24" rx="3" fill="#E8E2D6" stroke="#D3CBC0" stroke-width="1.5"/>
+    <line x1="230" y1="172" x2="570" y2="172" stroke="#FAF8F5" stroke-width="2"/>
+
+    <!-- Tube Body (from top crimp 340px down to shoulder 260px) -->
+    <path d="M 235 184
+             L 260 760
+             C 265 830, 290 870, 320 885
+             L 480 885
+             C 510 870, 535 830, 540 760
+             L 565 184 Z"
+          fill="url(#tubeShade)" stroke="#D8D2C5" stroke-width="2"/>
+
+    <!-- Gold Accent Ring between tube shoulder and cap -->
+    <rect x="315" y="888" width="170" height="14" rx="2" fill="url(#goldCapRing)"/>
+
+    <!-- Screw Cap Base (standing flat on surface) -->
+    <rect x="300" y="904" width="200" height="160" rx="12" fill="url(#capShade)" stroke="#CBC2B2" stroke-width="2"/>
+    <!-- Subtle cap ribs -->
+    <line x1="330" y1="910" x2="330" y2="1055" stroke="#E6E0D4" stroke-width="1.5"/>
+    <line x1="360" y1="910" x2="360" y2="1055" stroke="#E6E0D4" stroke-width="1.5"/>
+    <line x1="400" y1="910" x2="400" y2="1055" stroke="#E6E0D4" stroke-width="1.5"/>
+    <line x1="440" y1="910" x2="440" y2="1055" stroke="#E6E0D4" stroke-width="1.5"/>
+    <line x1="470" y1="910" x2="470" y2="1055" stroke="#E6E0D4" stroke-width="1.5"/>
+  </g>
+
+  <!-- TUBE LABEL GRAPHICS & TYPOGRAPHY -->
+  <g id="labelContentMoisturizer">
+    <!-- Brand Mandala Logo -->
+    <g transform="translate(400, 310)">
+      <!-- Outer gold ring -->
+      <circle cx="0" cy="0" r="50" fill="none" stroke="url(#goldMandala)" stroke-width="2.5"/>
+      <!-- Decorative dotted ring -->
+      <circle cx="0" cy="0" r="44" fill="none" stroke="#C29B27" stroke-width="1" stroke-dasharray="3 3"/>
+      <!-- Inner ring -->
+      <circle cx="0" cy="0" r="36" fill="none" stroke="url(#goldMandala)" stroke-width="1.5"/>
+      <!-- Botanical leaf left -->
+      <path d="M -14 4 C -21 -8, -11 -15, -9 -8 C -7 -2, -11 2, -14 4 Z" fill="none" stroke="#A17C18" stroke-width="1.8"/>
+      <!-- Center divider -->
+      <line x1="0" y1="-20" x2="0" y2="20" stroke="#A17C18" stroke-width="1.5"/>
+      <!-- Letter C right -->
+      <text x="13" y="6" font-family="'Playfair Display', Georgia, serif" font-size="20" font-weight="600" fill="#8C6A0D" text-anchor="middle">C</text>
+    </g>
+
+    <!-- Brand Name -->
+    <text x="400" y="395" font-family="'Cinzel', 'Playfair Display', Georgia, serif" font-size="28" font-weight="700" letter-spacing="4" fill="#3D3831" text-anchor="middle">
+      CARe
+    </text>
+    <line x1="330" y1="408" x2="470" y2="408" stroke="#D4AF37" stroke-width="1"/>
+    <text x="400" y="422" font-family="'Montserrat', sans-serif" font-size="10.5" font-weight="600" letter-spacing="3" fill="#6B6357" text-anchor="middle">
+      A BEAUTY SOLUTION
+    </text>
+
+    <!-- Product Title -->
+    <text x="400" y="475" font-family="'Playfair Display', Georgia, serif" font-size="30" font-weight="700" letter-spacing="0.5" fill="#1E293B" text-anchor="middle">
+      Hydrating Moisturizer
+    </text>
+
+    <!-- Key Actives -->
+    <text x="400" y="515" font-family="'Montserrat', sans-serif" font-size="13" font-weight="600" letter-spacing="0.8" fill="#52525B" text-anchor="middle">
+      With Ceramides + Niacinamide
+    </text>
+
+    <!-- Tinted Claim Box -->
+    <g transform="translate(400, 560)">
+      <rect x="-155" y="-18" width="310" height="36" rx="6" fill="#F4EFE6" stroke="#D4AF37" stroke-width="1"/>
+      <text x="0" y="5" font-family="'Montserrat', sans-serif" font-size="11.5" font-weight="700" letter-spacing="0.6" fill="#785412" text-anchor="middle">
+        Fragrance Free  |  Non-Comedogenic
+      </text>
+    </g>
+
+    <!-- Description Claim -->
+    <text x="400" y="625" font-family="'Playfair Display', Georgia, serif" font-style="italic" font-size="15" fill="#4B5563" text-anchor="middle">
+      Helps Strengthen Skin Barrier
+    </text>
+
+    <line x1="280" y1="655" x2="520" y2="655" stroke="#CBD5E1" stroke-width="1"/>
+
+    <!-- Suitability -->
+    <text x="400" y="688" font-family="'Montserrat', sans-serif" font-size="13" font-weight="600" letter-spacing="0.5" fill="#475569" text-anchor="middle">
+      For All Skin Types
+    </text>
+
+    <!-- Net Weight / Volume -->
+    <text x="400" y="735" font-family="'Montserrat', sans-serif" font-size="18" font-weight="700" letter-spacing="1" fill="#18181B" text-anchor="middle">
+      50 g
+    </text>
+  </g>
+</svg>

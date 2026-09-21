@@ -1,0 +1,85 @@
+name: CD - Deploy to Staging Qualification
+
+on:
+  push:
+    branches: [release/*, staging]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  build-and-push:
+    name: Build & Push Staging Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set lower-case image name
+        run: echo "IMAGE_NAME=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push container image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: infrastructure/docker/Dockerfile
+          push: true
+          build-args: |
+            NEXT_PUBLIC_ENABLE_DEVOPS_CONSOLE=true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:staging
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy-staging:
+    name: Deploy to Staging VPS
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set lower-case image name
+        run: echo "IMAGE_NAME=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+      - name: Copy docker-compose and configs to Staging VPS
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.STAGING_VPS_HOST || secrets.VPS_HOST }}
+          username: ${{ secrets.STAGING_VPS_USER || secrets.VPS_USER }}
+          port: ${{ secrets.STAGING_VPS_PORT || 22 }}
+          key: ${{ secrets.STAGING_VPS_SSH_KEY || secrets.VPS_SSH_KEY }}
+          source: "infrastructure/docker/docker-compose.staging.yml,infrastructure/nginx/nginx.conf"
+          target: "/opt/care-beauty/staging"
+
+      - name: Execute Remote Staging Cutover & E2E Validation
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.STAGING_VPS_HOST || secrets.VPS_HOST }}
+          username: ${{ secrets.STAGING_VPS_USER || secrets.VPS_USER }}
+          port: ${{ secrets.STAGING_VPS_PORT || 22 }}
+          key: ${{ secrets.STAGING_VPS_SSH_KEY || secrets.VPS_SSH_KEY }}
+          script: |
+            cd /opt/care-beauty/staging
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
+            export APP_IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+            docker compose -f infrastructure/docker/docker-compose.staging.yml pull
+            docker compose -f infrastructure/docker/docker-compose.staging.yml up -d --remove-orphans
+            docker run --network container:care-staging-app curlimages/curl:latest -s http://localhost:3000/api/health || exit 1

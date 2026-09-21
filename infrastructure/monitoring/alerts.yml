@@ -1,0 +1,87 @@
+groups:
+  - name: care_beauty_critical_alerts
+    rules:
+      - alert: WebsiteDown
+        expr: probe_success{job="uptime_blackbox"} == 0
+        for: 1m
+        labels:
+          severity: CRITICAL
+        annotations:
+          summary: "Care Beauty Storefront is down"
+          description: "Blackbox probe detected storefront is unreachable from the internet."
+
+      - alert: DatabaseUnavailable
+        expr: pg_up == 0
+        for: 30s
+        labels:
+          severity: CRITICAL
+        annotations:
+          summary: "PostgreSQL database unavailable"
+          description: "Postgres exporter cannot connect to care_beauty_prod database."
+
+      - alert: DiskCriticallyFull
+        expr: (node_filesystem_avail_bytes{mountpoint="/"} * 100) / node_filesystem_size_bytes{mountpoint="/"} < 10
+        for: 2m
+        labels:
+          severity: CRITICAL
+        annotations:
+          summary: "Host disk space critically low (<10% free)"
+          description: "Primary disk partition is almost exhausted on VPS host."
+
+  - name: care_beauty_high_alerts
+    rules:
+      - alert: Http5xxSpike
+        expr: sum(rate(http_requests_total{status=~"5.."}[2m])) / sum(rate(http_requests_total[2m])) * 100 > 5
+        for: 2m
+        labels:
+          severity: HIGH
+        annotations:
+          summary: "HTTP 5xx error rate exceeds 5%"
+          description: "High error rate detected in Next.js / API responses."
+
+      - alert: HighRequestLatency
+        expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le)) > 2.0
+        for: 3m
+        labels:
+          severity: HIGH
+        annotations:
+          summary: "p95 request latency exceeds 2.0 seconds"
+          description: "Customers are experiencing severe degradation in response times."
+
+      - alert: RedisUnavailable
+        expr: redis_up == 0
+        for: 1m
+        labels:
+          severity: HIGH
+        annotations:
+          summary: "Redis cache instance unavailable"
+          description: "Redis container has stopped responding to health checks."
+
+      - alert: ContainerCrashLoop
+        expr: rate(container_restarts_total[10m]) > 2
+        for: 2m
+        labels:
+          severity: HIGH
+        annotations:
+          summary: "Container crash loop detected"
+          description: "One or more Docker containers are restarting continuously."
+
+  - name: care_beauty_medium_alerts
+    rules:
+      - alert: HighCpuUtilization
+        expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 10m
+        labels:
+          severity: MEDIUM
+        annotations:
+          summary: "Sustained high CPU usage (>80% for 10m)"
+          description: "VPS host CPU utilization exceeds healthy operating margins."
+
+      - alert: HighMemoryUtilization
+        expr: (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 < 15
+        for: 5m
+        labels:
+          severity: MEDIUM
+        annotations:
+          summary: "Available host memory < 15%"
+          description: "RAM exhaustion risk on VPS host."

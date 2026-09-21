@@ -1,0 +1,39 @@
+name: Ops - Emergency Deployment Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target Environment'
+        required: true
+        type: choice
+        options:
+          - prod
+          - staging
+        default: 'prod'
+      reason:
+        description: 'Justification for rollback'
+        required: true
+        default: 'Automated health degradation alert'
+
+concurrency:
+  group: production-deployment-lock
+  cancel-in-progress: false
+
+jobs:
+  execute-rollback:
+    name: Execute Rollback
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Trigger Remote Rollback Script
+        uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2
+        with:
+          host: ${{ secrets.PROD_VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -eu
+            echo "Executing emergency rollback for reason: ${{ inputs.reason }}"
+            /opt/care-beauty/infrastructure/scripts/rollback.sh

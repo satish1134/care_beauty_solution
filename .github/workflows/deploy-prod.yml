@@ -1,0 +1,126 @@
+name: CD - Production Zero-Downtime Blue/Green Deployment
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      version_tag:
+        description: 'Semantic Version Tag (e.g., v1.0.0)'
+        required: false
+        default: 'v1.0.0'
+      confirm_deploy:
+        description: 'Type "CONFIRM" to deploy manually'
+        required: false
+        default: 'CONFIRM'
+
+concurrency:
+  group: production-deployment-lock
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  build-production-image:
+    name: Build Immutable Production Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify explicit confirmation if manual dispatch
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.confirm_deploy }}" != "CONFIRM" ]; then
+            echo "ERROR: Production deployment was NOT confirmed. Aborting to protect production."
+            exit 1
+          fi
+
+      - name: Checkout code
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Set lower-case image name
+        run: echo "IMAGE_NAME=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f
+
+      - name: Build and Push Immutable Image
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8
+        with:
+          context: .
+          file: infrastructure/docker/Dockerfile
+          push: true
+          build-args: |
+            NEXT_PUBLIC_ENABLE_DEVOPS_CONSOLE=false
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.event.inputs.version_tag || 'latest' }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy-production:
+    name: Production Gate & Blue/Green Cutover
+    needs: build-production-image
+    runs-on: ubuntu-latest
+    environment:
+      name: prod
+      url: https://carebeautysolution.com
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Set lower-case image name
+        run: echo "IMAGE_NAME=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+      - name: Sync Production Scripts and Compose
+        uses: appleboy/scp-action@ff85246acaad7bdce478db94a363cd2bf7c90345
+        with:
+          host: ${{ secrets.PROD_VPS_HOST || secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: "infrastructure/docker/docker-compose.prod.yml,infrastructure/scripts/deploy-blue-green.sh,infrastructure/scripts/rollback.sh,infrastructure/scripts/ssl-manager.sh"
+          target: "/opt/care-beauty"
+          strip_components: 2
+
+      - name: Sync Nginx Configurations
+        uses: appleboy/scp-action@ff85246acaad7bdce478db94a363cd2bf7c90345
+        with:
+          host: ${{ secrets.PROD_VPS_HOST || secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: "infrastructure/nginx/**"
+          target: "/opt/care-beauty"
+          strip_components: 1
+
+      - name: Execute Blue/Green Cutover
+        uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2
+        env:
+          TARGET_VERSION: ${{ github.event.inputs.version_tag || 'v1.0.0' }}
+          TARGET_SHA: ${{ github.sha }}
+          GHCR_USER: ${{ github.actor }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          IMAGE_BASE: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        with:
+          host: ${{ secrets.PROD_VPS_HOST || secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          envs: TARGET_VERSION,TARGET_SHA,GHCR_USER,GHCR_TOKEN,IMAGE_BASE
+          script: |
+            set -eu
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+            chmod +x /opt/care-beauty/deploy-blue-green.sh /opt/care-beauty/rollback.sh
+            IMAGE_NAME="$IMAGE_BASE" /opt/care-beauty/deploy-blue-green.sh "$TARGET_VERSION" "$TARGET_SHA"
+

@@ -1,0 +1,23 @@
+---
+- name: Download Docker installation script
+  get_url:
+    url: https://get.docker.com
+    dest: /tmp/get-docker.sh
+    mode: '0755'
+
+- name: Execute Docker installer
+  command: /tmp/get-docker.sh
+  args:
+    creates: /usr/bin/docker
+
+- name: Ensure docker service is enabled and running
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Add deploy user to docker group
+  user:
+    name: deploy
+    groups: docker
+    append: yes

@@ -1,80 +1,55 @@
-# CARe Beauty Solution — Full-Stack E-Commerce Platform
+# CARE-A Beauty Solution
 
-CARe Beauty Solution is an enterprise-grade D2C clinical skincare e-commerce platform engineered for Indian skin formulations.
+Pre-launch landing page and email waitlist for CARE-A Beauty Solution.
 
----
-
-## Production Deployment Stack
-
-| Component | Target Platform | Free Tier | Infrastructure Role |
-| :--- | :--- | :--- | :--- |
-| **Full-Stack Application** | **Vercel** | Yes (Hobby Tier) | Frontend Edge CDN & Serverless Express API backend |
-| **Database** | **Neon** | Yes | Managed serverless PostgreSQL database |
-| **Redis & Queue** | **Upstash** | Yes | Serverless Redis store for BullMQ job queue |
-| **Payments** | **Razorpay** | Pay-per-use | India payment gateway (UPI, Netbanking, Cards) |
-
----
-
-## Step-by-Step Deployment Guide
-
-### 1. Database Setup (Neon PostgreSQL)
-1. Sign up at [Neon.tech](https://neon.tech).
-2. Create a new PostgreSQL database project named `care-beauty-db`.
-3. Copy the Connection String URI and set it as `DATABASE_URL` in your environment variables.
-
-### 2. Redis & Job Queue Setup (Upstash Redis)
-1. Sign up at [Upstash.com](https://upstash.com).
-2. Create a Redis database instance.
-3. Copy the Redis Connection URL (`redis://...`) and set it as `REDIS_URL`.
-
-### 3. Deploy Full-Stack App (Vercel)
-1. Push your repository to GitHub.
-2. Connect your repository to **Vercel** (Add New Project).
-3. Vercel automatically detects `vercel.json` and builds both frontend and `/api` serverless backend functions.
-4. Configure environment variables in the Vercel dashboard:
-   - `NODE_ENV` = `production`
-   - `DATABASE_URL` (From Neon)
-   - `REDIS_URL` (From Upstash)
-   - `JWT_SECRET`
-   - `RAZORPAY_KEY_ID` & `RAZORPAY_SECRET`
-   - `GEMINI_API_KEY`
-5. Click **Deploy**. Your frontend and backend will both run under your custom Vercel domain!
-
----
-
-## Local Development & Testing
+## Run locally
 
 ```bash
-# Install dependencies
 npm install
-
-# Run build
-npm run build
-
-# Start dev server
 npm run dev
 ```
 
-### Automated Integration Tests & Load Testing
-```bash
-# Execute Phase 3-6 E2E Integration Test Suite
-curl -s http://localhost:3000/api/tests/phase3
-curl -s http://localhost:3000/api/tests/phase4
-curl -s http://localhost:3000/api/tests/phase5
-curl -s http://localhost:3000/api/tests/phase6
+Open `http://localhost:3000`.
 
-# Run Load Test Script (50 concurrent checkouts)
-node load-test-checkout.js
+The waitlist form posts to `/api/subscribe` and stores local development subscribers in `data/waitlist.json`. That file is ignored by Git. Use a managed database or email platform before production deployment.
+
+## Deployment
+
+- `main` deploys production at `careabeautysolution.com`.
+- `develop` deploys internal testing at `dev.careabeautysolution.com`.
+- Production uses VPS port `3001`; development uses VPS port `3002`.
+
+## GitHub CLI deployment flow
+
+Install GitHub CLI, then authenticate locally:
+
+```powershell
+gh auth login
+gh auth status
 ```
 
----
+GitHub Actions reads deployment secrets; local code never reads their values. Configure these secrets in both GitHub environments (`prod` and `dev`): `VPS_HOST`, `VPS_PORT`, `VPS_USER`, `VPS_SSH_KEY`, `GHCR_USER`, and `GHCR_READ_TOKEN`.
 
-## Environment Variables Reference (`.env.example`)
+Push normally from the local workspace:
 
-See `.env.example` for all required production variables:
-- `JWT_SECRET`
-- `RAZORPAY_KEY_ID` / `RAZORPAY_SECRET` / `RAZORPAY_WEBHOOK_SECRET`
-- `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` / `S3_BUCKET_NAME`
-- `DATABASE_URL` (Neon PostgreSQL)
-- `REDIS_URL` (Upstash Redis)
-- `GA4_MEASUREMENT_ID`
+```powershell
+git push origin develop  # deploys dev
+git push origin main     # deploys production
+```
+
+Or trigger a deployment manually from the local terminal:
+
+```powershell
+gh workflow run deploy.yml --ref develop -f branch=develop
+gh workflow run deploy.yml --ref main -f branch=main
+gh run watch
+```
+
+List configured secret names without revealing values:
+
+```powershell
+gh secret list --env dev
+gh secret list --env prod
+```
+
+GitHub CLI cannot read secret values by design. Use the GitHub Actions runner to consume them securely.

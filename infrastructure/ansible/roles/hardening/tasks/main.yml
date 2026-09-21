@@ -1,0 +1,44 @@
+---
+- name: Update apt cache and upgrade packages
+  apt:
+    update_cache: yes
+    upgrade: dist
+
+- name: Install required baseline packages
+  apt:
+    name:
+      - ufw
+      - fail2ban
+      - unattended-upgrades
+      - curl
+      - git
+      - htop
+    state: present
+
+- name: Disable SSH root login and password auth
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+  loop:
+    - { regexp: '^#?PermitRootLogin', line: 'PermitRootLogin no' }
+    - { regexp: '^#?PasswordAuthentication', line: 'PasswordAuthentication no' }
+  notify:
+    - restart ssh
+
+- name: Configure UFW firewall rules
+  ufw:
+    rule: "{{ item.rule }}"
+    port: "{{ item.port }}"
+    proto: "{{ item.proto }}"
+  loop:
+    - { rule: 'allow', port: '80', proto: 'tcp' }
+    - { rule: 'allow', port: '443', proto: 'tcp' }
+    - { rule: 'limit', port: '22', proto: 'tcp' }
+
+- name: Enable UFW with default deny incoming policy
+  ufw:
+    state: enabled
+    policy: deny
+    direction: incoming

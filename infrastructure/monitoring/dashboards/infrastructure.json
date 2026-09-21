@@ -1,0 +1,40 @@
+{
+  "title": "Care Beauty - Infrastructure & Host Health",
+  "tags": ["care-beauty", "infrastructure", "vps"],
+  "timezone": "browser",
+  "panels": [
+    {
+      "title": "CPU Utilization (%)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [{ "expr": "100 - (avg by (instance) (rate(node_cpu_seconds_total{mode='idle'}[5m])) * 100)" }]
+    },
+    {
+      "title": "Memory Usage (%)",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 0 },
+      "targets": [{ "expr": "100 * (1 - ((node_memory_MemAvailable_bytes) / (node_memory_MemTotal_bytes)))" }]
+    },
+    {
+      "title": "Root Disk Space (%)",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 0 },
+      "targets": [{ "expr": "100 - ((node_filesystem_avail_bytes{mountpoint='/'} * 100) / node_filesystem_size_bytes{mountpoint='/'})" }]
+    },
+    {
+      "title": "Network Ingress / Egress (Bytes/sec)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        { "expr": "rate(node_network_receive_bytes_total[5m])", "legendFormat": "Inbound" },
+        { "expr": "rate(node_network_transmit_bytes_total[5m])", "legendFormat": "Outbound" }
+      ]
+    },
+    {
+      "title": "Active Docker Containers",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [{ "expr": "count(container_last_seen)" }]
+    }
+  ]
+}

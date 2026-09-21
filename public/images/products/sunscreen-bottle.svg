@@ -1,0 +1,167 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1200" width="100%" height="100%">
+  <defs>
+    <!-- Background lighting -->
+    <linearGradient id="bgGradS" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FBFBF9"/>
+      <stop offset="50%" stop-color="#F2F0EB"/>
+      <stop offset="100%" stop-color="#E8E5DD"/>
+    </linearGradient>
+    <radialGradient id="sunGlowS" cx="50%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.9"/>
+      <stop offset="60%" stop-color="#F7F5EE" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#E5E0D5" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Bottle 3D Shading -->
+    <linearGradient id="bottleShadeS" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#E0DDD6"/>
+      <stop offset="8%" stop-color="#F6F5F2"/>
+      <stop offset="25%" stop-color="#FFFFFF"/>
+      <stop offset="70%" stop-color="#FCFCFA"/>
+      <stop offset="92%" stop-color="#ECE7DE"/>
+      <stop offset="100%" stop-color="#DAD4C8"/>
+    </linearGradient>
+    <!-- Clear Cap Shading (translucent acrylic look) -->
+    <linearGradient id="clearCap" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#B8CCD8" stop-opacity="0.35"/>
+      <stop offset="15%" stop-color="#FFFFFF" stop-opacity="0.7"/>
+      <stop offset="50%" stop-color="#E8F4F8" stop-opacity="0.2"/>
+      <stop offset="85%" stop-color="#FFFFFF" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#9CB3C2" stop-opacity="0.4"/>
+    </linearGradient>
+    <!-- Teal Base Band -->
+    <linearGradient id="tealBand" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3D8B84"/>
+      <stop offset="30%" stop-color="#55A8A0"/>
+      <stop offset="70%" stop-color="#4C9C94"/>
+      <stop offset="100%" stop-color="#2D6E68"/>
+    </linearGradient>
+    <!-- Gold Mandala -->
+    <linearGradient id="goldSun" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D4AF37"/>
+      <stop offset="50%" stop-color="#F3E5AB"/>
+      <stop offset="100%" stop-color="#AA820A"/>
+    </linearGradient>
+    <linearGradient id="spfBadge" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#A5CEC5"/>
+      <stop offset="50%" stop-color="#BAE0D8"/>
+      <stop offset="100%" stop-color="#93BEB5"/>
+    </linearGradient>
+    <filter id="dropShadowS" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="28" stdDeviation="24" flood-color="#362919" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="1200" fill="url(#bgGradS)"/>
+  <rect width="800" height="1200" fill="url(#sunGlowS)"/>
+
+  <!-- Botanical Palm Shadow Texture -->
+  <path d="M 0 120 Q 280 280 480 160 T 800 230 L 800 0 L 0 0 Z" fill="#2E4035" opacity="0.035"/>
+  <path d="M 800 380 Q 520 530 320 440 T 0 600 L 0 320 L 800 240 Z" fill="#2E4035" opacity="0.03"/>
+
+  <!-- Grounding Shadow -->
+  <ellipse cx="400" cy="1075" rx="190" ry="22" fill="#2A241E" opacity="0.16"/>
+  <ellipse cx="400" cy="1072" rx="130" ry="11" fill="#1C1814" opacity="0.22"/>
+
+  <!-- BOTTLE GROUP -->
+  <g filter="url(#dropShadowS)">
+    <!-- Dispenser Spray Nozzle Inside Cap -->
+    <rect x="360" y="240" width="80" height="40" rx="4" fill="#FAF9F7" stroke="#D5CFC3" stroke-width="1.5"/>
+    <path d="M 370 240 L 370 190 C 370 175, 430 175, 430 190 L 430 240 Z" fill="#FFFFFF" stroke="#D5CFC3" stroke-width="1.5"/>
+    <ellipse cx="380" cy="205" rx="3" ry="5" fill="#A8A29E"/>
+
+    <!-- Clear Protective Overcap (cylinder over pump) -->
+    <rect x="310" y="140" width="180" height="160" rx="16" fill="url(#clearCap)" stroke="#C8D6DE" stroke-width="2"/>
+    <line x1="330" y1="150" x2="330" y2="290" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+    <line x1="470" y1="155" x2="470" y2="285" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+
+    <!-- Main Cylindrical Bottle (100 ml tall pump spray) -->
+    <path d="M 280 295
+             C 320 288, 480 288, 520 295
+             C 545 302, 555 330, 555 360
+             L 555 980
+             C 555 1025, 520 1055, 400 1055
+             C 280 1055, 245 1025, 245 980
+             L 245 360
+             C 245 330, 255 302, 280 295 Z"
+          fill="url(#bottleShadeS)" stroke="#D8D2C5" stroke-width="2"/>
+
+    <!-- Teal Botanical Bottom Wave Band -->
+    <path d="M 246 920
+             C 310 935, 360 910, 410 925
+             C 460 940, 510 920, 554 930
+             L 554 980
+             C 554 1025, 520 1054, 400 1054
+             C 280 1054, 246 1025, 246 980 Z"
+          fill="url(#tealBand)"/>
+
+    <!-- Water drops graphic on teal band -->
+    <g fill="#FFFFFF" opacity="0.65">
+      <ellipse cx="320" cy="980" rx="6" ry="9"/>
+      <ellipse cx="380" cy="960" rx="5" ry="7"/>
+      <ellipse cx="440" cy="990" rx="7" ry="10"/>
+      <ellipse cx="490" cy="970" rx="5" ry="8"/>
+    </g>
+
+    <!-- Subdued Left Rim Reflection Highlight -->
+    <path d="M 265 370 L 265 910" stroke="#FFFFFF" stroke-width="5" opacity="0.7" stroke-linecap="round"/>
+  </g>
+
+  <!-- BOTTLE LABEL GRAPHICS & TYPOGRAPHY -->
+  <g id="labelContentSunscreen">
+    <!-- Brand Mandala Logo -->
+    <g transform="translate(400, 390)">
+      <circle cx="0" cy="0" r="50" fill="none" stroke="url(#goldSun)" stroke-width="2.5"/>
+      <circle cx="0" cy="0" r="44" fill="none" stroke="#C29B27" stroke-width="1" stroke-dasharray="3 3"/>
+      <circle cx="0" cy="0" r="36" fill="none" stroke="url(#goldSun)" stroke-width="1.5"/>
+      <path d="M -14 4 C -21 -8, -11 -15, -9 -8 C -7 -2, -11 2, -14 4 Z" fill="none" stroke="#A17C18" stroke-width="1.8"/>
+      <line x1="0" y1="-20" x2="0" y2="20" stroke="#A17C18" stroke-width="1.5"/>
+      <text x="13" y="6" font-family="'Playfair Display', Georgia, serif" font-size="20" font-weight="600" fill="#8C6A0D" text-anchor="middle">C</text>
+    </g>
+
+    <!-- Brand Name -->
+    <text x="400" y="475" font-family="'Cinzel', 'Playfair Display', Georgia, serif" font-size="28" font-weight="700" letter-spacing="4" fill="#3D3831" text-anchor="middle">
+      CARe
+    </text>
+    <line x1="330" y1="488" x2="470" y2="488" stroke="#D4AF37" stroke-width="1"/>
+    <text x="400" y="502" font-family="'Montserrat', sans-serif" font-size="10.5" font-weight="600" letter-spacing="3" fill="#6B6357" text-anchor="middle">
+      A BEAUTY SOLUTION
+    </text>
+
+    <!-- Product Title -->
+    <text x="400" y="555" font-family="'Playfair Display', Georgia, serif" font-size="30" font-weight="700" letter-spacing="0.5" fill="#1E293B" text-anchor="middle">
+      Ray Barrier Sunscreen
+    </text>
+
+    <!-- SPF 50+ Pill Box -->
+    <g transform="translate(400, 605)">
+      <rect x="-155" y="-18" width="310" height="36" rx="6" fill="url(#spfBadge)"/>
+      <text x="0" y="6" font-family="'Montserrat', sans-serif" font-size="13" font-weight="800" letter-spacing="1" fill="#133D35" text-anchor="middle">
+        Broad Spectrum SPF 50+
+      </text>
+    </g>
+
+    <!-- Key Solar Claims -->
+    <text x="400" y="668" font-family="'Montserrat', sans-serif" font-size="12" font-weight="600" letter-spacing="0.5" fill="#4B5563" text-anchor="middle">
+      UVA-UVB Protection
+    </text>
+    <text x="400" y="695" font-family="'Montserrat', sans-serif" font-size="12" font-weight="600" letter-spacing="0.5" fill="#4B5563" text-anchor="middle">
+      Water Resistant (80 minutes)
+    </text>
+    <text x="400" y="722" font-family="'Montserrat', sans-serif" font-size="12" font-weight="600" letter-spacing="0.5" fill="#4B5563" text-anchor="middle">
+      Lightweight, Non-Greasy
+    </text>
+
+    <line x1="280" y1="752" x2="520" y2="752" stroke="#CBD5E1" stroke-width="1"/>
+
+    <!-- Suitability -->
+    <text x="400" y="785" font-family="'Montserrat', sans-serif" font-size="13" font-weight="600" letter-spacing="0.5" fill="#475569" text-anchor="middle">
+      For All Skin Types
+    </text>
+
+    <!-- Volume -->
+    <text x="400" y="830" font-family="'Montserrat', sans-serif" font-size="18" font-weight="700" letter-spacing="1" fill="#1E293B" text-anchor="middle">
+      100 ml
+    </text>
+  </g>
+</svg>

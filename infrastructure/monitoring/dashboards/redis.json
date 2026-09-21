@@ -1,0 +1,27 @@
+{
+  "title": "Care Beauty - Redis Cache & Queues",
+  "tags": ["care-beauty", "redis", "cache"],
+  "panels": [
+    {
+      "title": "Memory Utilization",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 0 },
+      "targets": [{ "expr": "redis_memory_used_bytes / redis_memory_max_bytes * 100" }]
+    },
+    {
+      "title": "Cache Hit / Miss Ratio",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 0 },
+      "targets": [
+        { "expr": "rate(redis_keyspace_hits_total[1m])", "legendFormat": "Hits" },
+        { "expr": "rate(redis_keyspace_misses_total[1m])", "legendFormat": "Misses" }
+      ]
+    },
+    {
+      "title": "Connected Clients",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 0 },
+      "targets": [{ "expr": "redis_connected_clients" }]
+    }
+  ]
+}

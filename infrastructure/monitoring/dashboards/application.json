@@ -1,0 +1,28 @@
+{
+  "title": "Care Beauty - Application & API Observability",
+  "tags": ["care-beauty", "application", "nextjs"],
+  "panels": [
+    {
+      "title": "HTTP Request Rate (RPS)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 0 },
+      "targets": [{ "expr": "sum(rate(http_requests_total[1m])) by (status)" }]
+    },
+    {
+      "title": "Latency Percentiles (p50, p95, p99)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 0 },
+      "targets": [
+        { "expr": "histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))", "legendFormat": "p50" },
+        { "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))", "legendFormat": "p95" },
+        { "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))", "legendFormat": "p99" }
+      ]
+    },
+    {
+      "title": "Error Rate (5xx %)",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 0 },
+      "targets": [{ "expr": "(sum(rate(http_requests_total{status=~'5..'}[2m])) / sum(rate(http_requests_total[2m]))) * 100" }]
+    }
+  ]
+}

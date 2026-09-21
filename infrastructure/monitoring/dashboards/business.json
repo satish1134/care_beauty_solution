@@ -1,0 +1,27 @@
+{
+  "title": "Care Beauty - Business Health & Conversion",
+  "tags": ["care-beauty", "business", "orders"],
+  "panels": [
+    {
+      "title": "Waitlist Signups (per hour)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 0 },
+      "targets": [{ "expr": "sum(increase(care_waitlist_signups_total[1h]))" }]
+    },
+    {
+      "title": "Checkout Conversion Rate (%)",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 0 },
+      "targets": [{ "expr": "(sum(rate(care_orders_completed_total[5m])) / sum(rate(care_checkout_started_total[5m]))) * 100" }]
+    },
+    {
+      "title": "Payment Success vs Failure",
+      "type": "piechart",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 0 },
+      "targets": [
+        { "expr": "sum(rate(care_payments_total{status='success'}[5m]))", "legendFormat": "Success" },
+        { "expr": "sum(rate(care_payments_total{status='failure'}[5m]))", "legendFormat": "Failure" }
+      ]
+    }
+  ]
+}

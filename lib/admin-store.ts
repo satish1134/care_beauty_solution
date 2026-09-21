@@ -1,0 +1,1117 @@
+// Mock persistent store for Admin Portal and Storefront synchronization
+
+export interface ProductImageItem {
+  id: string;
+  url: string;
+  label?: string;
+  type?: 'bottle' | 'texture' | 'application' | 'routine' | 'lifestyle' | 'clinical';
+  caption?: string;
+  alt?: string;
+  focalPoint?: { x: number; y: number }; // 0-100%
+  isPrimary?: boolean;
+}
+
+export type AdminProductImage = ProductImageItem;
+
+export interface MediaAsset {
+  id: string;
+  filename: string;
+  url: string;
+  mimeType: string;
+  width?: number;
+  height?: number;
+  fileSize?: number;
+  sizeBytes?: number;
+  altText: string;
+  category: 'product' | 'hero' | 'campaign' | 'brand';
+  focalPoint?: { x: number; y: number };
+  createdAt: string;
+}
+
+export interface HeroCmsConfig {
+  id?: string;
+  campaignName: string;
+  status: 'ACTIVE' | 'PUBLISHED' | 'DRAFT' | 'ARCHIVED';
+  announcementText?: string;
+  announcementLink?: string;
+  eyebrow: string;
+  headline: string;
+  headlineMain: string;
+  headlineHighlight: string;
+  description: string;
+  mediaType: 'video' | 'image' | 'split';
+  desktopMediaType: 'video' | 'image';
+  desktopVideoUrl: string;
+  mobileMediaType: 'video' | 'image';
+  mobileVideoUrl: string;
+  heroImageUrl: string;
+  posterUrl: string;
+  focalPoint?: { x: number; y: number };
+  primaryCtaLabel: string;
+  primaryCtaUrl: string;
+  primaryCtaAction: 'scroll_products' | 'routine_modal' | 'bundle';
+  secondaryCtaLabel: string;
+  secondaryCtaUrl: string;
+  secondaryCtaLink: string;
+  proofPoints: { label: string; sublabel: string }[];
+  startsAt?: string;
+  endsAt?: string;
+  sortOrder?: number;
+  updatedAt: string;
+}
+
+export interface AdminProduct {
+  id: string;
+  slug: string;
+  title: string;
+  subtitle: string;
+  category: 'cleanser' | 'moisturizer' | 'sunscreen' | 'bundle';
+  price: number;
+  compareAtPrice?: number;
+  stock: number;
+  lowStockThreshold: number;
+  sku: string;
+  status: 'ACTIVE' | 'PUBLISHED' | 'DRAFT' | 'ARCHIVED';
+  volume: string;
+  description: string;
+  bestFor: string[];
+  keyBenefits: string[];
+  heroIngredients: string[];
+  heroActives: string[];
+  images: ProductImageItem[];
+  featuredOnHomepage?: boolean;
+  isHomepageFeatured?: boolean;
+  homepagePosition?: number;
+  homepageOrder?: number;
+  showProduct?: boolean;
+  cardTitle?: string;
+  cardDescription?: string;
+  ctaText?: string;
+  ctaUrl?: string;
+  marketplaceUrls: {
+    amazon?: string;
+    nykaa?: string;
+    flipkart?: string;
+  };
+  rating: number;
+  reviewCount: number;
+  updatedAt: string;
+}
+
+export interface AdminOrder {
+  id: string;
+  orderNumber: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  items: {
+    productId: string;
+    name: string;
+    price: number;
+    quantity: number;
+    volume: string;
+  }[];
+  subtotal: number;
+  discount: number;
+  shipping: number;
+  total: number;
+  status: 'PENDING' | 'PAID' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
+  paymentMethod: 'UPI' | 'Card' | 'COD';
+  paymentProvider: 'RAZORPAY' | 'STRIPE' | 'COD';
+  paymentId?: string;
+  shippingAddress: {
+    fullName: string;
+    phone: string;
+    street: string;
+    city: string;
+    state: string;
+    pincode: string;
+    landmark?: string;
+  };
+  trackingId?: string;
+  courierPartner?: 'Delhivery' | 'Shiprocket' | 'BlueDart';
+  dispatchDate?: string;
+  deliveryDate?: string;
+  createdAt: string;
+}
+
+export interface Coupon {
+  id: string;
+  code: string;
+  discountPercent?: number;
+  discountFixed?: number;
+  minSpend?: number;
+  usageLimit: number;
+  usedCount: number;
+  expiresAt: string;
+  isActive: boolean;
+}
+
+export interface AuditLog {
+  id: string;
+  timestamp: string;
+  user: string;
+  role: 'ADMIN' | 'FULFILLMENT' | 'SYSTEM';
+  action: string;
+  entityType: 'ORDER' | 'PRODUCT' | 'INVENTORY' | 'COUPON' | 'SECURITY';
+  details: string;
+  ipAddress: string;
+}
+
+export interface CustomerProfile {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  ordersCount: number;
+  totalSpent: number;
+  skinType: string;
+  skinConcern: string;
+  registeredAt: string;
+  lastActive: string;
+  tier: 'SILVER' | 'GOLD' | 'VIP';
+}
+
+export const INITIAL_HERO_CMS: HeroCmsConfig = {
+  campaignName: 'Barrier Reborn Spring 2026',
+  status: 'ACTIVE',
+  announcementText: 'Complimentary Express Dispatch on The 3-Step Sacred Ritual • 100% Zero White Cast Guaranteed',
+  announcementLink: '#products',
+  eyebrow: 'THE CARe BARRIER RITUAL',
+  headline: "YOUR SKIN'S BARRIER, REBORN.",
+  headlineMain: "YOUR SKIN'S",
+  headlineHighlight: 'BARRIER, REBORN.',
+  description: '3 essential formulas. Clinically tested. Made for Indian skin. Gentle cleansing, deep hydration, and invisible broad-spectrum protection.',
+  mediaType: 'video',
+  desktopMediaType: 'video',
+  desktopVideoUrl: '/video/care-hero-desktop.mp4',
+  mobileMediaType: 'video',
+  mobileVideoUrl: '/video/care-hero-mobile.mp4',
+  heroImageUrl: '/images/hero.png',
+  posterUrl: '/images/hero.png',
+  focalPoint: { x: 50, y: 50 },
+  primaryCtaLabel: 'SHOP THE 3-STEP RITUAL →',
+  primaryCtaUrl: '#products',
+  primaryCtaAction: 'scroll_products',
+  secondaryCtaLabel: 'EXPLORE THE SCIENCE',
+  secondaryCtaUrl: '#clinical-science',
+  secondaryCtaLink: '#clinical-science',
+  proofPoints: [
+    { label: '5 CERAMIDES', sublabel: 'Bio-Identical Barrier Lipids' },
+    { label: '72H HYDRATION', sublabel: 'Biomimetic Lipid Seal' },
+    { label: 'SPF 50+ PA++++', sublabel: 'Zero White Cast on Melanin' },
+    { label: 'ZERO RESIDUE', sublabel: 'Dermatologist Tested' }
+  ],
+  startsAt: '2026-01-01T00:00:00Z',
+  endsAt: '2026-12-31T23:59:59Z',
+  sortOrder: 1,
+  updatedAt: new Date().toISOString()
+};
+
+// Initial Mock Seed Data
+export const INITIAL_ADMIN_PRODUCTS: AdminProduct[] = [
+  {
+    id: 'prod-cleanser-1',
+    slug: 'refreshing-skin-cleanser',
+    title: 'REFRESHING SKIN CLEANSER',
+    subtitle: 'Clean without stripping.',
+    category: 'cleanser',
+    price: 699,
+    compareAtPrice: 799,
+    stock: 142,
+    lowStockThreshold: 25,
+    sku: 'CARE-CLN-120ML',
+    status: 'ACTIVE',
+    volume: '120 ml',
+    description:
+      'A gentle daily cleanser that effectively removes dirt, excess oil and sunscreen while respecting the skin barrier. Powered by mild amino acid-based cleansing agents together with ceramides, panthenol and niacinamide to leave skin feeling clean, comfortable and hydrated.',
+    bestFor: ['Normal Skin', 'Dry Skin', 'Combination Skin', 'Sensitive Skin'],
+    keyBenefits: [
+      'Cleanses without dryness',
+      'Supports the skin barrier',
+      'Helps maintain hydration',
+      'Leaves skin soft and comfortable',
+      'Suitable for daily use'
+    ],
+    heroIngredients: ['Ceramides', 'Niacinamide', 'Panthenol', 'Aloe Vera'],
+    heroActives: ['Ceramide Complex (NP, AP, EOP)', 'Niacinamide (Vitamin B3)', 'Panthenol (Pro-Vitamin B5)', 'Organic Aloe Barbadensis'],
+    images: [
+      {
+        id: 'img-cln-1',
+        url: '/images/products/cleanser-bottle.svg',
+        label: 'Primary Vessel',
+        type: 'bottle',
+        caption: '120 ml Ergonomic White Pump Bottle with Gold Mandala Crest',
+        alt: 'CARe Refreshing Skin Cleanser 120ml bottle',
+        focalPoint: { x: 50, y: 50 },
+        isPrimary: true
+      },
+      {
+        id: 'img-cln-2',
+        url: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=1000&q=80',
+        label: 'Silk Micro-Foam',
+        type: 'texture',
+        caption: 'Micro-emulsion velvet foam that lifts dirt without moisture depletion',
+        alt: 'Cleanser foaming texture',
+        focalPoint: { x: 50, y: 50 }
+      },
+      {
+        id: 'img-cln-3',
+        url: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=1000&q=80',
+        label: 'Step 01 Ritual',
+        type: 'routine',
+        caption: 'Morning & evening foundational step in the Sacred Barrier Regimen',
+        alt: 'Facial wash ritual',
+        focalPoint: { x: 50, y: 40 }
+      },
+      {
+        id: 'img-cln-4',
+        url: 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=1000&q=80',
+        label: 'Clinical Foam Quality',
+        type: 'clinical',
+        caption: 'Soap-free, pH 5.5 balanced amino acid lather',
+        alt: 'Amino acid lather',
+        focalPoint: { x: 50, y: 50 }
+      }
+    ],
+    marketplaceUrls: {
+      amazon: 'https://amazon.in/dp/care-cleanser',
+      nykaa: 'https://nykaa.com/care-a-cleanser',
+      flipkart: 'https://flipkart.com/care-a-cleanser'
+    },
+    rating: 4.9,
+    reviewCount: 128,
+    updatedAt: new Date(Date.now() - 86400000 * 2).toISOString()
+  },
+  {
+    id: 'prod-moisturizer-2',
+    slug: 'hydrating-moisturizer',
+    title: 'HYDRATING MOISTURIZER',
+    subtitle: 'Lightweight hydration. Long-lasting comfort.',
+    category: 'moisturizer',
+    price: 849,
+    compareAtPrice: 999,
+    stock: 28,
+    lowStockThreshold: 20,
+    sku: 'CARE-MST-50G',
+    status: 'ACTIVE',
+    volume: '50 g',
+    description:
+      'A daily moisturiser formulated to replenish moisture while supporting the skin’s natural barrier. The lightweight texture absorbs quickly without leaving a greasy finish, making it suitable for everyday use in all seasons.',
+    bestFor: ['Normal Skin', 'Dry Skin', 'Combination Skin', 'Sensitive Skin'],
+    keyBenefits: [
+      'Deep hydration',
+      'Strengthens the skin barrier',
+      'Lightweight, non-greasy finish',
+      'Layers comfortably under sunscreen',
+      'Daily barrier support'
+    ],
+    heroIngredients: ['Ceramides', 'Niacinamide', 'Panthenol', 'Sodium PCA', 'Allantoin'],
+    heroActives: ['5-Ceramide Barrier Complex', 'Niacinamide (Vitamin B3)', 'Panthenol (Pro-Vitamin B5)', 'Sodium PCA & Allantoin'],
+    images: [
+      {
+        id: 'img-mst-1',
+        url: '/images/products/moisturizer-tube.svg',
+        label: 'Primary Tube',
+        type: 'bottle',
+        caption: '50 g White Squeeze Tube with Precision Gold Collar Ring',
+        alt: 'CARe Hydrating Moisturizer 50g tube',
+        focalPoint: { x: 50, y: 50 },
+        isPrimary: true
+      },
+      {
+        id: 'img-mst-2',
+        url: 'https://images.unsplash.com/photo-1608248597359-007a8286a1f1?auto=format&fit=crop&w=1000&q=80',
+        label: 'Featherlight Cloud Cream',
+        type: 'texture',
+        caption: 'Biomimetic gel-cream emulsion melting instantly on skin contact',
+        alt: 'Moisturizer cream texture',
+        focalPoint: { x: 50, y: 50 }
+      },
+      {
+        id: 'img-mst-3',
+        url: 'https://images.unsplash.com/photo-1512290900672-1f55b93b4e60?auto=format&fit=crop&w=1000&q=80',
+        label: 'Step 02 Ritual',
+        type: 'routine',
+        caption: 'Replenishing stratum corneum moisture seal applied AM & PM',
+        alt: 'Moisturizer application ritual',
+        focalPoint: { x: 50, y: 50 }
+      },
+      {
+        id: 'img-mst-4',
+        url: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1000&q=80',
+        label: 'Skin Glow Finish',
+        type: 'application',
+        caption: 'Leaves breathable dewy bounce with zero oily sheen',
+        alt: 'Healthy barrier skin texture',
+        focalPoint: { x: 50, y: 50 }
+      }
+    ],
+    marketplaceUrls: {
+      amazon: 'https://amazon.in/dp/care-moisturizer',
+      nykaa: 'https://nykaa.com/care-a-moisturizer',
+      flipkart: 'https://flipkart.com/care-a-moisturizer'
+    },
+    rating: 4.95,
+    reviewCount: 214,
+    updatedAt: new Date(Date.now() - 86400000 * 1).toISOString()
+  },
+  {
+    id: 'prod-sunscreen-3',
+    slug: 'ray-barrier-sunscreen-spf50',
+    title: 'RAY BARRIER SUNSCREEN',
+    subtitle: 'SPF 50+ PA++++ • High protection. Comfortable everyday wear.',
+    category: 'sunscreen',
+    price: 749,
+    compareAtPrice: 899,
+    stock: 84,
+    lowStockThreshold: 20,
+    sku: 'CARE-SPF-100ML',
+    status: 'ACTIVE',
+    volume: '100 ml',
+    description:
+      'A lightweight broad-spectrum sunscreen developed with modern UV filters to help protect skin against UVA and UVB rays. Designed for Indian heat and humidity with a comfortable finish that wears well throughout the day.',
+    bestFor: ['Normal Skin', 'Dry Skin', 'Combination Skin', 'Sensitive Skin', 'Melanin-Rich (Fitzpatrick IV-VI)'],
+    keyBenefits: [
+      'Broad-spectrum SPF 50+',
+      'PA++++ Protection',
+      'No visible white cast* (*Subject to proper application and skin tone.)',
+      'Lightweight texture',
+      'Barrier-supportive formula',
+      'Daily wear comfort'
+    ],
+    heroIngredients: ['Modern UV Filters', 'Ceramide NP', 'Niacinamide', 'Panthenol', 'Ectoin', 'Centella Asiatica', 'Hyaluronic Acid'],
+    heroActives: ['Advanced Hybrid UV Defense Matrix', 'Ceramide NP (Barrier Shield)', 'Niacinamide & Panthenol', 'Extremolyte Ectoin & Cica'],
+    images: [
+      {
+        id: 'img-spf-1',
+        url: '/images/products/sunscreen-bottle.svg',
+        label: 'Primary Spray Bottle',
+        type: 'bottle',
+        caption: '100 ml Tall White Pump Bottle with Crystal-Clear Cap & Botanical Seal',
+        alt: 'CARe Ray Barrier Sunscreen 100ml bottle',
+        focalPoint: { x: 50, y: 50 },
+        isPrimary: true
+      },
+      {
+        id: 'img-spf-2',
+        url: 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=1000&q=80',
+        label: 'Water-Light Fluid',
+        type: 'texture',
+        caption: 'Ultra-thin fluid sunscreen melting completely invisible on skin',
+        alt: 'Fluid sunscreen swatch',
+        focalPoint: { x: 50, y: 50 }
+      },
+      {
+        id: 'img-spf-3',
+        url: 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=1000&q=80',
+        label: 'Zero White Cast',
+        type: 'application',
+        caption: '100% transparent finish tested on Indian melanin-rich skin tones',
+        alt: 'Sunscreen applied on deep skin tone',
+        focalPoint: { x: 50, y: 50 }
+      },
+      {
+        id: 'img-spf-4',
+        url: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1000&q=80',
+        label: 'Step 03 Ritual',
+        type: 'routine',
+        caption: 'Final morning armor against UVA, UVB, and indoor blue light',
+        alt: 'Morning sunscreen ritual',
+        focalPoint: { x: 50, y: 50 }
+      }
+    ],
+    marketplaceUrls: {
+      amazon: 'https://amazon.in/dp/care-sunscreen',
+      nykaa: 'https://nykaa.com/care-a-sunscreen',
+      flipkart: 'https://flipkart.com/care-a-sunscreen'
+    },
+    rating: 4.88,
+    reviewCount: 342,
+    updatedAt: new Date(Date.now() - 86400000 * 4).toISOString()
+  }
+];
+
+export const INITIAL_ADMIN_ORDERS: AdminOrder[] = [
+  {
+    id: 'ord-8842',
+    orderNumber: 'CARE-2026-8842',
+    customerName: 'Sandy Verma',
+    customerEmail: 'sandyverma3@gmail.com',
+    customerPhone: '+91 98765 43210',
+    items: [
+      {
+        productId: 'prod-cleanser-1',
+        name: 'Gentle Clarifying Cream Cleanser',
+        price: 699,
+        quantity: 1,
+        volume: '150 ml'
+      },
+      {
+        productId: 'prod-moisturizer-2',
+        name: 'Barrier Shield Daily Moisturizer',
+        price: 849,
+        quantity: 1,
+        volume: '50 ml'
+      },
+      {
+        productId: 'prod-sunscreen-3',
+        name: 'Invisible Mineral Sunscreen SPF 50+',
+        price: 749,
+        quantity: 1,
+        volume: '50 ml'
+      }
+    ],
+    subtotal: 2297,
+    discount: 345,
+    shipping: 0,
+    total: 1952,
+    status: 'PROCESSING',
+    paymentMethod: 'UPI',
+    paymentProvider: 'RAZORPAY',
+    paymentId: 'pay_Nz94k81Jsk4',
+    shippingAddress: {
+      fullName: 'Sandy Verma',
+      phone: '+91 98765 43210',
+      street: '402, Lotus Greens Boulevard, Sector 12',
+      city: 'Gurugram',
+      state: 'Haryana',
+      pincode: '122001',
+      landmark: 'Near Golf Course Road'
+    },
+    trackingId: 'DLH-99214482',
+    courierPartner: 'Delhivery',
+    dispatchDate: new Date().toISOString(),
+    createdAt: new Date(Date.now() - 1000 * 60 * 45).toISOString() // 45 mins ago
+  },
+  {
+    id: 'ord-8841',
+    orderNumber: 'CARE-2026-8841',
+    customerName: 'Aanya Sharma',
+    customerEmail: 'aanya.sharma@outlook.com',
+    customerPhone: '+91 98112 34567',
+    items: [
+      {
+        productId: 'prod-moisturizer-2',
+        name: 'Barrier Shield Daily Moisturizer',
+        price: 849,
+        quantity: 2,
+        volume: '50 ml'
+      }
+    ],
+    subtotal: 1698,
+    discount: 254,
+    shipping: 0,
+    total: 1444,
+    status: 'SHIPPED',
+    paymentMethod: 'Card',
+    paymentProvider: 'STRIPE',
+    paymentId: 'ch_3M49s184k',
+    shippingAddress: {
+      fullName: 'Aanya Sharma',
+      phone: '+91 98112 34567',
+      street: 'Flat 12B, Regency Heights, Bandra West',
+      city: 'Mumbai',
+      state: 'Maharashtra',
+      pincode: '400050',
+      landmark: 'Opposite Hill Road'
+    },
+    trackingId: 'SR-7731902',
+    courierPartner: 'Shiprocket',
+    dispatchDate: new Date(Date.now() - 86400000).toISOString(),
+    createdAt: new Date(Date.now() - 86400000 * 1.5).toISOString()
+  },
+  {
+    id: 'ord-8840',
+    orderNumber: 'CARE-2026-8840',
+    customerName: 'Rohan Deshmukh',
+    customerEmail: 'rohan.deshmukh@gmail.com',
+    customerPhone: '+91 97654 32109',
+    items: [
+      {
+        productId: 'prod-sunscreen-3',
+        name: 'Invisible Mineral Sunscreen SPF 50+',
+        price: 749,
+        quantity: 1,
+        volume: '50 ml'
+      }
+    ],
+    subtotal: 749,
+    discount: 0,
+    shipping: 99,
+    total: 848,
+    status: 'DELIVERED',
+    paymentMethod: 'UPI',
+    paymentProvider: 'RAZORPAY',
+    paymentId: 'pay_Ky19s390La',
+    shippingAddress: {
+      fullName: 'Rohan Deshmukh',
+      phone: '+91 97654 32109',
+      street: '77, Koramangala 4th Block',
+      city: 'Bengaluru',
+      state: 'Karnataka',
+      pincode: '560034'
+    },
+    trackingId: 'BD-3391840',
+    courierPartner: 'BlueDart',
+    dispatchDate: new Date(Date.now() - 86400000 * 4).toISOString(),
+    deliveryDate: new Date(Date.now() - 86400000 * 1).toISOString(),
+    createdAt: new Date(Date.now() - 86400000 * 5).toISOString()
+  },
+  {
+    id: 'ord-8839',
+    orderNumber: 'CARE-2026-8839',
+    customerName: 'Pooja Iyer',
+    customerEmail: 'pooja.iyer@gmail.com',
+    customerPhone: '+91 99201 88321',
+    items: [
+      {
+        productId: 'prod-cleanser-1',
+        name: 'Gentle Clarifying Cream Cleanser',
+        price: 699,
+        quantity: 1,
+        volume: '150 ml'
+      }
+    ],
+    subtotal: 699,
+    discount: 0,
+    shipping: 99,
+    total: 798,
+    status: 'PENDING',
+    paymentMethod: 'COD',
+    paymentProvider: 'COD',
+    shippingAddress: {
+      fullName: 'Pooja Iyer',
+      phone: '+91 99201 88321',
+      street: '204, Anna Nagar West',
+      city: 'Chennai',
+      state: 'Tamil Nadu',
+      pincode: '600040'
+    },
+    createdAt: new Date(Date.now() - 1000 * 60 * 15).toISOString() // 15 mins ago
+  }
+];
+
+export const INITIAL_COUPONS: Coupon[] = [
+  {
+    id: 'c-1',
+    code: 'BARRIER15',
+    discountPercent: 15,
+    minSpend: 1499,
+    usageLimit: 500,
+    usedCount: 142,
+    expiresAt: '2026-12-31T23:59:59Z',
+    isActive: true
+  },
+  {
+    id: 'c-2',
+    code: 'WELCOME10',
+    discountPercent: 10,
+    minSpend: 699,
+    usageLimit: 1000,
+    usedCount: 389,
+    expiresAt: '2026-12-31T23:59:59Z',
+    isActive: true
+  },
+  {
+    id: 'c-3',
+    code: 'VIPFLAT200',
+    discountFixed: 200,
+    minSpend: 1999,
+    usageLimit: 200,
+    usedCount: 45,
+    expiresAt: '2026-11-30T23:59:59Z',
+    isActive: true
+  }
+];
+
+export const INITIAL_AUDIT_LOGS: AuditLog[] = [
+  {
+    id: 'log-1',
+    timestamp: new Date(Date.now() - 1000 * 60 * 20).toISOString(),
+    user: 'admin@careabeautysolution.com',
+    role: 'ADMIN',
+    action: 'ORDER_FULFILLMENT_UPDATE',
+    entityType: 'ORDER',
+    details: 'Assigned courier Delhivery tracking ID DLH-99214482 to Order CARE-2026-8842',
+    ipAddress: '103.21.244.12'
+  },
+  {
+    id: 'log-2',
+    timestamp: new Date(Date.now() - 1000 * 60 * 120).toISOString(),
+    user: 'inventory@careabeautysolution.com',
+    role: 'FULFILLMENT',
+    action: 'STOCK_LEVEL_ADJUSTMENT',
+    entityType: 'INVENTORY',
+    details: 'Stock for Barrier Shield Daily Moisturizer adjusted from 25 to 18 units (Low Stock Warning)',
+    ipAddress: '103.21.244.18'
+  },
+  {
+    id: 'log-3',
+    timestamp: new Date(Date.now() - 86400000 * 1).toISOString(),
+    user: 'admin@careabeautysolution.com',
+    role: 'ADMIN',
+    action: 'COUPON_CREATED',
+    entityType: 'COUPON',
+    details: 'Created promotional campaign code BARRIER15 (15% off over ₹1499)',
+    ipAddress: '103.21.244.12'
+  }
+];
+
+export const INITIAL_CUSTOMERS: CustomerProfile[] = [
+  {
+    id: 'cust-1',
+    name: 'Sandy Verma',
+    email: 'sandyverma3@gmail.com',
+    phone: '+91 98765 43210',
+    ordersCount: 4,
+    totalSpent: 6490,
+    skinType: 'Combination',
+    skinConcern: 'Barrier Repair & SPF Protection',
+    registeredAt: '2026-08-15T10:00:00Z',
+    lastActive: 'Just now',
+    tier: 'VIP'
+  },
+  {
+    id: 'cust-2',
+    name: 'Aanya Sharma',
+    email: 'aanya.sharma@outlook.com',
+    phone: '+91 98112 34567',
+    ordersCount: 2,
+    totalSpent: 3142,
+    skinType: 'Dry & Sensitive',
+    skinConcern: 'Transepidermal Water Loss',
+    registeredAt: '2026-08-28T14:30:00Z',
+    lastActive: 'Yesterday',
+    tier: 'GOLD'
+  },
+  {
+    id: 'cust-3',
+    name: 'Rohan Deshmukh',
+    email: 'rohan.deshmukh@gmail.com',
+    phone: '+91 97654 32109',
+    ordersCount: 1,
+    totalSpent: 848,
+    skinType: 'Oily',
+    skinConcern: 'Sun Damage Prevention',
+    registeredAt: '2026-09-02T09:15:00Z',
+    lastActive: '3 days ago',
+    tier: 'SILVER'
+  },
+  {
+    id: 'cust-4',
+    name: 'Pooja Iyer',
+    email: 'pooja.iyer@gmail.com',
+    phone: '+91 99201 88321',
+    ordersCount: 1,
+    totalSpent: 798,
+    skinType: 'Normal',
+    skinConcern: 'Gentle Cleansing',
+    registeredAt: '2026-09-14T03:00:00Z',
+    lastActive: '15 mins ago',
+    tier: 'SILVER'
+  }
+];
+
+export const INITIAL_MEDIA_ASSETS: MediaAsset[] = [
+  {
+    id: 'media-hero-vid-desk',
+    filename: 'care-hero-desktop.mp4',
+    url: '/video/care-hero-desktop.mp4',
+    mimeType: 'video/mp4',
+    width: 1920,
+    height: 1080,
+    fileSize: 4280000,
+    altText: 'CARe Cinematic Atmospheric Hero Campaign Desktop Video',
+    category: 'hero',
+    focalPoint: { x: 50, y: 50 },
+    createdAt: '2026-08-01T08:00:00Z'
+  },
+  {
+    id: 'media-hero-vid-mob',
+    filename: 'care-hero-mobile.mp4',
+    url: '/video/care-hero-mobile.mp4',
+    mimeType: 'video/mp4',
+    width: 1080,
+    height: 1920,
+    fileSize: 2840000,
+    altText: 'CARe Cinematic Mobile 9:16 Vertical Story Video',
+    category: 'hero',
+    focalPoint: { x: 50, y: 50 },
+    createdAt: '2026-08-01T08:00:00Z'
+  },
+  {
+    id: 'media-hero-poster',
+    filename: 'hero.png',
+    url: '/images/hero.png',
+    mimeType: 'image/png',
+    width: 1920,
+    height: 1080,
+    fileSize: 1850000,
+    altText: 'CARe Brand Atmospheric Key Visual Poster',
+    category: 'hero',
+    focalPoint: { x: 50, y: 50 },
+    createdAt: '2026-08-01T08:00:00Z'
+  },
+  {
+    id: 'media-cleanser-bottle',
+    filename: 'cleanser-bottle.svg',
+    url: '/images/products/cleanser-bottle.svg',
+    mimeType: 'image/svg+xml',
+    width: 800,
+    height: 800,
+    fileSize: 45000,
+    altText: 'Refreshing Skin Cleanser 120ml Dispenser Vessel',
+    category: 'product',
+    focalPoint: { x: 50, y: 50 },
+    createdAt: '2026-08-05T09:00:00Z'
+  },
+  {
+    id: 'media-moisturizer-tube',
+    filename: 'moisturizer-tube.svg',
+    url: '/images/products/moisturizer-tube.svg',
+    mimeType: 'image/svg+xml',
+    width: 800,
+    height: 800,
+    fileSize: 42000,
+    altText: 'Hydrating Moisturizer 50g Biomimetic Tube with Gold Ring',
+    category: 'product',
+    focalPoint: { x: 50, y: 50 },
+    createdAt: '2026-08-05T09:00:00Z'
+  },
+  {
+    id: 'media-sunscreen-bottle',
+    filename: 'sunscreen-bottle.svg',
+    url: '/images/products/sunscreen-bottle.svg',
+    mimeType: 'image/svg+xml',
+    width: 800,
+    height: 800,
+    fileSize: 46000,
+    altText: 'Ray Barrier Sunscreen SPF 50+ PA++++ 100ml Precision Bottle',
+    category: 'product',
+    focalPoint: { x: 50, y: 50 },
+    createdAt: '2026-08-05T09:00:00Z'
+  }
+];
+
+// ==============================================================================
+// Storefront Content Management (All Sections, Doctor Testimonials, Real Stories, Reviews)
+// ==============================================================================
+
+export interface DoctorTestimonialItem {
+  id: string;
+  metric: string;
+  label: string;
+  duration: string;
+  participants: number;
+  description: string;
+  doctorQuote: string;
+  doctorName: string;
+  doctorRole: string;
+  verifiedIcon: string;
+}
+
+export interface RealSkinStoryItem {
+  id: string;
+  userName: string;
+  age: string;
+  skinType: string;
+  location: string;
+  concern: string;
+  timeframe: string;
+  headline: string;
+  story: string;
+  keyProducts: string[];
+  beforeMetric: string;
+  afterMetric: string;
+  statusBadge: string;
+}
+
+export interface MemberReviewItem {
+  id: string;
+  author: string;
+  location: string;
+  rating: number;
+  date: string;
+  title: string;
+  review: string;
+  verified: boolean;
+  helpful: number;
+  productName: string;
+  productCategory: string;
+  skinType?: string;
+}
+
+export interface SectionContentConfig {
+  // Top Marquee Announcement Ticker
+  marqueeAnnouncements: string[];
+
+  // Routine Essentials (The 3 Everyday Essentials)
+  routineBadge: string;
+  routineHeading: string;
+  routineDescription: string;
+
+  // Clinical & Doctor Evidence Hub
+  clinicalBadge: string;
+  clinicalHeading: string;
+  clinicalHeadingHighlight: string;
+  clinicalDescription: string;
+
+  // Formulation Standards / Holy Grail Promise
+  standardsBadge: string;
+  standardsHeading: string;
+  standardsDescription: string;
+  standardsPillars: {
+    id: string;
+    title: string;
+    description: string;
+    icon: 'droplet' | 'sun' | 'shield' | 'heart';
+  }[];
+
+  // VIP Inner Circle / Waitlist
+  vipBadge: string;
+  vipHeading: string;
+  vipDescription: string;
+
+  // Footer & Brand Details
+  footerDescription: string;
+  supportEmail: string;
+  supportPhone: string;
+  officeAddress: string;
+}
+
+export interface StorefrontCmsData {
+  doctorTestimonials: DoctorTestimonialItem[];
+  realSkinStories: RealSkinStoryItem[];
+  memberReviews: MemberReviewItem[];
+  sectionContent: SectionContentConfig;
+  updatedAt: string;
+}
+
+export const INITIAL_STOREFRONT_CMS: StorefrontCmsData = {
+  doctorTestimonials: [
+    {
+      id: 'cs-1',
+      metric: '98.4%',
+      label: 'Zero Stinging or Tight Feeling',
+      duration: 'Tested on 120 People',
+      participants: 120,
+      description: 'Face felt instantly calm and comfortable right after washing, with none of that dry, stretchy skin feeling.',
+      doctorQuote: 'The silk-amino cleanser keeps your natural moisture intact so skin stays soft and balanced even after washing twice daily.',
+      doctorName: 'Dr. Meera Sen, MD (Derma)',
+      doctorRole: 'Senior Dermatologist, Indian Skin Council',
+      verifiedIcon: 'shield'
+    },
+    {
+      id: 'cs-2',
+      metric: '72 Hours',
+      label: 'All-Day Plump & Dewy Bounce',
+      duration: '4-Week Daily User Test',
+      participants: 95,
+      description: 'Deep, lasting hydration that locks in moisture against harsh office AC, sun, and city humidity.',
+      doctorQuote: '5 skin-identical ceramides rebuild your barrier so your face stays plump and moisturized throughout Indian summers and winters.',
+      doctorName: 'Dr. Kabir Anand, MD',
+      doctorRole: 'Skin Barrier Specialist',
+      verifiedIcon: 'award'
+    },
+    {
+      id: 'cs-3',
+      metric: '100%',
+      label: 'Zero White Cast on Indian Skin',
+      duration: 'Tested on All Brown Complexions',
+      participants: 150,
+      description: 'Certified SPF 50+ mineral protection that melts in completely clear without turning purple, gray, or sticky.',
+      doctorQuote: 'Finally, an invisible mineral sunscreen that blends like silk on warm Indian skin tones and does not sweat off or clog pores.',
+      doctorName: 'Dr. Shalini Roy, DNB',
+      doctorRole: 'Cosmetic Dermatologist',
+      verifiedIcon: 'sun'
+    }
+  ],
+  realSkinStories: [
+    {
+      id: 'ba-1',
+      userName: 'Rhea Sengupta',
+      age: '29',
+      skinType: 'Compromised Barrier / Rosacea Prone',
+      location: 'Bengaluru',
+      concern: 'Burning sensation from over-exfoliation & AC dehydration',
+      timeframe: '12 Days Protocol',
+      headline: '“My skin went from angry crimson stinging to calm, plump glass-skin.”',
+      story: 'I completely wrecked my barrier with salicylic acid and retinol peeling. Every basic moisturizer stung like fire. After using the Amino Silk Cleanser and 5-Ceramide Cloud Cream for just 48 hours, the fire was out. In 12 days, my natural bounce came back without any heaviness.',
+      keyProducts: ['Amino Silk Cloud Cleanser', '5-Ceramide Velvet Cloud Cream'],
+      beforeMetric: 'Stinging Index: 9/10',
+      afterMetric: 'Stinging Index: 0/10',
+      statusBadge: 'Verified Clinical Log'
+    },
+    {
+      id: 'ba-2',
+      userName: 'Vikramaditya Iyer',
+      age: '34',
+      skinType: 'Fitzpatrick V / Melanin-Rich Oily',
+      location: 'Mumbai',
+      concern: 'Sunburn, dark spots, chalky white ghost cast from previous sunscreens',
+      timeframe: '3 Weeks Protocol',
+      headline: '“The first mineral sunscreen in India that doesn’t turn my beard or forehead purple.”',
+      story: 'I gave up on mineral sunscreens because of the ghostly purple residue on my deep South Indian skin tone. The Invisible Silk Mineral Veil SPF 50+ felt like water, absorbed in 10 seconds, and leaves an invisible velvet finish even during 35°C humid commute.',
+      keyProducts: ['Invisible Silk Mineral Veil SPF 50+'],
+      beforeMetric: 'White Cast: Severe (Chalky)',
+      afterMetric: 'White Cast: 0% Invisible Veil',
+      statusBadge: 'Verified Photo Evidence'
+    },
+    {
+      id: 'ba-3',
+      userName: 'Aanya Mathur',
+      age: '26',
+      skinType: 'Combination / Hormonal Breakouts',
+      location: 'New Delhi',
+      concern: 'Clogged pores from heavy creams and dull urban pollution film',
+      timeframe: '18 Days Protocol',
+      headline: '“Finally, deep 72-hour moisture that doesn’t trigger tiny closed comedones.”',
+      story: 'I was scared of ceramides because rich creams always gave me forehead bumps. The 5-Ceramide Cloud Cream has this cashmere cloud texture that melts instantly. My face stays soft all day without turning into an oil slick by 3 PM.',
+      keyProducts: ['5-Ceramide Velvet Cloud Cream', 'The 3-Step Sacred Ritual'],
+      beforeMetric: 'Dry Flakes: Cheeks & Forehead',
+      afterMetric: 'Skin Barrier: 100% Calibrated',
+      statusBadge: 'Verified Purchase'
+    }
+  ],
+  memberReviews: [
+    {
+      id: 'rev-cleanser-1',
+      author: 'Ananya Sharma',
+      location: 'Mumbai',
+      rating: 5,
+      date: '2026-08-14',
+      title: 'No tight feeling after washing!',
+      review: 'Most cleansers leave my skin feeling so dry and tight like paper. This cleanser creates a soft cloud lather and my face feels hydrated and clean right after towel drying.',
+      verified: true,
+      helpful: 42,
+      productName: 'Refreshing Cleanser',
+      productCategory: 'cleanser',
+      skinType: 'Dry & Sensitive'
+    },
+    {
+      id: 'rev-cleanser-2',
+      author: 'Pooja Nair',
+      location: 'Kochi',
+      rating: 5,
+      date: '2026-08-10',
+      title: 'Removes sunscreen without drying',
+      review: 'Finally a cleanser that removes waterproof sunscreen without stripping natural moisture. Absolutely love the gentle amino acid lather.',
+      verified: true,
+      helpful: 28,
+      productName: 'Refreshing Cleanser',
+      productCategory: 'cleanser',
+      skinType: 'Normal to Oily'
+    },
+    {
+      id: 'rev-moisturizer-1',
+      author: 'Rohan Mehta',
+      location: 'Delhi NCR',
+      rating: 5,
+      date: '2026-08-18',
+      title: 'Fixed my damaged barrier in 5 days',
+      review: 'I ruined my skin barrier using too many harsh chemical peels. The 5 ceramides in this formula gave instant relief with zero stinging. My skin feels plump and bouncy all day.',
+      verified: true,
+      helpful: 67,
+      productName: 'Hydrating Moisturizer',
+      productCategory: 'moisturizer',
+      skinType: 'Compromised Barrier'
+    },
+    {
+      id: 'rev-moisturizer-2',
+      author: 'Divya Krishnan',
+      location: 'Chennai',
+      rating: 5,
+      date: '2026-08-12',
+      title: 'Non-greasy in humid Chennai weather',
+      review: 'I thought 5 ceramides would feel heavy in humidity, but this cream sinks in instantly with a velvety matte-dewy finish. Great under makeup too!',
+      verified: true,
+      helpful: 35,
+      productName: 'Hydrating Moisturizer',
+      productCategory: 'moisturizer',
+      skinType: 'Combination'
+    },
+    {
+      id: 'rev-sunscreen-1',
+      author: 'Sneha Patel',
+      location: 'Ahmedabad',
+      rating: 5,
+      date: '2026-08-20',
+      title: 'Zero white cast, genuinely invisible!',
+      review: 'As someone with deeper Indian skin, every sunscreen turned me purple or chalky. This one blends completely transparent in seconds and never stings my eyes in the sun.',
+      verified: true,
+      helpful: 89,
+      productName: 'Ray Barrier Sunscreen',
+      productCategory: 'sunscreen',
+      skinType: 'Warm Wheatish'
+    },
+    {
+      id: 'rev-sunscreen-2',
+      author: 'Aditya Kapoor',
+      location: 'Pune',
+      rating: 5,
+      date: '2026-08-07',
+      title: 'Sweat-resistant and matte',
+      review: 'Does not clog pores or make my face sweaty during morning gym or commute. Best SPF 50+ mineral veil I have used in India.',
+      verified: true,
+      helpful: 41,
+      productName: 'Ray Barrier Sunscreen',
+      productCategory: 'sunscreen',
+      skinType: 'Oily & Acne-Prone'
+    }
+  ],
+  sectionContent: {
+    marqueeAnnouncements: [
+      '• 72H DEEP DEWY MOISTURE',
+      '• 5 BARRIER CERAMIDES',
+      '• ZERO WHITE CAST ON INDIAN SKIN',
+      '• CLINICALLY PROVEN TO SOOTHE SENSITIZED BARRIERS',
+      '• DERMATOLOGIST FORMULATED & TESTED',
+      '• SOAP-FREE GENTLE AMINO CLEANSING'
+    ],
+    routineBadge: 'The Daily Routine',
+    routineHeading: 'The 3 Everyday Essentials',
+    routineDescription: 'Everything your skin needs every single morning: a gentle foaming wash, deep barrier moisturizer, and a completely invisible sunscreen.',
+    clinicalBadge: 'Real Results & Customer Love',
+    clinicalHeading: 'Doctor Tested.',
+    clinicalHeadingHighlight: 'Loved by Indian Skin.',
+    clinicalDescription: 'See how our 3 daily formulas soothe sensitized barriers, deliver 72-hour dewy bounce, and leave zero white cast in hot, humid weather.',
+    standardsBadge: 'The Holy Grail Promise',
+    standardsHeading: 'Gentle Ingredients. Real Glowing Skin.',
+    standardsDescription: 'Every daily formula is crafted to care for your skin barrier—comfortingly rich, non-sticky, and made specifically for Indian weather.',
+    standardsPillars: [
+      {
+        id: 'pillar-1',
+        title: '5 Barrier Ceramides',
+        description: 'Matches your skin’s natural lipid layer to lock in deep hydration for 72 hours without feeling heavy or oily.',
+        icon: 'droplet'
+      },
+      {
+        id: 'pillar-2',
+        title: '100% Invisible Sunscreen',
+        description: 'Melts completely clear on all Indian skin tones with SPF 50+ broad spectrum defense and zero patchy white cast.',
+        icon: 'sun'
+      },
+      {
+        id: 'pillar-3',
+        title: 'Gentle Cloud Cleansing',
+        description: 'Silk-amino bubbles wash away dirt, city pollution, and stubborn sunscreen while leaving skin soft and refreshed.',
+        icon: 'shield'
+      },
+      {
+        id: 'pillar-4',
+        title: 'Toxin & Irritant Free',
+        description: 'Zero pore-clogging silicones, zero artificial fragrance, cruelty-free, and safe for sensitive or acne-prone skin.',
+        icon: 'heart'
+      }
+    ],
+    vipBadge: 'Sacred Inner Circle',
+    vipHeading: 'Reserve Priority Allocation for New Batches',
+    vipDescription: 'Join our private circle to receive limited small-batch reserve access, complimentary travel miniatures, and invitations to clinical trials.',
+    footerDescription: 'CARE-A Beauty Solution is an Indian clinical dermatology brand formulating biomimetic barrier skincare calibrated for tropical climates and melanin-rich skin.',
+    supportEmail: 'care@careabeautysolution.com',
+    supportPhone: '+91 (080) 4567-8900',
+    officeAddress: 'CARE-A Beauty Laboratories, Indiranagar 100ft Road, Bengaluru, Karnataka 560038'
+  },
+  updatedAt: new Date().toISOString()
+};

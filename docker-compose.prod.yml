@@ -1,0 +1,16 @@
+name: care-a-prod
+
+services:
+  care_a_prod:
+    image: ${IMAGE_NAME:-ghcr.io/satish1134/care-a-beauty-solution}:main
+    container_name: care_a_prod
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - /opt/care-a/prod/data:/app/data
+    environment:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: "1"
+      HOSTNAME: 127.0.0.1
+      PORT: "3001"
+

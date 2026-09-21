@@ -1,0 +1,24 @@
+{
+  "title": "Care Beauty - Security Events & Threat Metrics",
+  "tags": ["care-beauty", "security", "waf"],
+  "panels": [
+    {
+      "title": "Rate Limited Requests (HTTP 429)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 0 },
+      "targets": [{ "expr": "sum(rate(http_requests_total{status='429'}[1m]))" }]
+    },
+    {
+      "title": "Authentication Failures (LOGIN_FAILED)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 0 },
+      "targets": [{ "expr": "sum(rate(care_security_events_total{type='LOGIN_FAILED'}[5m]))" }]
+    },
+    {
+      "title": "Cloudflare WAF Threat Blocks",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 0 },
+      "targets": [{ "expr": "sum(rate(cloudflare_zones_threats_total[5m]))" }]
+    }
+  ]
+}
