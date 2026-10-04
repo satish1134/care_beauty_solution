@@ -51,10 +51,25 @@ function Storefront() {
   const [error, setError] = useState('');
   const [bundleNotice, setBundleNotice] = useState(false);
 
+  // Option 2: Pure Luxury Monolith (Permanent All-Black Luxury Theme)
+  const isDarkHeader = true;
+  const isDarkFooter = true;
+
   // Dynamic CMS State
   const [heroConfig, setHeroConfig] = useState<HeroCmsConfig | null>(null);
   const [productsList, setProductsList] = useState<Product[]>(CORE_PRODUCTS);
   const [storefrontCms, setStorefrontCms] = useState<StorefrontCmsData>(INITIAL_STOREFRONT_CMS);
+
+  // Logo sources and dimensions from CMS (Admin uploads & customizations)
+  const cmsSection = storefrontCms?.sectionContent;
+  const customHeaderLogo = cmsSection?.headerLogoUrl;
+  const customFooterLogo = cmsSection?.footerLogoUrl;
+  const headerLogoHeight = cmsSection?.headerLogoHeight || 54;
+  const footerLogoHeight = cmsSection?.footerLogoHeight || 64;
+
+  // Solid black luxury branding for Option 2
+  const headerLogoSrc = customHeaderLogo || '/images/logos/logo_sample1_black.png';
+  const footerLogoSrc = customFooterLogo || '/images/logos/logo_sample1_black.png';
 
   // Fetch CMS data on mount
   useEffect(() => {
@@ -229,14 +244,14 @@ function Storefront() {
 
   return (
     <main className="min-h-screen bg-[#FBF9F5] text-[#1C1917] selection:bg-[#EAE2D2] selection:text-[#1C1917] pb-16 md:pb-0">
-      {/* 1. TOP ANNOUNCEMENT BAR */}
-      <div className="bg-[#3e3a44] border-b border-[#5c5765] px-3 sm:px-4 py-1.5 sm:py-2 text-center text-[10px] sm:text-[11px] font-mono tracking-wider sm:tracking-widest text-[#E5B85C] uppercase flex items-center justify-center gap-1.5 sm:gap-2 select-none">
+      {/* 1. TOP ANNOUNCEMENT BAR (PURE LUXURY MONOLITH) */}
+      <div className="px-3 sm:px-4 py-1.5 sm:py-2 text-center text-[10px] sm:text-[11px] font-mono tracking-wider sm:tracking-widest uppercase flex items-center justify-center gap-1.5 sm:gap-2 select-none border-b bg-[#110F0E] text-[#E5B85C] border-[#2C2724]">
         <Sparkles size={11} className="text-[#E5B85C] shrink-0" />
         <span className="truncate sm:whitespace-normal">Complimentary Express Dispatch on The 3-Step Sacred Ritual • 100% Zero White Cast Guaranteed</span>
       </div>
 
       {/* 2. EDITORIAL NAVIGATION BAR WITH SEAMLESS MATCHED BACKGROUND */}
-      <header className="sticky top-0 z-40 backdrop-blur-md bg-[#4f4b55] border-b border-[#3c3942] transition-all shadow-lg">
+      <header className="sticky top-0 z-40 backdrop-blur-md border-b bg-black/95 border-[#27272A] text-white shadow-xl">
         {/* ROW 1: MOBILE MENU BUTTON + LOGO + DESKTOP SEARCH + QUICK ACTIONS */}
         <div className="max-w-7xl mx-auto px-3 sm:px-6 md:px-12 py-2 sm:py-3 flex items-center justify-between gap-2 sm:gap-4 lg:gap-6">
           <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
@@ -244,7 +259,11 @@ function Storefront() {
             <button
               type="button"
               onClick={() => setIsMobileMenuOpen(true)}
-              className="p-1.5 sm:p-2 -ml-1 text-[#DDD7CB] hover:text-[#F3CA74] hover:bg-white/10 rounded-full transition lg:hidden cursor-pointer"
+              className={`p-1.5 sm:p-2 -ml-1 rounded-full transition lg:hidden cursor-pointer ${
+                isDarkHeader
+                  ? 'text-[#DDD7CB] hover:text-[#F3CA74] hover:bg-white/10'
+                  : 'text-[#1C1917] hover:text-[#C49B45] hover:bg-stone-100'
+              }`}
               aria-label="Open navigation menu"
             >
               <Menu size={22} />
@@ -252,11 +271,19 @@ function Storefront() {
 
             {/* Brand Logo */}
             <a href="#top" className="flex items-center group py-0.5 shrink-0" title="CARE-A Beauty Solution">
-              <div className="relative h-8 sm:h-11 md:h-13 w-32 sm:w-44 md:w-56">
+              <div
+                className="relative transition-all duration-200 max-h-[46px] sm:max-h-none"
+                style={{
+                  height: `${headerLogoHeight}px`,
+                  width: `${Math.round(headerLogoHeight * 3.1)}px`,
+                  maxWidth: 'min(300px, 60vw)'
+                }}
+              >
                 <Image
-                  src="/images/header.png"
+                  src={headerLogoSrc}
                   alt="CARE-A Beauty Solution"
                   fill
+                  sizes="(max-width: 640px) 190px, 300px"
                   className="object-contain object-left transition-transform duration-300 group-hover:scale-[1.02]"
                   priority
                   referrerPolicy="no-referrer"
@@ -280,14 +307,23 @@ function Storefront() {
                 value={filters.searchQuery}
                 onChange={(e) => handleFilterChange({ searchQuery: e.target.value })}
                 placeholder="Search cleanser, moisturizer, sunscreen, ceramides..."
-                className="w-full pl-9 sm:pl-10 pr-8 sm:pr-9 py-2 sm:py-2.5 rounded-full bg-[#2c2833] border border-[#777180] text-white placeholder-[#DDD7CB] text-xs sm:text-sm font-medium focus:outline-none focus:border-[#F3CA74] focus:ring-2 focus:ring-[#F3CA74]/40 transition shadow-inner"
+                className={`w-full pl-9 sm:pl-10 pr-8 sm:pr-9 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium focus:outline-none transition shadow-inner ${
+                  isDarkHeader
+                    ? 'bg-[#1C1917] border border-[#3F3A35] text-white placeholder-stone-400 focus:border-[#E5B85C] focus:ring-2 focus:ring-[#E5B85C]/30'
+                    : 'bg-[#F7F5F0] border border-[#DDD7CD] text-stone-900 placeholder-stone-400 focus:bg-white focus:border-[#C49B45] focus:ring-2 focus:ring-[#C49B45]/20'
+                }`}
               />
-              <Search size={15} className="absolute left-3 text-[#F3CA74] pointer-events-none" />
+              <Search
+                size={15}
+                className={`absolute left-3 pointer-events-none ${
+                  isDarkHeader ? 'text-[#E5B85C]' : 'text-[#C49B45]'
+                }`}
+              />
               {filters.searchQuery && (
                 <button
                   type="button"
                   onClick={() => handleFilterChange({ searchQuery: '' })}
-                  className="absolute right-2.5 text-[#DDD7CB] hover:text-white p-1 rounded-full hover:bg-white/10 cursor-pointer"
+                  className="absolute right-2.5 text-stone-400 hover:text-stone-700 p-1 rounded-full hover:bg-stone-200 cursor-pointer"
                   title="Clear search"
                 >
                   <X size={13} />
@@ -302,28 +338,42 @@ function Storefront() {
             <button
               type="button"
               onClick={openProfile}
-              className="flex items-center gap-1.5 p-2 sm:px-3 sm:py-2 rounded-full text-white hover:text-[#F3CA74] hover:bg-[#3c3842] border border-transparent hover:border-[#635e6b]/60 transition cursor-pointer"
+              className={`flex items-center gap-1.5 p-2 sm:px-3 sm:py-2 rounded-full border border-transparent transition cursor-pointer ${
+                isDarkHeader
+                  ? 'text-stone-300 hover:text-[#E5B85C] hover:bg-stone-900'
+                  : 'text-stone-700 hover:text-[#C49B45] hover:bg-stone-100'
+              }`}
               title="Track Order & Express Delivery"
               aria-label="Track Order"
             >
-              <Truck size={17} className="text-[#F3CA74]" />
-              <span className="hidden xl:inline text-xs font-semibold tracking-wide text-white">Track</span>
+              <Truck size={17} className={isDarkHeader ? 'text-[#E5B85C]' : 'text-[#C49B45]'} />
+              <span className={`hidden xl:inline text-xs font-semibold tracking-wide ${isDarkHeader ? 'text-white' : 'text-stone-800'}`}>
+                Track
+              </span>
             </button>
 
             {/* Shopping Bag with Live Badge */}
             <button
               type="button"
               onClick={openCart}
-              className="relative flex items-center gap-1.5 p-2 sm:px-3.5 sm:py-2 rounded-full bg-[#2c2833] hover:bg-[#221e28] border border-[#777180] hover:border-[#F3CA74] text-white transition shadow-sm cursor-pointer"
+              className={`relative flex items-center gap-1.5 p-2 sm:px-3.5 sm:py-2 rounded-full transition shadow-xs cursor-pointer ${
+                isDarkHeader
+                  ? 'bg-[#1C1917] hover:bg-black border border-stone-700 hover:border-[#E5B85C] text-[#E5B85C]'
+                  : 'bg-stone-100 hover:bg-stone-200 border border-stone-200 hover:border-[#C49B45] text-stone-900'
+              }`}
               title="Shopping Bag"
               aria-label="Shopping Bag"
             >
-              <ShoppingBag size={16} className="text-[#F3CA74]" />
-              <span className="hidden sm:inline text-xs font-bold uppercase tracking-wider text-[#F3CA74]">
+              <ShoppingBag size={16} className={isDarkHeader ? 'text-[#E5B85C]' : 'text-[#C49B45]'} />
+              <span className={`hidden sm:inline text-xs font-bold uppercase tracking-wider ${isDarkHeader ? 'text-[#E5B85C]' : 'text-stone-900'}`}>
                 Bag
               </span>
               {totalItemCount > 0 && (
-                <span className="w-5 h-5 rounded-full bg-[#F3CA74] text-[#1C1917] text-[10px] font-mono flex items-center justify-center font-black shadow-xs">
+                <span
+                  className={`w-5 h-5 rounded-full text-[10px] font-mono flex items-center justify-center font-black shadow-xs ${
+                    isDarkHeader ? 'bg-[#E5B85C] text-[#1C1917]' : 'bg-[#1C1917] text-[#E5B85C]'
+                  }`}
+                >
                   {totalItemCount}
                 </span>
               )}
@@ -333,7 +383,11 @@ function Storefront() {
             <button
               type="button"
               onClick={openProfile}
-              className="flex items-center gap-1.5 p-2 sm:px-3 sm:py-2 rounded-full border border-[#F3CA74]/70 bg-[#2c2833] hover:bg-[#221e28] text-xs font-bold tracking-wider text-[#F3CA74] transition shadow-xs cursor-pointer"
+              className={`flex items-center gap-1.5 p-2 sm:px-3 sm:py-2 rounded-full text-xs font-bold tracking-wider transition shadow-xs cursor-pointer ${
+                isDarkHeader
+                  ? 'border border-[#E5B85C]/70 bg-[#1C1917] hover:bg-black text-[#E5B85C]'
+                  : 'border border-[#C49B45]/50 bg-stone-100 hover:bg-stone-200 text-stone-900'
+              }`}
               title={user ? `Signed in as ${user.name}` : 'Login / Account'}
               aria-label="User Profile"
             >
@@ -360,14 +414,23 @@ function Storefront() {
               value={filters.searchQuery}
               onChange={(e) => handleFilterChange({ searchQuery: e.target.value })}
               placeholder="Search cleanser, moisturizer, sunscreen..."
-              className="w-full pl-9 pr-8 py-2 rounded-full bg-[#2c2833] border border-[#777180] text-white placeholder-[#DDD7CB] text-xs font-medium focus:outline-none focus:border-[#F3CA74] transition shadow-inner"
+              className={`w-full pl-9 pr-8 py-2 rounded-full text-xs font-medium focus:outline-none transition shadow-inner ${
+                isDarkHeader
+                  ? 'bg-[#1C1917] border border-[#3F3A35] text-white placeholder-stone-400 focus:border-[#E5B85C]'
+                  : 'bg-[#F7F5F0] border border-[#DDD7CD] text-stone-900 placeholder-stone-400 focus:bg-white focus:border-[#C49B45]'
+              }`}
             />
-            <Search size={14} className="absolute left-3 text-[#F3CA74] pointer-events-none" />
+            <Search
+              size={14}
+              className={`absolute left-3 pointer-events-none ${
+                isDarkHeader ? 'text-[#E5B85C]' : 'text-[#C49B45]'
+              }`}
+            />
             {filters.searchQuery && (
               <button
                 type="button"
                 onClick={() => handleFilterChange({ searchQuery: '' })}
-                className="absolute right-2.5 text-[#DDD7CB] hover:text-white p-1 rounded-full cursor-pointer"
+                className="absolute right-2.5 text-stone-400 hover:text-stone-700 p-1 rounded-full cursor-pointer"
               >
                 <X size={12} />
               </button>
@@ -605,47 +668,76 @@ function Storefront() {
         </div>
       </section>
 
-      {/* 9. EDITORIAL FOOTER WITH OFFICIAL HEADER LOGO */}
-      <footer className="border-t border-[#3c3842] bg-[#47434d] px-5 md:px-12 py-12 text-xs text-[#F5EFE6]">
+      {/* 9. EDITORIAL FOOTER WITH SEAMLESS LOGO MATCH */}
+      <footer
+        className={`border-t px-5 md:px-12 py-12 text-xs transition-colors duration-300 ${
+          isDarkFooter
+            ? 'border-stone-800 bg-black text-[#D6D3D1]'
+            : 'border-[#EAE5DB] bg-white text-stone-600'
+        }`}
+      >
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
           <div>
-            <div className="relative h-14 md:h-16 w-60 md:w-80 mb-4">
+            <div
+              className="relative mb-4 transition-all duration-200"
+              style={{
+                height: `${footerLogoHeight}px`,
+                width: `${footerLogoHeight * 3.6}px`,
+                maxWidth: '320px'
+              }}
+            >
               <Image
-                src="/images/header.png"
+                src={footerLogoSrc}
                 alt="CARE-A Beauty Solution"
                 fill
                 className="object-contain object-left"
                 referrerPolicy="no-referrer"
               />
             </div>
-            <p className="text-xs text-[#F5EFE6] leading-relaxed">
+            <p className={`text-xs leading-relaxed ${isDarkFooter ? 'text-[#D6D3D1]' : 'text-stone-600'}`}>
               {storefrontCms?.sectionContent?.footerDescription ||
                 'Bio-compatible dermatological skincare designed to restore, replenish, and protect the cellular barrier.'}
             </p>
           </div>
 
           <div>
-            <h5 className="font-mono font-black text-[#F3CA74] uppercase tracking-wider text-xs mb-3">
+            <h5
+              className={`font-mono font-black uppercase tracking-wider text-xs mb-3 ${
+                isDarkFooter ? 'text-[#E5B85C]' : 'text-[#854D0E]'
+              }`}
+            >
               The Core Trio
             </h5>
             <ul className="space-y-2.5 font-medium">
               <li>
-                <a href="#products" className="text-[#F5EFE6] hover:text-[#F3CA74] transition">
+                <a
+                  href="#products"
+                  className={`transition ${isDarkFooter ? 'text-[#D6D3D1] hover:text-[#E5B85C]' : 'text-stone-600 hover:text-[#854D0E]'}`}
+                >
                   Refreshing Skin Cleanser (120ml)
                 </a>
               </li>
               <li>
-                <a href="#products" className="text-[#F5EFE6] hover:text-[#F3CA74] transition">
+                <a
+                  href="#products"
+                  className={`transition ${isDarkFooter ? 'text-[#D6D3D1] hover:text-[#E5B85C]' : 'text-stone-600 hover:text-[#854D0E]'}`}
+                >
                   Hydrating Moisturizer (50g)
                 </a>
               </li>
               <li>
-                <a href="#products" className="text-[#F5EFE6] hover:text-[#F3CA74] transition">
+                <a
+                  href="#products"
+                  className={`transition ${isDarkFooter ? 'text-[#D6D3D1] hover:text-[#E5B85C]' : 'text-stone-600 hover:text-[#854D0E]'}`}
+                >
                   Ray Barrier Sunscreen (100ml)
                 </a>
               </li>
               <li>
-                <a href="#products" className="hover:text-[#F3CA74] transition text-[#F3CA74] font-bold">
+                <a
+                  href="#products"
+                  className={`transition font-bold ${isDarkFooter ? 'text-[#E5B85C] hover:underline' : 'text-[#854D0E] hover:underline'}`}
+                >
                   The 3-Step Protocol Bundle (Save 15%)
                 </a>
               </li>
@@ -653,7 +745,11 @@ function Storefront() {
           </div>
 
           <div>
-            <h5 className="font-mono font-black text-[#F3CA74] uppercase tracking-wider text-xs mb-3">
+            <h5
+              className={`font-mono font-black uppercase tracking-wider text-xs mb-3 ${
+                isDarkFooter ? 'text-[#E5B85C]' : 'text-[#854D0E]'
+              }`}
+            >
               Official Marketplace Stores
             </h5>
             <div className="flex flex-col gap-2">
@@ -661,21 +757,34 @@ function Storefront() {
                 href="https://amazon.in"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 rounded-xl bg-white hover:bg-[#F3EDE2] border border-[#D5CCB8] flex items-center justify-between px-3.5 transition shadow-xs group cursor-pointer"
+                className={`p-2 rounded-xl border flex items-center justify-between px-3.5 transition shadow-xs group cursor-pointer ${
+                  isDarkFooter
+                    ? 'bg-[#110F0E] hover:bg-[#1C1917] border-stone-800'
+                    : 'bg-[#FBF9F5] hover:bg-[#F3EDE2] border-[#D5CCB8]'
+                }`}
                 title="CARE-A on Amazon"
               >
                 <div className="flex items-center gap-2">
-                  <AmazonLogo className="h-4 w-auto" variant="color" />
-                  <span className="text-[11px] font-bold text-[#111827]">Amazon Storefront</span>
+                  <AmazonLogo className="h-4 w-auto" variant={isDarkFooter ? 'white' : 'color'} />
+                  <span className={`text-[11px] font-bold ${isDarkFooter ? 'text-white' : 'text-[#111827]'}`}>
+                    Amazon Storefront
+                  </span>
                 </div>
-                <ExternalLink size={11} className="text-[#78716C] group-hover:text-[#111827]" />
+                <ExternalLink
+                  size={11}
+                  className={isDarkFooter ? 'text-stone-400 group-hover:text-white' : 'text-[#78716C] group-hover:text-[#111827]'}
+                />
               </a>
 
               <a
                 href="https://nykaa.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 rounded-xl bg-white hover:bg-[#FFF1F5] border border-[#D5CCB8] flex items-center justify-between px-3.5 transition shadow-xs group cursor-pointer"
+                className={`p-2 rounded-xl border flex items-center justify-between px-3.5 transition shadow-xs group cursor-pointer ${
+                  isDarkFooter
+                    ? 'bg-[#110F0E] hover:bg-[#1C1917] border-stone-800'
+                    : 'bg-white hover:bg-[#FFF1F5] border-[#D5CCB8]'
+                }`}
                 title="CARE-A on Nykaa"
               >
                 <div className="flex items-center gap-2">
@@ -689,7 +798,11 @@ function Storefront() {
                 href="https://flipkart.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 rounded-xl bg-white hover:bg-[#EFF6FF] border border-[#D5CCB8] flex items-center justify-between px-3.5 transition shadow-xs group cursor-pointer"
+                className={`p-2 rounded-xl border flex items-center justify-between px-3.5 transition shadow-xs group cursor-pointer ${
+                  isDarkFooter
+                    ? 'bg-[#110F0E] hover:bg-[#1C1917] border-stone-800'
+                    : 'bg-white hover:bg-[#EFF6FF] border-[#D5CCB8]'
+                }`}
                 title="CARE-A on Flipkart"
               >
                 <div className="flex items-center gap-2">
@@ -702,40 +815,60 @@ function Storefront() {
           </div>
 
           <div>
-            <h5 className="font-mono font-black text-[#F3CA74] uppercase tracking-wider text-xs mb-3">
+            <h5
+              className={`font-mono font-black uppercase tracking-wider text-xs mb-3 ${
+                isDarkFooter ? 'text-[#E5B85C]' : 'text-[#854D0E]'
+              }`}
+            >
               Dermatological Care
             </h5>
-            <p className="text-xs text-[#F5EFE6] leading-relaxed mb-3">
+            <p className={`text-xs leading-relaxed mb-3 ${isDarkFooter ? 'text-[#D6D3D1]' : 'text-stone-600'}`}>
               Have questions regarding your skin type or protocol formulation?
             </p>
             <a
               href="mailto:care@careabeautysolution.com"
-              className="font-mono text-[#F3CA74] font-bold hover:underline block mb-2"
+              className={`font-mono font-bold hover:underline block mb-2 ${
+                isDarkFooter ? 'text-[#E5B85C]' : 'text-[#854D0E]'
+              }`}
             >
               care@careabeautysolution.com
             </a>
             <button
               onClick={openProfile}
-              className="text-[11px] font-mono text-[#F3CA74] hover:text-white transition font-bold underline cursor-pointer"
+              className={`text-[11px] font-mono hover:underline transition font-bold cursor-pointer ${
+                isDarkFooter ? 'text-[#E5B85C]' : 'text-[#854D0E]'
+              }`}
             >
-              Client Portal & Past Orders →
+              Client Portal &amp; Past Orders →
             </button>
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto pt-8 border-t border-[#635e6b]/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-[#F5EFE6]">
+        <div
+          className={`max-w-7xl mx-auto pt-8 border-t flex flex-col sm:flex-row items-center justify-between gap-4 ${
+            isDarkFooter ? 'border-stone-800 text-stone-400' : 'border-[#EAE5DB] text-stone-500'
+          }`}
+        >
           <p>© {new Date().getFullYear()} CARE-A Beauty Solution Ltd. All rights reserved.</p>
           <div className="flex items-center gap-6 font-medium">
-            <a href="#privacy" className="hover:text-white transition">Privacy Policy</a>
-            <a href="#terms" className="hover:text-white transition">Terms of Service</a>
+            <a href="#privacy" className="hover:text-stone-900 dark:hover:text-white transition">Privacy Policy</a>
+            <a href="#terms" className="hover:text-stone-900 dark:hover:text-white transition">Terms of Service</a>
             <a
               href="/admin"
-              className="text-[#F3CA74] hover:underline font-mono text-xs flex items-center gap-1 font-bold"
+              className={`hover:underline font-mono text-xs flex items-center gap-1 font-bold ${
+                isDarkFooter ? 'text-[#E5B85C]' : 'text-[#854D0E]'
+              }`}
             >
               <span>Admin Portal</span>
               <ExternalLink size={11} />
             </a>
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-[#F3CA74] hover:text-white transition" aria-label="Follow us on Instagram">
+            <a
+              href="https://instagram.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`transition ${isDarkFooter ? 'text-[#E5B85C] hover:text-white' : 'text-stone-600 hover:text-stone-900'}`}
+              aria-label="Follow us on Instagram"
+            >
               <Instagram size={18} />
             </a>
           </div>

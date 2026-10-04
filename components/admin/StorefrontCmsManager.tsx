@@ -36,6 +36,7 @@ import {
   SectionContentConfig,
   INITIAL_STOREFRONT_CMS
 } from '@/lib/admin-store';
+import BrandLogoCmsManager from '@/components/admin/BrandLogoCmsManager';
 
 interface StorefrontCmsManagerProps {
   initialData?: StorefrontCmsData;
@@ -44,7 +45,7 @@ interface StorefrontCmsManagerProps {
 
 export default function StorefrontCmsManager({ initialData, onSaved }: StorefrontCmsManagerProps) {
   const [data, setData] = useState<StorefrontCmsData>(initialData || INITIAL_STOREFRONT_CMS);
-  const [activeTab, setActiveTab] = useState<'doctors' | 'stories' | 'reviews' | 'sections'>('doctors');
+  const [activeTab, setActiveTab] = useState<'logos' | 'doctors' | 'stories' | 'reviews' | 'sections'>('logos');
   const [isLoading, setIsLoading] = useState<boolean>(!initialData);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
@@ -310,6 +311,19 @@ export default function StorefrontCmsManager({ initialData, onSaved }: Storefron
       <div className="flex items-center gap-2 overflow-x-auto pb-1 border-b border-white/10 no-scrollbar">
         <button
           type="button"
+          onClick={() => setActiveTab('logos')}
+          className={`px-4 py-2.5 rounded-xl text-xs font-mono uppercase font-bold tracking-wider transition cursor-pointer flex items-center gap-2 whitespace-nowrap ${
+            activeTab === 'logos'
+              ? 'bg-[#E5B85C] text-[#1C1917] shadow-sm'
+              : 'text-[#E8E2D5]/70 hover:text-[#FAF8F5] hover:bg-white/5'
+          }`}
+        >
+          <Sparkles size={14} />
+          <span>Brand Logos &amp; Sizing</span>
+        </button>
+
+        <button
+          type="button"
           onClick={() => setActiveTab('doctors')}
           className={`px-4 py-2.5 rounded-xl text-xs font-mono uppercase font-bold tracking-wider transition cursor-pointer flex items-center gap-2 whitespace-nowrap ${
             activeTab === 'doctors'
@@ -360,6 +374,20 @@ export default function StorefrontCmsManager({ initialData, onSaved }: Storefron
           <span>Storefront Copy & Marquee</span>
         </button>
       </div>
+
+      {/* ========================================================================= */}
+      {/* TAB 0: BRAND LOGOS & IDENTITY CUSTOMIZER */}
+      {/* ========================================================================= */}
+      {activeTab === 'logos' && (
+        <BrandLogoCmsManager
+          storefrontCms={data}
+          onUpdate={(updated) => setData(updated)}
+          onSave={handleSaveAll}
+          isSaving={isSaving}
+          saveStatus={saveStatus}
+          errorMessage={errorMessage}
+        />
+      )}
 
       {/* ========================================================================= */}
       {/* TAB 1: DOCTOR TESTIMONIALS & CLINICAL TRIALS */}

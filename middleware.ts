@@ -5,12 +5,16 @@ export function middleware(request: NextRequest) {
   const host = request.headers.get('host') || '';
   const pathname = request.nextUrl.pathname;
 
-  // 1. Host: dev.careabeautysolution.com / dev.carebeautysolution.com
-  if (host.startsWith('dev.')) {
-    // When visiting dev domain, serve routes directly:
-    // - / -> Developing Storefront for clients & team to preview progress
-    // - /admin -> Dev Admin Portal (with login prompt & dev schema default credentials)
-    // - /dev/sql-studio -> Developer SQL Studio
+  // 1. Development & Preview environments (localhost, Cloud Run ais-dev preview, dev subdomain)
+  // Always allow direct access to /admin and all routes without redirecting externally!
+  const isDevOrPreview =
+    host.includes('localhost') ||
+    host.includes('127.0.0.1') ||
+    host.includes('run.app') ||
+    host.includes('ais-') ||
+    host.startsWith('dev.');
+
+  if (isDevOrPreview) {
     const response = NextResponse.next();
     response.headers.set('X-Care-Environment', 'Development-Staging');
     return response;
@@ -29,17 +33,22 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // 3. Main Production Storefront (carebeautysolution.com, www.carebeautysolution.com, etc.)
-  // Route /admin on production storefront to the dedicated production admin portal domain!
-  if (pathname === '/admin' || pathname.startsWith('/admin/')) {
+  // 3. Main Custom Production Storefront (carebeautysolution.com, www.carebeautysolution.com)
+  const isCustomProduction =
+    host === 'carebeautysolution.com' ||
+    host === 'www.carebeautysolution.com' ||
+    host === 'careabeautysolution.com' ||
+    host === 'www.careabeautysolution.com';
+
+  if (isCustomProduction && (pathname === '/admin' || pathname.startsWith('/admin/'))) {
     const adminHost = host.includes('careabeautysolution.com')
       ? 'admin.careabeautysolution.com'
       : 'admin.carebeautysolution.com';
     return NextResponse.redirect(new URL(`https://${adminHost}/`));
   }
 
-  // Strictly isolate developer tools: block /dev routes so SQL Studio NEVER exists in production!
-  if (pathname.startsWith('/dev')) {
+  // Strictly isolate developer tools: block /dev routes in custom production
+  if (isCustomProduction && pathname.startsWith('/dev')) {
     return new NextResponse('Not Found', { status: 404 });
   }
 

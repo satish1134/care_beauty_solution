@@ -62,12 +62,14 @@ export default function MobileMenuDrawer({
           >
             {/* Header / Brand & Close */}
             <div className="p-4 border-b border-[#433e4b] flex items-center justify-between bg-[#383340]">
-              <div className="relative h-10 w-40">
+              <div className="relative h-11 w-44">
                 <Image
-                  src="/images/header.png"
+                  src="/images/logos/logo_sample1_black.png"
                   alt="CARE-A Beauty Solution"
                   fill
                   className="object-contain object-left"
+                  priority
+                  referrerPolicy="no-referrer"
                 />
               </div>
               <button

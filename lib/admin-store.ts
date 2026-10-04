@@ -873,6 +873,16 @@ export interface SectionContentConfig {
   vipHeading: string;
   vipDescription: string;
 
+  // Brand Logo & Appearance Customization
+  headerLogoUrl?: string;
+  headerLogoHeight?: number; // Height in pixels (e.g. 36-72px)
+  headerBgMode?: 'white' | 'black' | 'custom';
+  headerBgCustom?: string;
+  footerLogoUrl?: string;
+  footerLogoHeight?: number; // Height in pixels (e.g. 40-90px)
+  footerBgMode?: 'black' | 'white' | 'custom';
+  footerBgCustom?: string;
+
   // Footer & Brand Details
   footerDescription: string;
   supportEmail: string;
@@ -1108,6 +1118,14 @@ export const INITIAL_STOREFRONT_CMS: StorefrontCmsData = {
     vipBadge: 'Sacred Inner Circle',
     vipHeading: 'Reserve Priority Allocation for New Batches',
     vipDescription: 'Join our private circle to receive limited small-batch reserve access, complimentary travel miniatures, and invitations to clinical trials.',
+    headerLogoUrl: '/images/logos/logo_sample1_black.png',
+    headerLogoHeight: 54,
+    headerBgMode: 'black',
+    headerBgCustom: '#000000',
+    footerLogoUrl: '/images/logos/logo_sample1_black.png',
+    footerLogoHeight: 64,
+    footerBgMode: 'black',
+    footerBgCustom: '#000000',
     footerDescription: 'CARE-A Beauty Solution is an Indian clinical dermatology brand formulating biomimetic barrier skincare calibrated for tropical climates and melanin-rich skin.',
     supportEmail: 'care@careabeautysolution.com',
     supportPhone: '+91 (080) 4567-8900',
